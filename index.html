@@ -235,8 +235,8 @@
             <button id="btnAdd" class="btn-add">+ Добавить вопрос в эту базу</button>
             
             <div class="db-file-actions">
-                <button class="btn-file-action" id="btnExport" title="Скачать файл базы данных">💾 Скачать базу</button>
-                <button class="btn-file-action" id="btnImport" title="Загрузить файл базы данных с компьютера">📂 Загрузить файл</button>
+                <button class="btn-file-action" id="btnExport" title="Скачать базу в файл">💾 Скачать</button>
+                <button class="btn-file-action" id="btnImport" title="Загрузить базу из файла">📂 Загрузить</button>
                 <input type="file" id="filePicker" accept=".json" style="display: none;" multiple>
             </div>
         </div>
@@ -262,6 +262,33 @@
     </div>
 
     <script>
+        // ==========================================
+        // ВСТРОЕННАЯ БАЗА ДАННЫХ (ПРИЛЕТАЕТ ВСЕМ ЧЕРЕЗ GITHUB)
+        // Вы можете добавлять сюда вопросы прямо в коде, 
+        // и они автоматически появятся у всех на домене!
+        // ==========================================
+        const INITIAL_PROJECT_DATABASES = {
+            "Основная база": [
+                { 
+                    id: "1710000000001", 
+                    title: "Пример вопроса 1", 
+                    text: "Это текст ответа по умолчанию. Он будет виден у всех пользователей на домене." 
+                },
+                { 
+                    id: "1710000000002", 
+                    title: "Пример вопроса 2", 
+                    text: "Вы можете изменить или дополнить этот список прямо в коде index.html перед отправкой в Git." 
+                }
+            ],
+            "Вторая база (Тест)": [
+                { 
+                    id: "1710000000003", 
+                    title: "Вопрос из второй базы", 
+                    text: "Пример содержимого дополнительной встроенной базы данных." 
+                }
+            ]
+        };
+
         const searchBox = document.getElementById('searchBox');
         const questionsList = document.getElementById('questionsList');
         const rightPane = document.getElementById('rightPane');
@@ -308,20 +335,17 @@
             });
         }
 
-        const ALL_DBS_KEY = 'spy_all_databases_registry';
-        const ACTIVE_DB_KEY = 'spy_active_database_name';
+        const ALL_DBS_KEY = 'spy_project_databases_v2';
+        const ACTIVE_DB_KEY = 'spy_active_database_name_v2';
 
         function getAllDatabases() {
             const data = localStorage.getItem(ALL_DBS_KEY);
-            if (data) { try { return JSON.parse(data); } catch(e) {} }
-            // Базовый дефолтный набор, если ничего не найдено
-            const defaultDbs = { 
-                "Основная база": [
-                    { id: "1", title: "Пример вопроса", text: "Здесь будет находиться текст ответа или информации." }
-                ] 
-            };
-            saveAllDatabases(defaultDbs);
-            return defaultDbs;
+            if (data) { 
+                try { return JSON.parse(data); } catch(e) {} 
+            }
+            // Если у пользователя на ПК пусто, подтягиваем встроенную в проект базу
+            saveAllDatabases(INITIAL_PROJECT_DATABASES);
+            return INITIAL_PROJECT_DATABASES;
         }
 
         function saveAllDatabases(dbs) { localStorage.setItem(ALL_DBS_KEY, JSON.stringify(dbs)); }

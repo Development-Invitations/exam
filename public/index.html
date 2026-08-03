@@ -321,8 +321,9 @@
                 serverFilesList = await res.json();
                 
                 if (serverFilesList.length === 0) {
-                    // Если папка пуста, создадим автоматически дефолтную базу
-                    await saveDatabaseToServer('baza.json', []);
+                    // Если баз нет, создадим автоматически дефолтную базу
+                    const ok = await saveDatabaseToServer('baza.json', []);
+                    if (!ok) return; // не повторяем бесконечно при ошибке сервера
                     return fetchDatabases();
                 }
 
@@ -351,13 +352,19 @@
 
         async function saveDatabaseToServer(filename, data) {
             try {
-                await fetch('/api/dbs', {
+                const res = await fetch('/api/dbs', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: filename, data: data })
                 });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error || `Ошибка сервера (${res.status})`);
+                }
+                return true;
             } catch (err) {
-                alert('Не удалось сохранить на сервер');
+                alert('Не удалось сохранить на сервер: ' + err.message);
+                return false;
             }
         }
 
@@ -492,9 +499,12 @@
             const text = textInput.value.trim();
             if (!title || !text) { await showModal({ title: 'Внимание', desc: 'Заполните поля!', type: 'alert' }); return; }
 
-            currentDbData.push({ id: Date.now().toString(), title, text });
-            await saveDatabaseToServer(activeDbName, currentDbData);
-            
+            const newItem = { id: Date.now().toString(), title, text };
+            const previousData = currentDbData;
+            currentDbData = [...currentDbData, newItem];
+            const ok = await saveDatabaseToServer(activeDbName, currentDbData);
+            if (!ok) { currentDbData = previousData; return; }
+
             titleInput.value = ''; textInput.value = '';
             renderCurrentDbCards();
             searchBox.focus();
@@ -503,8 +513,10 @@
         // Удалить карточку
         window.deleteCard = async function(id) {
             if (await showModal({ title: 'Удаление', desc: 'Удалить этот вопрос?', type: 'confirm', confirmText: 'Удалить', confirmClass: 'danger' })) {
+                const previousData = currentDbData;
                 currentDbData = currentDbData.filter(item => item.id !== id);
-                await saveDatabaseToServer(activeDbName, currentDbData);
+                const ok = await saveDatabaseToServer(activeDbName, currentDbData);
+                if (!ok) { currentDbData = previousData; return; }
                 renderCurrentDbCards();
             }
         };
@@ -532,13 +544,18 @@
                 reader.onload = async function(event) {
                     try {
                         const json = JSON.parse(event.target.result);
-                        const data = Array.isArray(json) ? json : (json.data || []);
-                        await saveDatabaseToServer(file.name, data);
+                        if (!Array.isArray(json) && !Array.isArray(json.data)) {
+                            alert(`Файл "${file.name}" не содержит массив вопросов (ни в корне, ни в поле "data")`);
+                            return;
+                        }
+                        const data = Array.isArray(json) ? json : json.data;
+                        const ok = await saveDatabaseToServer(file.name, data);
+                        if (!ok) return;
                         activeDbName = file.name.endsWith('.json') ? file.name : file.name + '.json';
                         await fetchDatabases(true);
                         filePicker.value = '';
                     } catch(err) {
-                        alert("Ошибка чтения JSON файла: " + file.name);
+                        alert("Ошибка чтения JSON файла: " + file.name + " — " + err.message);
                     }
                 };
                 reader.readAsText(file);

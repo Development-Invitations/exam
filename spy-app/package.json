@@ -1,0 +1,12 @@
+{
+  "name": "spy-app",
+  "version": "1.0.0",
+  "description": "Spy app with Node.js backend database",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2"
+  }
+}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сайт-шпион с поиском</title>
+    <title>Сайт-шпион с серверной базой</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -54,7 +54,7 @@
             cursor: pointer;
         }
         .btn-small {
-            padding: 8px 12px;
+            padding: 8px 10px;
             background: #334155;
             border: none;
             border-radius: 6px;
@@ -68,6 +68,8 @@
         .btn-small:hover { background: #475569; color: #fff; }
         .btn-small.danger { background: #7f1d1d; color: #fca5a5; }
         .btn-small.danger:hover { background: #991b1b; color: #fff; }
+        .btn-small.refresh { background: #065f46; color: #a7f3d0; }
+        .btn-small.refresh:hover { background: #047857; color: #fff; }
 
         .search-container {
             padding: 12px 15px;
@@ -214,8 +216,8 @@
                 <button class="btn-small" id="btnCreateDb" title="Создать новую базу">+ Создать</button>
             </div>
             <div class="db-header-row">
-                <button class="btn-small" id="btnRenameDb" style="flex:1;">Переименовать</button>
-                <button class="btn-small danger" id="btnDeleteDb" style="flex:1;">Удалить базу</button>
+                <button class="btn-small refresh" id="btnRefresh" title="Обновить список баз с сервера" style="flex:1;">🔄 Обновить базы</button>
+                <button class="btn-small danger" id="btnDeleteDb" style="flex:1;" title="Удалить текущую базу с сервера">Удалить базу</button>
             </div>
         </div>
 
@@ -235,8 +237,8 @@
             <button id="btnAdd" class="btn-add">+ Добавить вопрос в эту базу</button>
             
             <div class="db-file-actions">
-                <button class="btn-file-action" id="btnExport" title="Скачать базу в файл">💾 Скачать</button>
-                <button class="btn-file-action" id="btnImport" title="Загрузить базу из файла">📂 Загрузить</button>
+                <button class="btn-file-action" id="btnExport" title="Скачать текущую базу на ПК">💾 Скачать на ПК</button>
+                <button class="btn-file-action" id="btnImport" title="Загрузить базу с ПК на сервер">📂 Загрузить с ПК</button>
                 <input type="file" id="filePicker" accept=".json" style="display: none;" multiple>
             </div>
         </div>
@@ -262,32 +264,9 @@
     </div>
 
     <script>
-        // ==========================================
-        // ВСТРОЕННАЯ БАЗА ДАННЫХ (ПРИЛЕТАЕТ ВСЕМ ЧЕРЕЗ GITHUB)
-        // Вы можете добавлять сюда вопросы прямо в коде, 
-        // и они автоматически появятся у всех на домене!
-        // ==========================================
-        const INITIAL_PROJECT_DATABASES = {
-            "Основная база": [
-                { 
-                    id: "1710000000001", 
-                    title: "Пример вопроса 1", 
-                    text: "Это текст ответа по умолчанию. Он будет виден у всех пользователей на домене." 
-                },
-                { 
-                    id: "1710000000002", 
-                    title: "Пример вопроса 2", 
-                    text: "Вы можете изменить или дополнить этот список прямо в коде index.html перед отправкой в Git." 
-                }
-            ],
-            "Вторая база (Тест)": [
-                { 
-                    id: "1710000000003", 
-                    title: "Вопрос из второй базы", 
-                    text: "Пример содержимого дополнительной встроенной базы данных." 
-                }
-            ]
-        };
+        let serverFilesList = [];
+        let currentDbData = [];
+        let activeDbName = '';
 
         const searchBox = document.getElementById('searchBox');
         const questionsList = document.getElementById('questionsList');
@@ -335,55 +314,75 @@
             });
         }
 
-        const ALL_DBS_KEY = 'spy_project_databases_v2';
-        const ACTIVE_DB_KEY = 'spy_active_database_name_v2';
+        // Загрузка списка баз с сервера
+        async function fetchDatabases(keepActive = true) {
+            try {
+                const res = await fetch('/api/dbs');
+                serverFilesList = await res.json();
+                
+                if (serverFilesList.length === 0) {
+                    // Если папка пуста, создадим автоматически дефолтную базу
+                    await saveDatabaseToServer('baza.json', []);
+                    return fetchDatabases();
+                }
 
-        function getAllDatabases() {
-            const data = localStorage.getItem(ALL_DBS_KEY);
-            if (data) { 
-                try { return JSON.parse(data); } catch(e) {} 
+                if (!activeDbName || !serverFilesList.includes(activeDbName) || !keepActive) {
+                    activeDbName = serverFilesList[0];
+                }
+
+                updateDbSelectUI();
+                await loadCurrentDbData();
+            } catch (err) {
+                console.error('Ошибка связи с сервером:', err);
             }
-            // Если у пользователя на ПК пусто, подтягиваем встроенную в проект базу
-            saveAllDatabases(INITIAL_PROJECT_DATABASES);
-            return INITIAL_PROJECT_DATABASES;
         }
 
-        function saveAllDatabases(dbs) { localStorage.setItem(ALL_DBS_KEY, JSON.stringify(dbs)); }
-        
-        function getActiveDbName() {
-            let active = localStorage.getItem(ACTIVE_DB_KEY);
-            const dbs = getAllDatabases();
-            if (!active || !dbs[active]) {
-                active = Object.keys(dbs)[0];
-                localStorage.setItem(ACTIVE_DB_KEY, active);
+        async function loadCurrentDbData() {
+            if (!activeDbName) return;
+            try {
+                const res = await fetch(`/api/dbs/${encodeURIComponent(activeDbName)}`);
+                currentDbData = await res.json();
+                renderCurrentDbCards();
+            } catch (err) {
+                currentDbData = [];
+                renderCurrentDbCards();
             }
-            return active;
         }
-        function setActiveDbName(name) { localStorage.setItem(ACTIVE_DB_KEY, name); }
+
+        async function saveDatabaseToServer(filename, data) {
+            try {
+                await fetch('/api/dbs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: filename, data: data })
+                });
+            } catch (err) {
+                alert('Не удалось сохранить на сервер');
+            }
+        }
 
         function updateDbSelectUI() {
-            const dbs = getAllDatabases();
-            const activeName = getActiveDbName();
             dbSelect.innerHTML = '';
-            Object.keys(dbs).forEach(dbName => {
+            serverFilesList.forEach(fileName => {
                 const opt = document.createElement('option');
-                opt.value = dbName;
-                opt.textContent = dbName;
-                if (dbName === activeName) opt.selected = true;
+                opt.value = fileName;
+                opt.textContent = fileName;
+                if (fileName === activeDbName) opt.selected = true;
                 dbSelect.appendChild(opt);
             });
-            dbNameLabel.textContent = `Текущая база: ${activeName} — (Всего вопросов: ${(dbs[activeName] || []).length})`;
-            renderCurrentDbCards();
+            dbNameLabel.textContent = `Текущая база: ${activeNameFormatted()} — (Вопросов: ${currentDbData.length})`;
+        }
+
+        function activeNameFormatted() {
+            return activeDbName ? activeDbName.replace('.json', '') : '—';
         }
 
         function renderCurrentDbCards() {
             Array.from(rightPane.getElementsByClassName('answer-card')).forEach(c => c.remove());
-            const dbs = getAllDatabases();
-            const activeName = getActiveDbName();
-            const cardsData = dbs[activeName] || [];
+            dbNameLabel.textContent = `Текущая база: ${activeNameFormatted()} — (Вопросов: ${currentDbData.length})`;
 
             let emptyState = document.getElementById('emptyState');
-            if (cardsData.length === 0) {
+            if (currentDbData.length === 0) {
                 if (!emptyState) {
                     const placeholder = document.createElement('div');
                     placeholder.id = 'emptyState';
@@ -393,13 +392,13 @@
                 }
             } else {
                 if (emptyState) emptyState.remove();
-                cardsData.forEach((item, index) => {
+                currentDbData.forEach((item, index) => {
                     const newCard = document.createElement('div');
                     newCard.className = 'answer-card';
                     newCard.setAttribute('data-id', item.id);
                     newCard.innerHTML = `
                         <button class="btn-delete" onclick="deleteCard('${item.id}')">Удалить</button>
-                        <div class="answer-header-row"><span class="answer-number">№ ${index + 1} из ${cardsData.length}</span></div>
+                        <div class="answer-header-row"><span class="answer-number">№ ${index + 1} из ${currentDbData.length}</span></div>
                         <div class="answer-title">${escapeHtml(item.title)}</div>
                         <div class="answer-text">${escapeHtml(item.text)}</div>
                     `;
@@ -448,46 +447,44 @@
         }
 
         searchBox.addEventListener('input', applySmartSearch);
-        dbSelect.addEventListener('change', (e) => { setActiveDbName(e.target.value); updateDbSelectUI(); searchBox.value = ''; });
+        
+        dbSelect.addEventListener('change', async (e) => {
+            activeDbName = e.target.value;
+            searchBox.value = '';
+            await loadCurrentDbData();
+        });
 
+        // Кнопка обновления баз с сервера
+        document.getElementById('btnRefresh').addEventListener('click', async () => {
+            await fetchDatabases(true);
+            searchBox.value = '';
+        });
+
+        // Создать новую базу на сервере
         document.getElementById('btnCreateDb').addEventListener('click', async () => {
-            const dbName = await showModal({ title: 'Создание новой базы', desc: 'Введите название:', type: 'prompt', defaultValue: 'Новая база', confirmText: 'Создать' });
+            const dbName = await showModal({ title: 'Создание новой базы', desc: 'Введите название:', type: 'prompt', defaultValue: 'new_base', confirmText: 'Создать' });
             if (!dbName || !dbName.trim()) return;
-            const trimmedName = dbName.trim();
-            const dbs = getAllDatabases();
-            if (dbs[trimmedName]) { await showModal({ title: 'Ошибка', desc: 'База уже существует!', type: 'alert' }); return; }
-            dbs[trimmedName] = [];
-            saveAllDatabases(dbs);
-            setActiveDbName(trimmedName);
-            updateDbSelectUI();
+            let filename = dbName.trim();
+            if (!filename.endsWith('.json')) filename += '.json';
+
+            await saveDatabaseToServer(filename, []);
+            activeDbName = filename;
+            await fetchDatabases(true);
         });
 
-        document.getElementById('btnRenameDb').addEventListener('click', async () => {
-            const currentName = getActiveDbName();
-            const newName = await showModal({ title: 'Переименование', desc: 'Новое имя:', type: 'prompt', defaultValue: currentName });
-            if (!newName || !newName.trim() || newName.trim() === currentName) return;
-            const trimmedName = newName.trim();
-            const dbs = getAllDatabases();
-            if (dbs[trimmedName]) { await showModal({ title: 'Ошибка', desc: 'Уже есть такая база!', type: 'alert' }); return; }
-            dbs[trimmedName] = dbs[currentName];
-            delete dbs[currentName];
-            saveAllDatabases(dbs);
-            setActiveDbName(trimmedName);
-            updateDbSelectUI();
-        });
-
+        // Удалить текущую базу с сервера
         document.getElementById('btnDeleteDb').addEventListener('click', async () => {
-            const currentName = getActiveDbName();
-            const dbs = getAllDatabases();
-            if (Object.keys(dbs).length <= 1) { await showModal({ title: 'Внимание', desc: 'Нельзя удалить последнюю базу!', type: 'alert' }); return; }
-            if (await showModal({ title: 'Удаление', desc: `Удалить базу «${currentName}»?`, type: 'confirm', confirmText: 'Удалить', confirmClass: 'danger' })) {
-                delete dbs[currentName];
-                saveAllDatabases(dbs);
-                setActiveDbName(Object.keys(dbs)[0]);
-                updateDbSelectUI();
+            if (serverFilesList.length <= 1) {
+                await showModal({ title: 'Внимание', desc: 'Нельзя удалить последнюю базу на сервере!', type: 'alert' });
+                return;
+            }
+            if (await showModal({ title: 'Удаление', desc: `Удалить базу «${activeDbName}» с сервера?`, type: 'confirm', confirmText: 'Удалить', confirmClass: 'danger' })) {
+                await fetch(`/api/dbs/${encodeURIComponent(activeDbName)}`, { method: 'DELETE' });
+                await fetchDatabases(false);
             }
         });
 
+        // Добавить вопрос
         document.getElementById('btnAdd').addEventListener('click', async () => {
             const titleInput = document.getElementById('newTitle');
             const textInput = document.getElementById('newText');
@@ -495,62 +492,53 @@
             const text = textInput.value.trim();
             if (!title || !text) { await showModal({ title: 'Внимание', desc: 'Заполните поля!', type: 'alert' }); return; }
 
-            const activeName = getActiveDbName();
-            const dbs = getAllDatabases();
-            dbs[activeName].push({ id: Date.now().toString(), title, text });
-            saveAllDatabases(dbs);
+            currentDbData.push({ id: Date.now().toString(), title, text });
+            await saveDatabaseToServer(activeDbName, currentDbData);
+            
             titleInput.value = ''; textInput.value = '';
-            updateDbSelectUI();
+            renderCurrentDbCards();
             searchBox.focus();
         });
 
+        // Удалить карточку
         window.deleteCard = async function(id) {
             if (await showModal({ title: 'Удаление', desc: 'Удалить этот вопрос?', type: 'confirm', confirmText: 'Удалить', confirmClass: 'danger' })) {
-                const activeName = getActiveDbName();
-                const dbs = getAllDatabases();
-                dbs[activeName] = dbs[activeName].filter(item => item.id !== id);
-                saveAllDatabases(dbs);
-                updateDbSelectUI();
+                currentDbData = currentDbData.filter(item => item.id !== id);
+                await saveDatabaseToServer(activeDbName, currentDbData);
+                renderCurrentDbCards();
             }
         };
 
+        // Скачать текущую базу на свой ПК
         document.getElementById('btnExport').addEventListener('click', () => {
-            const activeName = getActiveDbName();
-            const cardsData = getAllDatabases()[activeName] || [];
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ dbName: activeName, data: cardsData }, null, 2));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentDbData, null, 2));
             const a = document.createElement('a');
             a.href = dataStr;
-            a.download = `${activeName}.json`;
+            a.download = activeDbName;
             document.body.appendChild(a);
             a.click();
             a.remove();
         });
 
+        // Загрузить файл с ПК на сервер
         document.getElementById('btnImport').addEventListener('click', () => { filePicker.click(); });
 
         filePicker.addEventListener('change', (e) => {
             const files = e.target.files;
             if (!files || files.length === 0) return;
-            const dbs = getAllDatabases();
-            let processedCount = 0;
-
+            
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = async function(event) {
                     try {
                         const json = JSON.parse(event.target.result);
-                        let dbName = json.dbName || file.name.replace('.json', '');
-                        let data = Array.isArray(json) ? json : (json.data || []);
-                        dbs[dbName] = data;
-                        processedCount++;
-                        if (processedCount === files.length) {
-                            saveAllDatabases(dbs);
-                            setActiveDbName(dbName);
-                            updateDbSelectUI();
-                            filePicker.value = '';
-                        }
+                        const data = Array.isArray(json) ? json : (json.data || []);
+                        await saveDatabaseToServer(file.name, data);
+                        activeDbName = file.name.endsWith('.json') ? file.name : file.name + '.json';
+                        await fetchDatabases(true);
+                        filePicker.value = '';
                     } catch(err) {
-                        alert("Ошибка чтения файла: " + file.name);
+                        alert("Ошибка чтения JSON файла: " + file.name);
                     }
                 };
                 reader.readAsText(file);
@@ -559,8 +547,8 @@
 
         function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
-        // Запуск интерфейса
-        updateDbSelectUI();
+        // Стартовая инициализация
+        fetchDatabases();
     </script>
 </body>
 </html>

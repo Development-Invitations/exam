@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сайт-шпион с автозагрузкой из /baza</title>
+    <title>Сайт-шпион с поиском</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -235,8 +235,9 @@
             <button id="btnAdd" class="btn-add">+ Добавить вопрос в эту базу</button>
             
             <div class="db-file-actions">
-                <button class="btn-file-action" id="btnExport" title="Скачать файл для сохранения в папку baza">💾 Скачать текущую базу</button>
-                <button class="btn-file-action" id="btnReloadServer" title="Подтянуть файлы из папки baza на сервере">🔄 Обновить из /baza</button>
+                <button class="btn-file-action" id="btnExport" title="Скачать файл базы данных">💾 Скачать базу</button>
+                <button class="btn-file-action" id="btnImport" title="Загрузить файл базы данных с компьютера">📂 Загрузить файл</button>
+                <input type="file" id="filePicker" accept=".json" style="display: none;" multiple>
             </div>
         </div>
     </div>
@@ -266,6 +267,7 @@
         const rightPane = document.getElementById('rightPane');
         const dbSelect = document.getElementById('dbSelect');
         const dbNameLabel = document.getElementById('dbNameLabel');
+        const filePicker = document.getElementById('filePicker');
 
         const modalOverlay = document.getElementById('customModal');
         const modalTitle = document.getElementById('modalTitle');
@@ -312,12 +314,18 @@
         function getAllDatabases() {
             const data = localStorage.getItem(ALL_DBS_KEY);
             if (data) { try { return JSON.parse(data); } catch(e) {} }
-            const emptyDefault = { "Основная база": [] };
-            saveAllDatabases(emptyDefault);
-            return emptyDefault;
+            // Базовый дефолтный набор, если ничего не найдено
+            const defaultDbs = { 
+                "Основная база": [
+                    { id: "1", title: "Пример вопроса", text: "Здесь будет находиться текст ответа или информации." }
+                ] 
+            };
+            saveAllDatabases(defaultDbs);
+            return defaultDbs;
         }
 
         function saveAllDatabases(dbs) { localStorage.setItem(ALL_DBS_KEY, JSON.stringify(dbs)); }
+        
         function getActiveDbName() {
             let active = localStorage.getItem(ACTIVE_DB_KEY);
             const dbs = getAllDatabases();
@@ -328,38 +336,6 @@
             return active;
         }
         function setActiveDbName(name) { localStorage.setItem(ACTIVE_DB_KEY, name); }
-
-        // АВТОМАТИЧЕСКАЯ ПОДГРУЗКА ИЗ ПАПКИ BAZA НА СЕРВЕРЕ
-        async function loadDatabasesFromServer() {
-            // Список файлов баз, которые лежат в папке /baza на сервере (дописывайте новые имена сюда)
-            const serverFiles = [
-                "baza/Основная база.json",
-                // "baza/Вторая база.json"
-            ];
-
-            let dbs = getAllDatabases();
-            let loadedAny = false;
-
-            for (let filePath of serverFiles) {
-                try {
-                    let response = await fetch(filePath);
-                    if (response.ok) {
-                        let json = await response.json();
-                        let dbName = json.dbName || filePath.split('/').pop().replace('.json', '');
-                        let data = Array.isArray(json) ? json : (json.data || []);
-                        dbs[dbName] = data;
-                        loadedAny = true;
-                    }
-                } catch(e) {
-                    console.log("Файл не найден или сервер заблокировал доступ:", filePath);
-                }
-            }
-
-            if (loadedAny) {
-                saveAllDatabases(dbs);
-                updateDbSelectUI();
-            }
-        }
 
         function updateDbSelectUI() {
             const dbs = getAllDatabases();
@@ -372,7 +348,7 @@
                 if (dbName === activeName) opt.selected = true;
                 dbSelect.appendChild(opt);
             });
-            dbNameLabel.textContent = `Активная база: ${activeName} — (Всего вопросов: ${(dbs[activeName] || []).length})`;
+            dbNameLabel.textContent = `Текущая база: ${activeName} — (Всего вопросов: ${(dbs[activeName] || []).length})`;
             renderCurrentDbCards();
         }
 
@@ -514,7 +490,7 @@
             }
         };
 
-        document.getElementById('btnExport').addEventListener('click', async () => {
+        document.getElementById('btnExport').addEventListener('click', () => {
             const activeName = getActiveDbName();
             const cardsData = getAllDatabases()[activeName] || [];
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ dbName: activeName, data: cardsData }, null, 2));
@@ -524,24 +500,43 @@
             document.body.appendChild(a);
             a.click();
             a.remove();
-            
-            await showModal({ 
-                title: 'Сохранено!', 
-                desc: `Положите скачанный файл в папку «baza» на вашем ПК и сделайте git push.`, 
-                type: 'alert' 
-            });
         });
 
-        document.getElementById('btnReloadServer').addEventListener('click', async () => {
-            await loadDatabasesFromServer();
-            await showModal({ title: 'Успешно', desc: 'Базы с сервера успешно подтянуты!', type: 'alert' });
+        document.getElementById('btnImport').addEventListener('click', () => { filePicker.click(); });
+
+        filePicker.addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            const dbs = getAllDatabases();
+            let processedCount = 0;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const json = JSON.parse(event.target.result);
+                        let dbName = json.dbName || file.name.replace('.json', '');
+                        let data = Array.isArray(json) ? json : (json.data || []);
+                        dbs[dbName] = data;
+                        processedCount++;
+                        if (processedCount === files.length) {
+                            saveAllDatabases(dbs);
+                            setActiveDbName(dbName);
+                            updateDbSelectUI();
+                            filePicker.value = '';
+                        }
+                    } catch(err) {
+                        alert("Ошибка чтения файла: " + file.name);
+                    }
+                };
+                reader.readAsText(file);
+            });
         });
 
         function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
-        // Первичный запуск
+        // Запуск интерфейса
         updateDbSelectUI();
-        loadDatabasesFromServer(); // Автоматически подтягиваем при открытии страницы
     </script>
 </body>
 </html>

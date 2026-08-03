@@ -3,25 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сайт-шпион с мульти-базами</title>
+    <title>Сайт-шпион с папкой Baza</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        /* Скроллбары под дизайн интерфейса */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
@@ -32,7 +20,6 @@
             overflow: hidden; 
         }
         
-        /* ЛЕВАЯ ПАНЕЛЬ */
         .left-pane {
             width: 42%;
             min-width: 340px;
@@ -42,7 +29,6 @@
             background: #1e293b;
         }
 
-        /* БЛОК УПРАВЛЕНИЯ БАЗАМИ ДАННЫХ */
         .db-selector-container {
             padding: 12px 15px;
             background: #0f172a;
@@ -79,18 +65,9 @@
             transition: background 0.2s;
             white-space: nowrap;
         }
-        .btn-small:hover {
-            background: #475569;
-            color: #fff;
-        }
-        .btn-small.danger {
-            background: #7f1d1d;
-            color: #fca5a5;
-        }
-        .btn-small.danger:hover {
-            background: #991b1b;
-            color: #fff;
-        }
+        .btn-small:hover { background: #475569; color: #fff; }
+        .btn-small.danger { background: #7f1d1d; color: #fca5a5; }
+        .btn-small.danger:hover { background: #991b1b; color: #fff; }
 
         .search-container {
             padding: 12px 15px;
@@ -108,9 +85,7 @@
             outline: none;
             transition: border-color 0.2s;
         }
-        .search-input:focus, .form-input:focus, .form-textarea:focus {
-            border-color: #38bdf8;
-        }
+        .search-input:focus, .form-input:focus, .form-textarea:focus { border-color: #38bdf8; }
         
         .questions-list {
             overflow-y: auto;
@@ -127,34 +102,17 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .question-item:hover {
-            border-color: #38bdf8;
-            background: #1e293b;
-        }
-        .question-item.active {
-            border-color: #38bdf8;
-            background: #1e3a8a;
-        }
-        .q-title {
-            font-weight: 600;
-            font-size: 14px;
-            color: #f8fafc;
-            word-break: break-word;
-        }
+        .question-item:hover { border-color: #38bdf8; background: #1e293b; }
+        .question-item.active { border-color: #38bdf8; background: #1e3a8a; }
+        .q-title { font-weight: 600; font-size: 14px; color: #f8fafc; word-break: break-word; }
 
-        /* Форма добавления внизу */
         .add-form-container {
             padding: 15px;
             border-top: 1px solid #334155;
             background: #1e293b;
         }
-        .form-group {
-            margin-bottom: 8px;
-        }
-        .form-textarea {
-            resize: vertical;
-            height: 50px;
-        }
+        .form-group { margin-bottom: 8px; }
+        .form-textarea { resize: vertical; height: 50px; }
         .btn-add {
             width: 100%;
             padding: 10px;
@@ -166,9 +124,7 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .btn-add:hover {
-            background: #0284c7;
-        }
+        .btn-add:hover { background: #0284c7; }
         .db-file-actions {
             display: flex;
             gap: 6px;
@@ -184,14 +140,11 @@
             font-size: 11px;
             cursor: pointer;
             transition: background 0.2s;
+            text-align: center;
         }
-        .btn-file-action:hover {
-            background: #475569;
-            color: #fff;
-        }
+        .btn-file-action:hover { background: #475569; color: #fff; }
         #importFile { display: none; }
 
-        /* ПРАВАЯ ПАНЕЛЬ */
         .right-pane {
             width: 58%;
             padding: 30px;
@@ -205,12 +158,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .empty-placeholder {
-            color: #64748b;
-            text-align: center;
-            margin-top: 50px;
-            font-size: 15px;
-        }
+        .empty-placeholder { color: #64748b; text-align: center; margin-top: 50px; font-size: 15px; }
         .answer-card {
             background: #1e293b;
             border: 1px solid #334155;
@@ -218,155 +166,42 @@
             padding: 20px;
             margin-bottom: 20px;
             position: relative;
-            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .answer-card.highlight {
-            border-color: #38bdf8;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
-        }
-        .answer-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-right: 70px;
-        }
-        .answer-number {
-            font-size: 12px;
-            font-weight: 600;
-            color: #38bdf8;
-            background: #0f172a;
-            padding: 3px 8px;
-            border-radius: 4px;
-            border: 1px solid #334155;
-        }
-        .answer-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #f8fafc;
-            margin-bottom: 10px;
-            word-break: break-word;
-        }
-        .answer-text {
-            color: #94a3b8;
-            line-height: 1.5;
-            font-size: 15px;
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
+        .answer-card.highlight { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
+        .answer-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-right: 70px; }
+        .answer-number { font-size: 12px; font-weight: 600; color: #38bdf8; background: #0f172a; padding: 3px 8px; border-radius: 4px; border: 1px solid #334155; }
+        .answer-title { font-size: 18px; font-weight: bold; color: #f8fafc; margin-bottom: 10px; word-break: break-word; }
+        .answer-text { color: #94a3b8; line-height: 1.5; font-size: 15px; word-break: break-word; white-space: pre-wrap; }
         .btn-delete {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: transparent;
-            border: 1px solid #ef4444;
-            color: #ef4444;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
+            position: absolute; top: 20px; right: 20px;
+            background: transparent; border: 1px solid #ef4444; color: #ef4444;
+            padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;
             transition: all 0.2s;
         }
-        .btn-delete:hover {
-            background: #ef4444;
-            color: #fff;
-        }
+        .btn-delete:hover { background: #ef4444; color: #fff; }
 
-        /* КАСТОМНЫЕ МОДАЛЬНЫЕ ОКНА */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(2px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(2px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.2s ease;
         }
-        .modal-overlay.open {
-            opacity: 1;
-            visibility: visible;
-        }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
         .modal-box {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            width: 400px;
-            max-width: 90%;
-            padding: 24px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
-            transform: translateY(-10px);
-            transition: transform 0.2s ease;
+            background: #1e293b; border: 1px solid #334155; border-radius: 10px;
+            width: 400px; max-width: 90%; padding: 24px; box-shadow: 0 15px 30px rgba(0,0,0,0.6);
         }
-        .modal-overlay.open .modal-box {
-            transform: translateY(0);
-        }
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #f8fafc;
-            margin-bottom: 10px;
-        }
-        .modal-desc {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 16px;
-            line-height: 1.5;
-            word-break: break-word;
-        }
+        .modal-title { font-size: 18px; font-weight: 600; color: #f8fafc; margin-bottom: 10px; }
+        .modal-desc { font-size: 14px; color: #94a3b8; margin-bottom: 16px; line-height: 1.5; }
         .modal-input {
-            width: 100%;
-            padding: 10px 14px;
-            background: #0f172a;
-            border: 1px solid #475569;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            margin-bottom: 20px;
+            width: 100%; padding: 10px 14px; background: #0f172a;
+            border: 1px solid #475569; border-radius: 6px; color: #fff; font-size: 14px; outline: none; margin-bottom: 20px;
         }
-        .modal-input:focus {
-            border-color: #38bdf8;
-        }
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        .modal-btn {
-            padding: 9px 18px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: background 0.2s;
-        }
-        .modal-btn.cancel {
-            background: #334155;
-            color: #cbd5e1;
-        }
-        .modal-btn.cancel:hover {
-            background: #475569;
-            color: #fff;
-        }
-        .modal-btn.confirm {
-            background: #0ea5e9;
-            color: #fff;
-        }
-        .modal-btn.confirm:hover {
-            background: #0284c7;
-        }
-        .modal-btn.danger {
-            background: #ef4444;
-            color: #fff;
-        }
-        .modal-btn.danger:hover {
-            background: #dc2626;
-        }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-btn { padding: 9px 18px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+        .modal-btn.cancel { background: #334155; color: #cbd5e1; }
+        .modal-btn.confirm { background: #0ea5e9; color: #fff; }
+        .modal-btn.danger { background: #ef4444; color: #fff; }
     </style>
 </head>
 <body>
@@ -399,8 +234,8 @@
             <button id="btnAdd" class="btn-add">+ Добавить вопрос в эту базу</button>
             
             <div class="db-file-actions">
-                <button class="btn-file-action" id="btnExport">💾 Сохранить базу</button>
-                <button class="btn-file-action" id="btnImportTrigger">📂 Загрузить базу</button>
+                <button class="btn-file-action" id="btnExport" title="Скачать базу для папки baza">💾 Скачать файл</button>
+                <button class="btn-file-action" id="btnImportTrigger" title="Загрузить базы из папки baza">📂 Загрузить из папки baza</button>
                 <input type="file" id="importFile" accept=".json" multiple>
             </div>
         </div>
@@ -408,7 +243,7 @@
 
     <div class="right-pane" id="rightPane">
         <div id="dbNameLabel" class="current-db-title">Текущая база: — (0 вопросов)</div>
-        <div id="emptyState" class="empty-placeholder">База данных пуста. Добавьте первый вопрос через форму слева.</div>
+        <div id="emptyState" class="empty-placeholder">База данных пуста. Загрузите файлы из папки baza или добавьте вопросы.</div>
     </div>
 
     <div id="customModal" class="modal-overlay">
@@ -444,59 +279,28 @@
         function showModal(options) {
             modalTitle.textContent = options.title || 'Сообщение';
             modalDesc.textContent = options.desc || '';
-            
             if (options.type === 'prompt') {
                 modalInputContainer.style.display = 'block';
                 modalInput.value = options.defaultValue || '';
-                setTimeout(() => {
-                    modalInput.focus();
-                    modalInput.select();
-                }, 50);
+                setTimeout(() => { modalInput.focus(); modalInput.select(); }, 50);
             } else {
                 modalInputContainer.style.display = 'none';
             }
-
-            if (options.type === 'alert') {
-                modalBtnCancel.style.display = 'none';
-            } else {
-                modalBtnCancel.style.display = 'inline-block';
-            }
-
+            modalBtnCancel.style.display = (options.type === 'alert') ? 'none' : 'inline-block';
             modalBtnConfirm.className = 'modal-btn ' + (options.confirmClass || 'confirm');
             modalBtnConfirm.textContent = options.confirmText || 'OK';
-
             modalOverlay.classList.add('open');
 
             return new Promise((resolve) => {
-                const handleConfirm = () => {
-                    cleanup();
-                    if (options.type === 'prompt') {
-                        resolve(modalInput.value);
-                    } else {
-                        resolve(true);
-                    }
-                };
-
-                const handleCancel = () => {
-                    cleanup();
-                    resolve(options.type === 'prompt' ? null : false);
-                };
-
-                const handleKeypress = (e) => {
-                    if (e.key === 'Enter') {
-                        handleConfirm();
-                    } else if (e.key === 'Escape') {
-                        handleCancel();
-                    }
-                };
-
+                const handleConfirm = () => { cleanup(); resolve(options.type === 'prompt' ? modalInput.value : true); };
+                const handleCancel = () => { cleanup(); resolve(options.type === 'prompt' ? null : false); };
+                const handleKeypress = (e) => { if (e.key === 'Enter') handleConfirm(); else if (e.key === 'Escape') handleCancel(); };
                 const cleanup = () => {
                     modalOverlay.classList.remove('open');
                     modalBtnConfirm.removeEventListener('click', handleConfirm);
                     modalBtnCancel.removeEventListener('click', handleCancel);
                     modalInput.removeEventListener('keydown', handleKeypress);
                 };
-
                 modalBtnConfirm.addEventListener('click', handleConfirm);
                 modalBtnCancel.addEventListener('click', handleCancel);
                 modalInput.addEventListener('keydown', handleKeypress);
@@ -506,31 +310,15 @@
         const ALL_DBS_KEY = 'spy_all_databases_registry';
         const ACTIVE_DB_KEY = 'spy_active_database_name';
 
-        // ДЕФОЛТНЫЕ БАЗЫ ДАННЫХ (вшитые по умолчанию для всех при первом запуске)
-        const DEFAULT_DATABASES = {
-            "Основная база": [
-                { id: "101", title: "Пример вопроса 1", text: "Это тестовый ответ для проверки работы сайта-шпиона." },
-                { id: "102", title: "Пример вопроса 2", text: "Здесь можно хранить любые тексты, коды и подсказки." }
-            ],
-            "Тестовая база": [
-                { id: "201", title: "Тест базы №2", text: "Вторая база данных для демонстрации переключения на лету." }
-            ]
-        };
-
         function getAllDatabases() {
             const data = localStorage.getItem(ALL_DBS_KEY);
-            if (data) {
-                try { return JSON.parse(data); } catch(e) {}
-            }
-            // Если в памяти ничего нет, возвращаем дефолтные и сохраняем их
-            saveAllDatabases(DEFAULT_DATABASES);
-            return DEFAULT_DATABASES;
+            if (data) { try { return JSON.parse(data); } catch(e) {} }
+            const emptyDefault = { "Основная база": [] };
+            saveAllDatabases(emptyDefault);
+            return emptyDefault;
         }
 
-        function saveAllDatabases(dbs) {
-            localStorage.setItem(ALL_DBS_KEY, JSON.stringify(dbs));
-        }
-
+        function saveAllDatabases(dbs) { localStorage.setItem(ALL_DBS_KEY, JSON.stringify(dbs)); }
         function getActiveDbName() {
             let active = localStorage.getItem(ACTIVE_DB_KEY);
             const dbs = getAllDatabases();
@@ -540,15 +328,11 @@
             }
             return active;
         }
-
-        function setActiveDbName(name) {
-            localStorage.setItem(ACTIVE_DB_KEY, name);
-        }
+        function setActiveDbName(name) { localStorage.setItem(ACTIVE_DB_KEY, name); }
 
         function updateDbSelectUI() {
             const dbs = getAllDatabases();
             const activeName = getActiveDbName();
-
             dbSelect.innerHTML = '';
             Object.keys(dbs).forEach(dbName => {
                 const opt = document.createElement('option');
@@ -557,16 +341,12 @@
                 if (dbName === activeName) opt.selected = true;
                 dbSelect.appendChild(opt);
             });
-
-            const totalCount = (dbs[activeName] || []).length;
-            dbNameLabel.textContent = `Активная база: ${activeName} — (Всего вопросов: ${totalCount})`;
+            dbNameLabel.textContent = `Активная база: ${activeName} — (Всего вопросов: ${(dbs[activeName] || []).length})`;
             renderCurrentDbCards();
         }
 
         function renderCurrentDbCards() {
-            const cards = rightPane.getElementsByClassName('answer-card');
-            Array.from(cards).forEach(c => c.remove());
-
+            Array.from(rightPane.getElementsByClassName('answer-card')).forEach(c => c.remove());
             const dbs = getAllDatabases();
             const activeName = getActiveDbName();
             const cardsData = dbs[activeName] || [];
@@ -577,36 +357,30 @@
                     const placeholder = document.createElement('div');
                     placeholder.id = 'emptyState';
                     placeholder.className = 'empty-placeholder';
-                    placeholder.textContent = 'База данных пуста. Добавьте первый вопрос через форму слева.';
+                    placeholder.textContent = 'База данных пуста. Загрузите файлы из папки baza или добавьте вопросы.';
                     rightPane.appendChild(placeholder);
                 }
             } else {
                 if (emptyState) emptyState.remove();
-
                 cardsData.forEach((item, index) => {
                     const newCard = document.createElement('div');
                     newCard.className = 'answer-card';
                     newCard.setAttribute('data-id', item.id);
-                    const questionNumberStr = `${index + 1} из ${cardsData.length}`;
                     newCard.innerHTML = `
                         <button class="btn-delete" onclick="deleteCard('${item.id}')">Удалить</button>
-                        <div class="answer-header-row">
-                            <span class="answer-number">№ ${questionNumberStr}</span>
-                        </div>
+                        <div class="answer-header-row"><span class="answer-number">№ ${index + 1} из ${cardsData.length}</span></div>
                         <div class="answer-title">${escapeHtml(item.title)}</div>
                         <div class="answer-text">${escapeHtml(item.text)}</div>
                     `;
                     rightPane.appendChild(newCard);
                 });
             }
-
             initList();
         }
 
         function initList() {
             questionsList.innerHTML = '';
             const cards = Array.from(rightPane.getElementsByClassName('answer-card'));
-
             cards.forEach(card => {
                 const cardId = card.getAttribute('data-id');
                 const titleText = card.querySelector('.answer-title').textContent;
@@ -621,67 +395,36 @@
                 item.addEventListener('click', () => {
                     document.querySelectorAll('.question-item').forEach(el => el.classList.remove('active'));
                     item.classList.add('active');
-
                     cards.forEach(c => c.classList.remove('highlight'));
                     card.classList.add('highlight');
-                    
                     card.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
-
                 questionsList.appendChild(item);
             });
-
             applySmartSearch();
         }
 
         function applySmartSearch() {
             const rawQuery = searchBox.value.trim().toLowerCase();
-            const items = questionsList.getElementsByClassName('question-item');
-
-            Array.from(items).forEach(item => {
+            Array.from(questionsList.getElementsByClassName('question-item')).forEach(item => {
                 const searchContent = item.getAttribute('data-search');
-                
                 if (rawQuery === '') {
                     item.style.display = 'none';
                 } else {
-                    const queryTerms = rawQuery.split(/\s+/).filter(term => term.length > 0);
-                    const isMatch = queryTerms.every(term => searchContent.includes(term));
-
-                    if (isMatch) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
+                    item.style.display = rawQuery.split(/\s+/).every(term => searchContent.includes(term)) ? 'block' : 'none';
                 }
             });
         }
 
         searchBox.addEventListener('input', applySmartSearch);
-
-        dbSelect.addEventListener('change', (e) => {
-            setActiveDbName(e.target.value);
-            updateDbSelectUI();
-            searchBox.value = '';
-        });
+        dbSelect.addEventListener('change', (e) => { setActiveDbName(e.target.value); updateDbSelectUI(); searchBox.value = ''; });
 
         document.getElementById('btnCreateDb').addEventListener('click', async () => {
-            const dbName = await showModal({
-                title: 'Создание новой базы',
-                desc: 'Введите название для новой базы данных:',
-                type: 'prompt',
-                defaultValue: 'Новая база',
-                confirmText: 'Создать'
-            });
-
+            const dbName = await showModal({ title: 'Создание новой базы', desc: 'Введите название:', type: 'prompt', defaultValue: 'Новая база', confirmText: 'Создать' });
             if (!dbName || !dbName.trim()) return;
             const trimmedName = dbName.trim();
             const dbs = getAllDatabases();
-
-            if (dbs[trimmedName]) {
-                await showModal({ title: 'Ошибка', desc: 'База с таким названием уже существует!', type: 'alert', confirmText: 'Понятно' });
-                return;
-            }
-
+            if (dbs[trimmedName]) { await showModal({ title: 'Ошибка', desc: 'База уже существует!', type: 'alert' }); return; }
             dbs[trimmedName] = [];
             saveAllDatabases(dbs);
             setActiveDbName(trimmedName);
@@ -690,23 +433,11 @@
 
         document.getElementById('btnRenameDb').addEventListener('click', async () => {
             const currentName = getActiveDbName();
-            const newName = await showModal({
-                title: 'Переименование базы',
-                desc: 'Введите новое название для базы данных:',
-                type: 'prompt',
-                defaultValue: currentName,
-                confirmText: 'Сохранить'
-            });
-
+            const newName = await showModal({ title: 'Переименование', desc: 'Новое имя:', type: 'prompt', defaultValue: currentName });
             if (!newName || !newName.trim() || newName.trim() === currentName) return;
             const trimmedName = newName.trim();
             const dbs = getAllDatabases();
-
-            if (dbs[trimmedName]) {
-                await showModal({ title: 'Ошибка', desc: 'База с таким названием уже существует!', type: 'alert', confirmText: 'Понятно' });
-                return;
-            }
-
+            if (dbs[trimmedName]) { await showModal({ title: 'Ошибка', desc: 'Уже есть такая база!', type: 'alert' }); return; }
             dbs[trimmedName] = dbs[currentName];
             delete dbs[currentName];
             saveAllDatabases(dbs);
@@ -717,25 +448,11 @@
         document.getElementById('btnDeleteDb').addEventListener('click', async () => {
             const currentName = getActiveDbName();
             const dbs = getAllDatabases();
-
-            if (Object.keys(dbs).length <= 1) {
-                await showModal({ title: 'Внимание', desc: 'Нельзя удалить последнюю оставшуюся базу!', type: 'alert', confirmText: 'OK' });
-                return;
-            }
-
-            const confirmed = await showModal({
-                title: 'Удаление базы',
-                desc: `Вы действительно хотите полностью удалить базу «${currentName}»?`,
-                type: 'confirm',
-                confirmText: 'Удалить',
-                confirmClass: 'danger'
-            });
-
-            if (confirmed) {
+            if (Object.keys(dbs).length <= 1) { await showModal({ title: 'Внимание', desc: 'Нельзя удалить последнюю базу!', type: 'alert' }); return; }
+            if (await showModal({ title: 'Удаление', desc: `Удалить базу «${currentName}»?`, type: 'confirm', confirmText: 'Удалить', confirmClass: 'danger' })) {
                 delete dbs[currentName];
                 saveAllDatabases(dbs);
-                const remaining = Object.keys(dbs)[0];
-                setActiveDbName(remaining);
+                setActiveDbName(Object.keys(dbs)[0]);
                 updateDbSelectUI();
             }
         });
@@ -743,141 +460,77 @@
         document.getElementById('btnAdd').addEventListener('click', async () => {
             const titleInput = document.getElementById('newTitle');
             const textInput = document.getElementById('newText');
-            
             const title = titleInput.value.trim();
             const text = textInput.value.trim();
-
-            if (!title || !text) {
-                await showModal({ title: 'Внимание', desc: 'Заполните заголовок и текст ответа!', type: 'alert', confirmText: 'OK' });
-                return;
-            }
+            if (!title || !text) { await showModal({ title: 'Внимание', desc: 'Заполните поля!', type: 'alert' }); return; }
 
             const activeName = getActiveDbName();
             const dbs = getAllDatabases();
-            const cardsData = dbs[activeName];
-
-            const isDuplicate = cardsData.some(item => item.title.trim().toLowerCase() === title.toLowerCase());
-            if (isDuplicate) {
-                await showModal({ title: 'Ошибка', desc: 'Вопрос с таким заголовком уже существует в этой базе!', type: 'alert', confirmText: 'Понятно' });
-                return;
-            }
-
-            cardsData.push({
-                id: Date.now().toString(),
-                title: title,
-                text: text
-            });
-
+            dbs[activeName].push({ id: Date.now().toString(), title, text });
             saveAllDatabases(dbs);
-
-            titleInput.value = '';
-            textInput.value = '';
-
+            titleInput.value = ''; textInput.value = '';
             updateDbSelectUI();
             searchBox.focus();
         });
 
         window.deleteCard = async function(id) {
-            const confirmed = await showModal({
-                title: 'Удаление записи',
-                desc: 'Вы действительно хотите удалить этот вопрос и ответ?',
-                type: 'confirm',
-                confirmText: 'Удалить',
-                confirmClass: 'danger'
-            });
-
-            if (confirmed) {
+            if (await showModal({ title: 'Удаление', desc: 'Удалить этот вопрос?', type: 'confirm', confirmText: 'Удалить', confirmClass: 'danger' })) {
                 const activeName = getActiveDbName();
                 const dbs = getAllDatabases();
-                
                 dbs[activeName] = dbs[activeName].filter(item => item.id !== id);
                 saveAllDatabases(dbs);
-
                 updateDbSelectUI();
-                searchBox.focus();
             }
         };
 
-        document.getElementById('btnExport').addEventListener('click', async () => {
+        document.getElementById('btnExport').addEventListener('click', () => {
             const activeName = getActiveDbName();
-            const dbs = getAllDatabases();
-            const cardsData = dbs[activeName] || [];
-
-            if (cardsData.length === 0) {
-                await showModal({ title: 'Внимание', desc: 'Текущая база пуста, нечего скачивать!', type: 'alert', confirmText: 'OK' });
-                return;
-            }
-
-            const exportPayload = {
-                dbName: activeName,
-                data: cardsData
-            };
-
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `${activeName.replace(/\s+/g, '_')}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
+            const cardsData = getAllDatabases()[activeName] || [];
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ dbName: activeName, data: cardsData }, null, 2));
+            const a = document.createElement('a');
+            a.href = dataStr;
+            a.download = `${activeName}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
         });
 
-        document.getElementById('btnImportTrigger').addEventListener('click', () => {
-            importFileInput.click();
-        });
+        document.getElementById('btnImportTrigger').addEventListener('click', () => importFileInput.click());
 
-        // Поддержка загрузки сразу нескольких файлов базы
-        importFileInput.addEventListener('change', async (event) => {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-
+        importFileInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (!files.length) return;
             const dbs = getAllDatabases();
-            let importedCount = 0;
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+            let count = 0;
+            for (let file of files) {
                 await new Promise((resolve) => {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
+                    reader.onload = function(evt) {
                         try {
-                            const parsed = JSON.parse(e.target.result);
-                            let targetName = file.name.replace(/\.[^/.]+$/, "");
-                            let cards = [];
-
-                            if (Array.isArray(parsed)) {
-                                cards = parsed;
-                            } else if (parsed && Array.isArray(parsed.data)) {
-                                targetName = parsed.dbName || targetName;
-                                cards = parsed.data;
+                            const parsed = JSON.parse(evt.target.result);
+                            let dbName = file.name.replace(/\.[^/.]+$/, "");
+                            let data = [];
+                            if (Array.isArray(parsed)) data = parsed;
+                            else if (parsed && Array.isArray(parsed.data)) {
+                                dbName = parsed.dbName || dbName;
+                                data = parsed.data;
                             }
-
-                            if (cards.length > 0) {
-                                dbs[targetName] = cards;
-                                importedCount++;
-                                setActiveDbName(targetName);
-                            }
-                        } catch (err) {}
+                            dbs[dbName] = data;
+                            setActiveDbName(dbName);
+                            count++;
+                        } catch(err) {}
                         resolve();
                     };
                     reader.readAsText(file);
                 });
             }
-
             saveAllDatabases(dbs);
             updateDbSelectUI();
             importFileInput.value = '';
-
-            if (importedCount > 0) {
-                await showModal({ title: 'Успешно', desc: `Успешно загружено баз: ${importedCount}`, type: 'alert', confirmText: 'Отлично' });
-            } else {
-                await showModal({ title: 'Ошибка', desc: 'Не удалось прочитать ни один файл базы!', type: 'alert', confirmText: 'OK' });
-            }
+            await showModal({ title: 'Готово', desc: `Успешно загружено баз: ${count}. Положите их в папку baza на хостинге.`, type: 'alert' });
         });
 
-        function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
+        function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
         updateDbSelectUI();
     </script>
 </body>

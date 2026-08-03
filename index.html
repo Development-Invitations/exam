@@ -125,6 +125,7 @@
             transition: background 0.2s;
         }
         .btn-add:hover { background: #0284c7; }
+        
         .db-file-actions {
             display: flex;
             gap: 6px;
@@ -132,17 +133,18 @@
         }
         .btn-file-action {
             flex: 1;
-            padding: 6px;
-            background: #334155;
+            padding: 8px 6px;
+            background: #0369a1;
             border: none;
             border-radius: 6px;
-            color: #cbd5e1;
-            font-size: 11px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
             text-align: center;
         }
-        .btn-file-action:hover { background: #475569; color: #fff; }
+        .btn-file-action:hover { background: #0284c7; }
         #importFile { display: none; }
 
         .right-pane {
@@ -234,8 +236,8 @@
             <button id="btnAdd" class="btn-add">+ Добавить вопрос в эту базу</button>
             
             <div class="db-file-actions">
-                <button class="btn-file-action" id="btnExport" title="Скачать базу для папки baza">💾 Скачать файл</button>
-                <button class="btn-file-action" id="btnImportTrigger" title="Загрузить базы из папки baza">📂 Загрузить из папки baza</button>
+                <button class="btn-file-action" id="btnExport" title="Сохранить базу для папки baza">💾 Скачать в /baza</button>
+                <button class="btn-file-action" id="btnImportTrigger" title="Загрузить базы из папки baza">📂 Загрузить из /baza</button>
                 <input type="file" id="importFile" accept=".json" multiple>
             </div>
         </div>
@@ -243,7 +245,7 @@
 
     <div class="right-pane" id="rightPane">
         <div id="dbNameLabel" class="current-db-title">Текущая база: — (0 вопросов)</div>
-        <div id="emptyState" class="empty-placeholder">База данных пуста. Загрузите файлы из папки baza или добавьте вопросы.</div>
+        <div id="emptyState" class="empty-placeholder">База данных пуста. Загрузите файлы или добавьте вопросы.</div>
     </div>
 
     <div id="customModal" class="modal-overlay">
@@ -357,7 +359,7 @@
                     const placeholder = document.createElement('div');
                     placeholder.id = 'emptyState';
                     placeholder.className = 'empty-placeholder';
-                    placeholder.textContent = 'База данных пуста. Загрузите файлы из папки baza или добавьте вопросы.';
+                    placeholder.textContent = 'База данных пуста. Загрузите файлы или добавьте вопросы.';
                     rightPane.appendChild(placeholder);
                 }
             } else {
@@ -483,7 +485,7 @@
             }
         };
 
-        document.getElementById('btnExport').addEventListener('click', () => {
+        document.getElementById('btnExport').addEventListener('click', async () => {
             const activeName = getActiveDbName();
             const cardsData = getAllDatabases()[activeName] || [];
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ dbName: activeName, data: cardsData }, null, 2));
@@ -493,6 +495,12 @@
             document.body.appendChild(a);
             a.click();
             a.remove();
+            
+            await showModal({ 
+                title: 'Сохранено!', 
+                desc: `Файл «${activeName}.json» скачан. Перенесите его в локальную папку «baza» на вашем компьютере, чтобы отправить изменения на GitHub.`, 
+                type: 'alert' 
+            });
         });
 
         document.getElementById('btnImportTrigger').addEventListener('click', () => importFileInput.click());
@@ -527,7 +535,7 @@
             saveAllDatabases(dbs);
             updateDbSelectUI();
             importFileInput.value = '';
-            await showModal({ title: 'Готово', desc: `Успешно загружено баз: ${count}. Положите их в папку baza на хостинге.`, type: 'alert' });
+            await showModal({ title: 'Готово', desc: `Успешно загружено баз: ${count}`, type: 'alert' });
         });
 
         function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }

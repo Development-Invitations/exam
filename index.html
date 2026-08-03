@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сайт-шпион с папкой Baza</title>
+    <title>Сайт-шпион с автозагрузкой из /baza</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -145,7 +145,6 @@
             text-align: center;
         }
         .btn-file-action:hover { background: #0284c7; }
-        #importFile { display: none; }
 
         .right-pane {
             width: 58%;
@@ -236,16 +235,15 @@
             <button id="btnAdd" class="btn-add">+ Добавить вопрос в эту базу</button>
             
             <div class="db-file-actions">
-                <button class="btn-file-action" id="btnExport" title="Сохранить базу для папки baza">💾 Скачать в /baza</button>
-                <button class="btn-file-action" id="btnImportTrigger" title="Загрузить базы из папки baza">📂 Загрузить из /baza</button>
-                <input type="file" id="importFile" accept=".json" multiple>
+                <button class="btn-file-action" id="btnExport" title="Скачать файл для сохранения в папку baza">💾 Скачать текущую базу</button>
+                <button class="btn-file-action" id="btnReloadServer" title="Подтянуть файлы из папки baza на сервере">🔄 Обновить из /baza</button>
             </div>
         </div>
     </div>
 
     <div class="right-pane" id="rightPane">
         <div id="dbNameLabel" class="current-db-title">Текущая база: — (0 вопросов)</div>
-        <div id="emptyState" class="empty-placeholder">База данных пуста. Загрузите файлы или добавьте вопросы.</div>
+        <div id="emptyState" class="empty-placeholder">База данных пуста.</div>
     </div>
 
     <div id="customModal" class="modal-overlay">
@@ -267,7 +265,6 @@
         const questionsList = document.getElementById('questionsList');
         const rightPane = document.getElementById('rightPane');
         const dbSelect = document.getElementById('dbSelect');
-        const importFileInput = document.getElementById('importFile');
         const dbNameLabel = document.getElementById('dbNameLabel');
 
         const modalOverlay = document.getElementById('customModal');
@@ -332,6 +329,38 @@
         }
         function setActiveDbName(name) { localStorage.setItem(ACTIVE_DB_KEY, name); }
 
+        // АВТОМАТИЧЕСКАЯ ПОДГРУЗКА ИЗ ПАПКИ BAZA НА СЕРВЕРЕ
+        async function loadDatabasesFromServer() {
+            // Список файлов баз, которые лежат в папке /baza на сервере (дописывайте новые имена сюда)
+            const serverFiles = [
+                "baza/Основная база.json",
+                // "baza/Вторая база.json"
+            ];
+
+            let dbs = getAllDatabases();
+            let loadedAny = false;
+
+            for (let filePath of serverFiles) {
+                try {
+                    let response = await fetch(filePath);
+                    if (response.ok) {
+                        let json = await response.json();
+                        let dbName = json.dbName || filePath.split('/').pop().replace('.json', '');
+                        let data = Array.isArray(json) ? json : (json.data || []);
+                        dbs[dbName] = data;
+                        loadedAny = true;
+                    }
+                } catch(e) {
+                    console.log("Файл не найден или сервер заблокировал доступ:", filePath);
+                }
+            }
+
+            if (loadedAny) {
+                saveAllDatabases(dbs);
+                updateDbSelectUI();
+            }
+        }
+
         function updateDbSelectUI() {
             const dbs = getAllDatabases();
             const activeName = getActiveDbName();
@@ -359,7 +388,7 @@
                     const placeholder = document.createElement('div');
                     placeholder.id = 'emptyState';
                     placeholder.className = 'empty-placeholder';
-                    placeholder.textContent = 'База данных пуста. Загрузите файлы или добавьте вопросы.';
+                    placeholder.textContent = 'База данных пуста.';
                     rightPane.appendChild(placeholder);
                 }
             } else {
@@ -498,48 +527,21 @@
             
             await showModal({ 
                 title: 'Сохранено!', 
-                desc: `Файл «${activeName}.json» скачан. Перенесите его в локальную папку «baza» на вашем компьютере, чтобы отправить изменения на GitHub.`, 
+                desc: `Положите скачанный файл в папку «baza» на вашем ПК и сделайте git push.`, 
                 type: 'alert' 
             });
         });
 
-        document.getElementById('btnImportTrigger').addEventListener('click', () => importFileInput.click());
-
-        importFileInput.addEventListener('change', async (e) => {
-            const files = e.target.files;
-            if (!files.length) return;
-            const dbs = getAllDatabases();
-            let count = 0;
-            for (let file of files) {
-                await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        try {
-                            const parsed = JSON.parse(evt.target.result);
-                            let dbName = file.name.replace(/\.[^/.]+$/, "");
-                            let data = [];
-                            if (Array.isArray(parsed)) data = parsed;
-                            else if (parsed && Array.isArray(parsed.data)) {
-                                dbName = parsed.dbName || dbName;
-                                data = parsed.data;
-                            }
-                            dbs[dbName] = data;
-                            setActiveDbName(dbName);
-                            count++;
-                        } catch(err) {}
-                        resolve();
-                    };
-                    reader.readAsText(file);
-                });
-            }
-            saveAllDatabases(dbs);
-            updateDbSelectUI();
-            importFileInput.value = '';
-            await showModal({ title: 'Готово', desc: `Успешно загружено баз: ${count}`, type: 'alert' });
+        document.getElementById('btnReloadServer').addEventListener('click', async () => {
+            await loadDatabasesFromServer();
+            await showModal({ title: 'Успешно', desc: 'Базы с сервера успешно подтянуты!', type: 'alert' });
         });
 
         function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+        // Первичный запуск
         updateDbSelectUI();
+        loadDatabasesFromServer(); // Автоматически подтягиваем при открытии страницы
     </script>
 </body>
 </html>

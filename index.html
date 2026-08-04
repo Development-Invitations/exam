@@ -298,6 +298,17 @@
 <div id="toast" class="toast"></div>
 
 <script>
+// ══════════════════════════════════════════════════════════════════════
+//  🔧 НАСТРОЙКИ РЕПОЗИТОРИЯ — заполни и залей в Git
+//  Все пользователи получат эти базы автоматически при нажатии "Обновить"
+// ══════════════════════════════════════════════════════════════════════
+const DEFAULT_CONFIG = {
+    owner:  'Development-Invitations',     // GitHub логин, например: ivanov123
+    repo:   'exam', // Название репо, например: exam-notes
+    branch: 'main'           // Ветка (обычно main или master)
+};
+// ══════════════════════════════════════════════════════════════════════
+
 // ── Состояние ──────────────────────────────────────────────────────────
 let dbList = [];          // [{ name, source: 'git'|'local' }]
 let currentDbName = '';
@@ -318,7 +329,14 @@ function showToast(msg, type = '') {
 
 // ── Config GitHub ──────────────────────────────────────────────────────
 function getGhConfig() {
-    try { return JSON.parse(localStorage.getItem('gh_config') || 'null'); } catch { return null; }
+    // Сначала смотрим localStorage (настройки пользователя), потом дефолт из кода
+    try {
+        const saved = JSON.parse(localStorage.getItem('gh_config') || 'null');
+        if (saved && saved.owner && saved.repo) return saved;
+    } catch {}
+    // Используем вшитые настройки если они заполнены
+    if (DEFAULT_CONFIG.owner && DEFAULT_CONFIG.owner !== 'ВАШ_ЛОГИН') return DEFAULT_CONFIG;
+    return null;
 }
 function saveGhConfig(cfg) {
     localStorage.setItem('gh_config', JSON.stringify(cfg));
@@ -591,13 +609,13 @@ document.getElementById('dbSelect').addEventListener('change', e => {
 document.getElementById('btnRefresh').addEventListener('click', fetchFromGithub);
 
 document.getElementById('btnSettings').addEventListener('click', async () => {
-    const cfg = getGhConfig() || {};
+    const cfg = getGhConfig() || DEFAULT_CONFIG;
     const result = await showModal({
         title: '⚙️ Настройки GitHub',
-        desc: 'Укажи данные своего репозитория. Папка baza/ должна быть в корне репозитория.',
+        desc: 'Репозиторий должен быть публичным. Папка baza/ должна быть в корне.',
         fields: [
-            { name: 'owner', label: 'GitHub логин (username)', placeholder: 'например: ivanov123', value: cfg.owner || '' },
-            { name: 'repo',  label: 'Название репозитория',    placeholder: 'например: exam-notes', value: cfg.repo  || '' },
+            { name: 'owner', label: 'GitHub логин (username)', placeholder: 'например: ivanov123', value: cfg.owner !== 'ВАШ_ЛОГИН' ? cfg.owner : '' },
+            { name: 'repo',  label: 'Название репозитория',    placeholder: 'например: exam-notes', value: cfg.repo  !== 'ВАШ_РЕПОЗИТОРИЙ' ? cfg.repo : '' },
             { name: 'branch',label: 'Ветка (обычно main)',     placeholder: 'main',                 value: cfg.branch || 'main' },
         ],
         confirmText: 'Сохранить'
@@ -606,6 +624,7 @@ document.getElementById('btnSettings').addEventListener('click', async () => {
     if (!result.owner || !result.repo) {
         showToast('Заполни логин и репозиторий', 'error'); return;
     }
+    if (!result.branch) result.branch = 'main';
     saveGhConfig(result);
     showToast('Настройки сохранены! Нажми 🔄 Обновить из Git', 'success');
 });
@@ -718,10 +737,13 @@ function init() {
         updateDbSelectUI();
         loadCurrentDb();
     } else {
-        // Проверяем есть ли уже config — если да, сразу предлагаем обновить
         const cfg = getGhConfig();
         if (cfg) {
-            document.getElementById('emptyState').textContent = 'Нажми 🔄 Обновить из Git чтобы загрузить базы';
+            // Конфиг есть — сразу грузим из Git автоматически
+            document.getElementById('emptyState').textContent = '⏳ Загружаю базы из Git...';
+            fetchFromGithub();
+        } else {
+            document.getElementById('emptyState').textContent = 'Нажми ⚙️ Git чтобы указать репозиторий, затем 🔄 Обновить из Git';
         }
     }
 }

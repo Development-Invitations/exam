@@ -280,6 +280,7 @@
             color: var(--text-primary); font-size: 14px; outline: none; margin-bottom: 12px;
         }
         .modal-input:focus { border-color: var(--border-focus); }
+        .modal-textarea { resize: vertical; height: 100px; font-family: inherit; }
         .modal-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block; }
         .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
         .modal-btn { padding: 9px 18px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
@@ -441,13 +442,7 @@
         <div id="questionsList" class="questions-list"></div>
 
         <div class="add-form-container">
-            <div class="form-group">
-                <input type="text" id="newTitle" class="form-input" placeholder="Заголовок / вопрос...">
-            </div>
-            <div class="form-group">
-                <textarea id="newText" class="form-textarea" placeholder="Текст ответа..."></textarea>
-            </div>
-            <button id="btnAdd" class="btn-add">+ Добавить вопрос в эту базу</button>
+            <button id="btnAdd" class="btn-add">+ Добавить вопрос в базу</button>
 
             <div class="db-file-actions">
                 <button class="btn-file-action" id="btnExport" title="Скачать текущую базу на ПК">💾 Скачать на ПК</button>
@@ -579,9 +574,9 @@ function showModal(options) {
             const label = document.createElement('label');
             label.className = 'modal-label';
             label.textContent = f.label;
-            const input = document.createElement('input');
-            input.className = 'modal-input';
-            input.type = 'text';
+            const input = document.createElement(f.type === 'textarea' ? 'textarea' : 'input');
+            input.className = 'modal-input' + (f.type === 'textarea' ? ' modal-textarea' : '');
+            if (f.type !== 'textarea') input.type = 'text';
             input.id = 'mfield_' + f.name;
             input.placeholder = f.placeholder || '';
             input.value = f.value || '';
@@ -628,6 +623,7 @@ function showModal(options) {
         };
         const onCancel = () => done(options.fields || options.type === 'prompt' ? null : false);
         const onKey = (e) => {
+            if (e.key === 'Enter' && e.target.tagName === 'TEXTAREA' && !e.ctrlKey) return; // перенос строки
             if (e.key === 'Enter') onConfirm();
             else if (e.key === 'Escape') onCancel();
         };
@@ -817,10 +813,18 @@ document.getElementById('btnDeleteDb').addEventListener('click', async () => {
 });
 
 document.getElementById('btnAdd').addEventListener('click', async () => {
-    const titleEl = document.getElementById('newTitle');
-    const textEl = document.getElementById('newText');
-    const title = titleEl.value.trim();
-    const text = textEl.value.trim();
+    const result = await showModal({
+        title: '+ Новый вопрос',
+        fields: [
+            { name: 'title', label: 'Заголовок / вопрос', type: 'text', placeholder: 'Введите вопрос...' },
+            { name: 'text', label: 'Текст ответа', type: 'textarea', placeholder: 'Введите ответ...' },
+        ],
+        confirmText: 'Добавить'
+    });
+    if (!result) return;
+
+    const title = result.title.trim();
+    const text = result.text.trim();
     if (!title || !text) {
         await showModal({ title: 'Внимание', desc: 'Заполни оба поля!', type: 'alert' }); return;
     }
@@ -851,8 +855,6 @@ document.getElementById('btnAdd').addEventListener('click', async () => {
     const newItem = { id: Date.now().toString(), title, text };
     const dataToSave = [...currentDbData, newItem];
 
-    const btnAddEl = document.getElementById('btnAdd');
-    btnAddEl.disabled = true;
     try {
         await apiSaveDb(dbNameForNew, dataToSave);
         if (isNewDb) {
@@ -861,14 +863,10 @@ document.getElementById('btnAdd').addEventListener('click', async () => {
             updateDbSelectUI();
         }
         currentDbData = dataToSave;
-        titleEl.value = ''; textEl.value = '';
         renderCards();
-        document.getElementById('searchBox').focus();
         showToast('Вопрос сохранён в GitHub', 'success');
     } catch (err) {
         showToast('Не удалось сохранить в GitHub: ' + err.message, 'error');
-    } finally {
-        btnAddEl.disabled = false;
     }
 });
 

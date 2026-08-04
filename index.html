@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шпаргалки</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .left-pane {
+            width: 42%;
+            min-width: 340px;
+            border-right: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            background: #1e293b;
+        }
+
+        .db-selector-container {
+            padding: 12px 15px;
+            background: #0f172a;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .db-header-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .db-select {
+            flex-grow: 1;
+            padding: 8px 10px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+        .btn-small {
+            padding: 8px 10px;
+            background: #334155;
+            border: none;
+            border-radius: 6px;
+            color: #cbd5e1;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .btn-small:hover { background: #475569; color: #fff; }
+        .btn-small.danger { background: #7f1d1d; color: #fca5a5; }
+        .btn-small.danger:hover { background: #991b1b; color: #fff; }
+        .btn-small.refresh { background: #065f46; color: #a7f3d0; }
+        .btn-small.refresh:hover { background: #047857; color: #fff; }
+        .btn-small.settings { background: #1e3a5f; color: #93c5fd; }
+        .btn-small.settings:hover { background: #1e40af; color: #fff; }
+
+        .search-container {
+            padding: 12px 15px;
+            border-bottom: 1px solid #334155;
+            background: #1e293b;
+        }
+        .search-input, .form-input, .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus, .form-input:focus, .form-textarea:focus { border-color: #38bdf8; }
+
+        .questions-list {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 15px;
+        }
+        .question-item {
+            display: none;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .question-item:hover { border-color: #38bdf8; background: #1e293b; }
+        .question-item.active { border-color: #38bdf8; background: #1e3a8a; }
+        .q-title { font-weight: 600; font-size: 14px; color: #f8fafc; word-break: break-word; }
+
+        .add-form-container {
+            padding: 15px;
+            border-top: 1px solid #334155;
+            background: #1e293b;
+        }
+        .form-group { margin-bottom: 8px; }
+        .form-textarea { resize: vertical; height: 50px; }
+        .btn-add {
+            width: 100%;
+            padding: 10px;
+            background: #0ea5e9;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-add:hover { background: #0284c7; }
+
+        .db-file-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .btn-file-action {
+            flex: 1;
+            padding: 8px 6px;
+            background: #0369a1;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+        }
+        .btn-file-action:hover { background: #0284c7; }
+
+        .right-pane {
+            width: 58%;
+            padding: 30px;
+            overflow-y: auto;
+            background: #0b0f19;
+        }
+        .current-db-title {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .empty-placeholder { color: #64748b; text-align: center; margin-top: 50px; font-size: 15px; }
+        .answer-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .answer-card.highlight { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
+        .answer-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-right: 70px; }
+        .answer-number { font-size: 12px; font-weight: 600; color: #38bdf8; background: #0f172a; padding: 3px 8px; border-radius: 4px; border: 1px solid #334155; }
+        .answer-title { font-size: 18px; font-weight: bold; color: #f8fafc; margin-bottom: 10px; word-break: break-word; }
+        .answer-text { color: #94a3b8; line-height: 1.5; font-size: 15px; word-break: break-word; white-space: pre-wrap; }
+        .btn-delete {
+            position: absolute; top: 20px; right: 20px;
+            background: transparent; border: 1px solid #ef4444; color: #ef4444;
+            padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;
+            transition: all 0.2s;
+        }
+        .btn-delete:hover { background: #ef4444; color: #fff; }
+
+        /* Статус GitHub */
+        .gh-status {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+        .gh-status.from-git { background: #064e3b; color: #6ee7b7; }
+        .gh-status.local-only { background: #1c1917; color: #a8a29e; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(3px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.2s ease;
+        }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+        .modal-box {
+            background: #1e293b; border: 1px solid #334155; border-radius: 10px;
+            width: 450px; max-width: 95%; padding: 24px; box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+        }
+        .modal-title { font-size: 18px; font-weight: 600; color: #f8fafc; margin-bottom: 10px; }
+        .modal-desc { font-size: 14px; color: #94a3b8; margin-bottom: 16px; line-height: 1.5; }
+        .modal-input {
+            width: 100%; padding: 10px 14px; background: #0f172a;
+            border: 1px solid #475569; border-radius: 6px; color: #fff; font-size: 14px;
+            outline: none; margin-bottom: 12px;
+        }
+        .modal-input:focus { border-color: #38bdf8; }
+        .modal-label { font-size: 12px; color: #64748b; margin-bottom: 4px; display: block; }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+        .modal-btn { padding: 9px 18px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+        .modal-btn.cancel { background: #334155; color: #cbd5e1; }
+        .modal-btn.confirm { background: #0ea5e9; color: #fff; }
+        .modal-btn.danger { background: #ef4444; color: #fff; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: #1e293b; border: 1px solid #334155;
+            border-radius: 8px; padding: 12px 18px;
+            font-size: 14px; color: #f8fafc;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transform: translateY(20px); opacity: 0;
+            transition: all 0.3s ease; pointer-events: none; z-index: 99999;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: #065f46; color: #6ee7b7; }
+        .toast.error { border-color: #7f1d1d; color: #fca5a5; }
+
+        .loading-text { color: #64748b; font-size: 13px; padding: 15px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="left-pane">
+    <div class="db-selector-container">
+        <div class="db-header-row">
+            <select id="dbSelect" class="db-select" title="Выбрать базу данных"></select>
+            <button class="btn-small settings" id="btnSettings" title="Настройки GitHub">⚙️ Git</button>
+        </div>
+        <div class="db-header-row">
+            <button class="btn-small refresh" id="btnRefresh" style="flex:1;" title="Загрузить базы из GitHub репозитория">🔄 Обновить из Git</button>
+            <button class="btn-small danger" id="btnDeleteDb" style="flex:1;" title="Удалить текущую базу (только локально)">Удалить базу</button>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchBox" class="search-input" placeholder="🔍 Поиск по тексту..." autofocus>
+    </div>
+
+    <div id="questionsList" class="questions-list"></div>
+
+    <div class="add-form-container">
+        <div class="form-group">
+            <input type="text" id="newTitle" class="form-input" placeholder="Заголовок / вопрос...">
+        </div>
+        <div class="form-group">
+            <textarea id="newText" class="form-textarea" placeholder="Текст ответа..."></textarea>
+        </div>
+        <button id="btnAdd" class="btn-add">+ Добавить вопрос в эту базу</button>
+
+        <div class="db-file-actions">
+            <button class="btn-file-action" id="btnExport" title="Скачать текущую базу на ПК">💾 Скачать на ПК</button>
+            <button class="btn-file-action" id="btnImport" title="Загрузить базу с ПК">📂 Загрузить с ПК</button>
+            <input type="file" id="filePicker" accept=".json" style="display: none;" multiple>
+        </div>
+    </div>
+</div>
+
+<div class="right-pane" id="rightPane">
+    <div id="dbNameLabel" class="current-db-title">Текущая база: — (0 вопросов)</div>
+    <div id="emptyState" class="empty-placeholder">Настройте GitHub в ⚙️ Git и нажмите 🔄 Обновить из Git</div>
+</div>
+
+<!-- Modal -->
+<div id="customModal" class="modal-overlay">
+    <div class="modal-box">
+        <div id="modalTitle" class="modal-title">Сообщение</div>
+        <div id="modalDesc" class="modal-desc"></div>
+        <div id="modalFields"></div>
+        <div class="modal-buttons">
+            <button id="modalBtnCancel" class="modal-btn cancel">Отмена</button>
+            <button id="modalBtnConfirm" class="modal-btn confirm">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+// ── Состояние ──────────────────────────────────────────────────────────
+let dbList = [];          // [{ name, source: 'git'|'local' }]
+let currentDbName = '';
+let currentDbData = [];   // текущие данные (из localStorage)
+
+// ── Утилиты ────────────────────────────────────────────────────────────
+function escapeHtml(t) {
+    return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showToast(msg, type = '') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show ' + type;
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => { el.className = 'toast'; }, 3000);
+}
+
+// ── Config GitHub ──────────────────────────────────────────────────────
+function getGhConfig() {
+    try { return JSON.parse(localStorage.getItem('gh_config') || 'null'); } catch { return null; }
+}
+function saveGhConfig(cfg) {
+    localStorage.setItem('gh_config', JSON.stringify(cfg));
+}
+
+// ── Хранилище баз (localStorage) ──────────────────────────────────────
+function getStoredDb(name) {
+    try { return JSON.parse(localStorage.getItem('db_' + name) || 'null'); } catch { return null; }
+}
+function saveStoredDb(name, data) {
+    localStorage.setItem('db_' + name, JSON.stringify(data));
+}
+function removeStoredDb(name) {
+    localStorage.removeItem('db_' + name);
+}
+function getDbList() {
+    try { return JSON.parse(localStorage.getItem('dbList') || '[]'); } catch { return []; }
+}
+function saveDbList(list) {
+    localStorage.setItem('dbList', JSON.stringify(list));
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────
+function showModal(options) {
+    const overlay = document.getElementById('customModal');
+    document.getElementById('modalTitle').textContent = options.title || '';
+    document.getElementById('modalDesc').textContent = options.desc || '';
+    const fieldsEl = document.getElementById('modalFields');
+    fieldsEl.innerHTML = '';
+
+    if (options.fields) {
+        options.fields.forEach(f => {
+            const label = document.createElement('label');
+            label.className = 'modal-label';
+            label.textContent = f.label;
+            const input = document.createElement('input');
+            input.className = 'modal-input';
+            input.type = 'text';
+            input.id = 'mfield_' + f.name;
+            input.placeholder = f.placeholder || '';
+            input.value = f.value || '';
+            fieldsEl.appendChild(label);
+            fieldsEl.appendChild(input);
+        });
+    } else if (options.type === 'prompt') {
+        const input = document.createElement('input');
+        input.className = 'modal-input';
+        input.type = 'text';
+        input.id = 'mfield_single';
+        input.placeholder = options.placeholder || '';
+        input.value = options.defaultValue || '';
+        fieldsEl.appendChild(input);
+    }
+
+    const cancelBtn = document.getElementById('modalBtnCancel');
+    const confirmBtn = document.getElementById('modalBtnConfirm');
+    cancelBtn.style.display = options.type === 'alert' ? 'none' : 'inline-block';
+    confirmBtn.className = 'modal-btn ' + (options.confirmClass || 'confirm');
+    confirmBtn.textContent = options.confirmText || 'OK';
+    overlay.classList.add('open');
+
+    return new Promise(resolve => {
+        const done = (val) => {
+            overlay.classList.remove('open');
+            confirmBtn.removeEventListener('click', onConfirm);
+            cancelBtn.removeEventListener('click', onCancel);
+            document.removeEventListener('keydown', onKey);
+            resolve(val);
+        };
+        const onConfirm = () => {
+            if (options.fields) {
+                const result = {};
+                options.fields.forEach(f => {
+                    result[f.name] = document.getElementById('mfield_' + f.name).value.trim();
+                });
+                done(result);
+            } else if (options.type === 'prompt') {
+                done(document.getElementById('mfield_single').value);
+            } else {
+                done(true);
+            }
+        };
+        const onCancel = () => done(options.fields || options.type === 'prompt' ? null : false);
+        const onKey = (e) => {
+            if (e.key === 'Enter') onConfirm();
+            else if (e.key === 'Escape') onCancel();
+        };
+        confirmBtn.addEventListener('click', onConfirm);
+        cancelBtn.addEventListener('click', onCancel);
+        document.addEventListener('keydown', onKey);
+
+        // Фокус на первом поле
+        setTimeout(() => {
+            const first = fieldsEl.querySelector('input') || document.getElementById('mfield_single');
+            if (first) { first.focus(); first.select(); }
+        }, 50);
+    });
+}
+
+// ── GitHub API ─────────────────────────────────────────────────────────
+async function fetchFromGithub() {
+    const cfg = getGhConfig();
+    if (!cfg || !cfg.owner || !cfg.repo) {
+        showToast('Сначала настройте GitHub репозиторий (⚙️ Git)', 'error');
+        return;
+    }
+
+    const branch = cfg.branch || 'main';
+    const apiUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/baza?ref=${branch}`;
+
+    document.getElementById('emptyState').textContent = '⏳ Загружаю из GitHub...';
+
+    try {
+        const res = await fetch(apiUrl, {
+            headers: { 'Accept': 'application/vnd.github.v3+json' }
+        });
+
+        if (!res.ok) {
+            if (res.status === 404) throw new Error('Папка baza не найдена в репозитории');
+            if (res.status === 403) throw new Error('Превышен лимит GitHub API. Подождите минуту.');
+            throw new Error(`GitHub ответил: ${res.status}`);
+        }
+
+        const files = await res.json();
+        const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+
+        if (jsonFiles.length === 0) {
+            showToast('В папке baza нет .json файлов', 'error');
+            return;
+        }
+
+        let count = 0;
+        for (const file of jsonFiles) {
+            try {
+                const rawUrl = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${branch}/baza/${file.name}`;
+                const dataRes = await fetch(rawUrl + '?t=' + Date.now());
+                if (!dataRes.ok) continue;
+                const data = await dataRes.json();
+                const arr = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : null);
+                if (!arr) continue;
+                saveStoredDb(file.name, arr);
+                count++;
+                // Добавляем в список если нет
+                if (!dbList.find(d => d.name === file.name)) {
+                    dbList.push({ name: file.name, source: 'git' });
+                } else {
+                    const entry = dbList.find(d => d.name === file.name);
+                    entry.source = 'git';
+                }
+            } catch (e) { /* пропускаем битые файлы */ }
+        }
+
+        saveDbList(dbList);
+
+        if (!currentDbName && dbList.length > 0) currentDbName = dbList[0].name;
+        updateDbSelectUI();
+        loadCurrentDb();
+        showToast(`Загружено ${count} баз из GitHub`, 'success');
+
+    } catch (err) {
+        showToast('Ошибка GitHub: ' + err.message, 'error');
+        document.getElementById('emptyState').textContent = 'Ошибка загрузки из GitHub.';
+    }
+}
+
+// ── UI ─────────────────────────────────────────────────────────────────
+function updateDbSelectUI() {
+    const sel = document.getElementById('dbSelect');
+    sel.innerHTML = '';
+    dbList.forEach(db => {
+        const opt = document.createElement('option');
+        opt.value = db.name;
+        opt.textContent = db.name.replace('.json', '') + (db.source === 'git' ? ' ✓' : ' (локал.)');
+        if (db.name === currentDbName) opt.selected = true;
+        sel.appendChild(opt);
+    });
+    updateDbLabel();
+}
+
+function updateDbLabel() {
+    document.getElementById('dbNameLabel').textContent =
+        `Текущая база: ${currentDbName.replace('.json','') || '—'} — (Вопросов: ${currentDbData.length})`;
+}
+
+function loadCurrentDb() {
+    if (!currentDbName) { currentDbData = []; renderCards(); return; }
+    currentDbData = getStoredDb(currentDbName) || [];
+    renderCards();
+}
+
+function renderCards() {
+    const pane = document.getElementById('rightPane');
+    Array.from(pane.getElementsByClassName('answer-card')).forEach(c => c.remove());
+    updateDbLabel();
+
+    let emptyState = document.getElementById('emptyState');
+    if (currentDbData.length === 0) {
+        if (!emptyState) {
+            const p = document.createElement('div');
+            p.id = 'emptyState'; p.className = 'empty-placeholder';
+            p.textContent = 'База данных пуста.';
+            pane.appendChild(p);
+        } else {
+            emptyState.textContent = 'База данных пуста.';
+        }
+    } else {
+        if (emptyState) emptyState.remove();
+        currentDbData.forEach((item, i) => {
+            const card = document.createElement('div');
+            card.className = 'answer-card';
+            card.setAttribute('data-id', item.id);
+            card.innerHTML = `
+                <button class="btn-delete" data-id="${item.id}">Удалить</button>
+                <div class="answer-header-row">
+                    <span class="answer-number">№ ${i + 1} из ${currentDbData.length}</span>
+                </div>
+                <div class="answer-title">${escapeHtml(item.title)}</div>
+                <div class="answer-text">${escapeHtml(item.text)}</div>
+            `;
+            card.querySelector('.btn-delete').addEventListener('click', () => deleteCard(item.id));
+            pane.appendChild(card);
+        });
+    }
+    buildSearchList();
+}
+
+function buildSearchList() {
+    const list = document.getElementById('questionsList');
+    list.innerHTML = '';
+    const cards = Array.from(document.getElementById('rightPane').getElementsByClassName('answer-card'));
+    cards.forEach(card => {
+        const id = card.getAttribute('data-id');
+        const title = card.querySelector('.answer-title').textContent;
+        const body = card.querySelector('.answer-text').textContent;
+        const item = document.createElement('div');
+        item.className = 'question-item';
+        item.setAttribute('data-id', id);
+        item.setAttribute('data-search', (title + ' ' + body).toLowerCase());
+        item.innerHTML = `<div class="q-title">${escapeHtml(title)}</div>`;
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.question-item').forEach(el => el.classList.remove('active'));
+            item.classList.add('active');
+            cards.forEach(c => c.classList.remove('highlight'));
+            card.classList.add('highlight');
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        list.appendChild(item);
+    });
+    applySearch();
+}
+
+function applySearch() {
+    const q = document.getElementById('searchBox').value.trim().toLowerCase();
+    document.querySelectorAll('.question-item').forEach(item => {
+        if (!q) { item.style.display = 'none'; return; }
+        const match = q.split(/\s+/).every(t => item.getAttribute('data-search').includes(t));
+        item.style.display = match ? 'block' : 'none';
+    });
+}
+
+// ── События ────────────────────────────────────────────────────────────
+document.getElementById('searchBox').addEventListener('input', applySearch);
+
+document.getElementById('dbSelect').addEventListener('change', e => {
+    currentDbName = e.target.value;
+    document.getElementById('searchBox').value = '';
+    loadCurrentDb();
+});
+
+document.getElementById('btnRefresh').addEventListener('click', fetchFromGithub);
+
+document.getElementById('btnSettings').addEventListener('click', async () => {
+    const cfg = getGhConfig() || {};
+    const result = await showModal({
+        title: '⚙️ Настройки GitHub',
+        desc: 'Укажи данные своего репозитория. Папка baza/ должна быть в корне репозитория.',
+        fields: [
+            { name: 'owner', label: 'GitHub логин (username)', placeholder: 'например: ivanov123', value: cfg.owner || '' },
+            { name: 'repo',  label: 'Название репозитория',    placeholder: 'например: exam-notes', value: cfg.repo  || '' },
+            { name: 'branch',label: 'Ветка (обычно main)',     placeholder: 'main',                 value: cfg.branch || 'main' },
+        ],
+        confirmText: 'Сохранить'
+    });
+    if (!result) return;
+    if (!result.owner || !result.repo) {
+        showToast('Заполни логин и репозиторий', 'error'); return;
+    }
+    saveGhConfig(result);
+    showToast('Настройки сохранены! Нажми 🔄 Обновить из Git', 'success');
+});
+
+document.getElementById('btnDeleteDb').addEventListener('click', async () => {
+    if (!currentDbName) return;
+    const ok = await showModal({
+        title: 'Удаление',
+        desc: `Удалить базу «${currentDbName.replace('.json','')}» из браузера? (файл в Git останется)`,
+        type: 'confirm', confirmText: 'Удалить', confirmClass: 'danger'
+    });
+    if (!ok) return;
+    removeStoredDb(currentDbName);
+    dbList = dbList.filter(d => d.name !== currentDbName);
+    saveDbList(dbList);
+    currentDbName = dbList.length > 0 ? dbList[0].name : '';
+    updateDbSelectUI();
+    loadCurrentDb();
+    showToast('База удалена из браузера', 'success');
+});
+
+document.getElementById('btnAdd').addEventListener('click', async () => {
+    const titleEl = document.getElementById('newTitle');
+    const textEl = document.getElementById('newText');
+    const title = titleEl.value.trim();
+    const text = textEl.value.trim();
+    if (!title || !text) {
+        await showModal({ title: 'Внимание', desc: 'Заполни оба поля!', type: 'alert' }); return;
+    }
+    if (!currentDbName) {
+        // Предложим создать новую базу
+        const name = await showModal({
+            title: 'Новая база',
+            desc: 'Введи название новой базы:',
+            type: 'prompt', defaultValue: 'новая_база', confirmText: 'Создать'
+        });
+        if (!name || !name.trim()) return;
+        let fn = name.trim();
+        if (!fn.endsWith('.json')) fn += '.json';
+        currentDbName = fn;
+        dbList.push({ name: fn, source: 'local' });
+        saveDbList(dbList);
+        currentDbData = [];
+        updateDbSelectUI();
+    }
+    currentDbData.push({ id: Date.now().toString(), title, text });
+    saveStoredDb(currentDbName, currentDbData);
+    titleEl.value = ''; textEl.value = '';
+    renderCards();
+    document.getElementById('searchBox').focus();
+});
+
+async function deleteCard(id) {
+    const ok = await showModal({
+        title: 'Удаление', desc: 'Удалить этот вопрос?',
+        type: 'confirm', confirmText: 'Удалить', confirmClass: 'danger'
+    });
+    if (!ok) return;
+    currentDbData = currentDbData.filter(i => i.id !== id);
+    saveStoredDb(currentDbName, currentDbData);
+    renderCards();
+}
+
+document.getElementById('btnExport').addEventListener('click', () => {
+    if (!currentDbName) { showToast('Нет активной базы', 'error'); return; }
+    const json = JSON.stringify(currentDbData, null, 2);
+    const a = document.createElement('a');
+    a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(json);
+    a.download = currentDbName;
+    document.body.appendChild(a); a.click(); a.remove();
+});
+
+document.getElementById('btnImport').addEventListener('click', () => {
+    document.getElementById('filePicker').click();
+});
+
+document.getElementById('filePicker').addEventListener('change', e => {
+    Array.from(e.target.files || []).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = async ev => {
+            try {
+                const json = JSON.parse(ev.target.result);
+                const data = Array.isArray(json) ? json : (Array.isArray(json.data) ? json.data : null);
+                if (!data) { showToast(`${file.name}: не массив`, 'error'); return; }
+                const fn = file.name.endsWith('.json') ? file.name : file.name + '.json';
+                saveStoredDb(fn, data);
+                if (!dbList.find(d => d.name === fn)) {
+                    dbList.push({ name: fn, source: 'local' });
+                    saveDbList(dbList);
+                }
+                currentDbName = fn;
+                currentDbData = data;
+                updateDbSelectUI();
+                renderCards();
+                showToast(`Загружено: ${fn}`, 'success');
+            } catch(err) {
+                showToast('Ошибка JSON: ' + file.name, 'error');
+            }
+        };
+        reader.readAsText(file);
+    });
+    e.target.value = '';
+});
+
+// ── Инициализация ──────────────────────────────────────────────────────
+function init() {
+    dbList = getDbList();
+    if (dbList.length > 0) {
+        currentDbName = dbList[0].name;
+        updateDbSelectUI();
+        loadCurrentDb();
+    } else {
+        // Проверяем есть ли уже config — если да, сразу предлагаем обновить
+        const cfg = getGhConfig();
+        if (cfg) {
+            document.getElementById('emptyState').textContent = 'Нажми 🔄 Обновить из Git чтобы загрузить базы';
+        }
+    }
+}
+
+init();
+</script>
+</body>
+</html>

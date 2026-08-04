@@ -34,8 +34,9 @@ app.get('/api/dbs/:name', async (req, res) => {
         if (blobs.length === 0) {
             return res.status(404).json({ error: 'База не найдена' });
         }
-        // Для приватных блобов используем downloadUrl (подписанный временный URL)
-        const response = await fetch(blobs[0].downloadUrl);
+        const response = await fetch(blobs[0].url, {
+            headers: { Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` }
+        });
         const data = await response.json();
         res.json(data);
     } catch (err) {
@@ -52,7 +53,7 @@ app.post('/api/dbs', async (req, res) => {
 
         const filename = normalizeName(name);
         await put(BLOB_PREFIX + filename, JSON.stringify(data, null, 2), {
-            access: 'private',
+            access: 'public',
             contentType: 'application/json',
             addRandomSuffix: false
         });

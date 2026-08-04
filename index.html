@@ -303,8 +303,8 @@
 //  Все пользователи получат эти базы автоматически при нажатии "Обновить"
 // ══════════════════════════════════════════════════════════════════════
 const DEFAULT_CONFIG = {
-    owner:  'Development-Invitations',     // GitHub логин, например: ivanov123
-    repo:   'exam', // Название репо, например: exam-notes
+    owner:  'ВАШ_ЛОГИН',     // GitHub логин, например: ivanov123
+    repo:   'ВАШ_РЕПОЗИТОРИЙ', // Название репо, например: exam-notes
     branch: 'main'           // Ветка (обычно main или master)
 };
 // ══════════════════════════════════════════════════════════════════════
@@ -436,7 +436,7 @@ function showModal(options) {
     });
 }
 
-// ── GitHub API ─────────────────────────────────────────────────────────
+// ── Загрузка через raw.githubusercontent.com (без API, без лимитов) ────
 async function fetchFromGithub() {
     const cfg = getGhConfig();
     if (!cfg || !cfg.owner || !cfg.repo) {
@@ -445,60 +445,55 @@ async function fetchFromGithub() {
     }
 
     const branch = cfg.branch || 'main';
-    const apiUrl = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/baza?ref=${branch}`;
+    const rawBase = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${branch}/baza`;
+    const bust = '?t=' + Date.now();
 
-    document.getElementById('emptyState').textContent = '⏳ Загружаю из GitHub...';
+    const emptyEl = document.getElementById('emptyState');
+    if (emptyEl) emptyEl.textContent = '⏳ Загружаю из Git...';
 
     try {
-        const res = await fetch(apiUrl, {
-            headers: { 'Accept': 'application/vnd.github.v3+json' }
-        });
-
-        if (!res.ok) {
-            if (res.status === 404) throw new Error('Папка baza не найдена в репозитории');
-            if (res.status === 403) throw new Error('Превышен лимит GitHub API. Подождите минуту.');
-            throw new Error(`GitHub ответил: ${res.status}`);
+        // Читаем manifest.json — список файлов без GitHub API
+        const manifestRes = await fetch(`${rawBase}/manifest.json${bust}`);
+        if (!manifestRes.ok) {
+            throw new Error(
+                'Файл baza/manifest.json не найден в репозитории. ' +
+                'Создай его — инструкция в описании ниже.'
+            );
         }
-
-        const files = await res.json();
-        const jsonFiles = files.filter(f => f.name.endsWith('.json'));
-
-        if (jsonFiles.length === 0) {
-            showToast('В папке baza нет .json файлов', 'error');
+        const manifest = await manifestRes.json();
+        if (!Array.isArray(manifest) || manifest.length === 0) {
+            showToast('manifest.json пустой или неверный формат', 'error');
             return;
         }
 
         let count = 0;
-        for (const file of jsonFiles) {
+        for (const filename of manifest) {
+            if (!filename.endsWith('.json') || filename === 'manifest.json') continue;
             try {
-                const rawUrl = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${branch}/baza/${file.name}`;
-                const dataRes = await fetch(rawUrl + '?t=' + Date.now());
-                if (!dataRes.ok) continue;
-                const data = await dataRes.json();
+                const res = await fetch(`${rawBase}/${filename}${bust}`);
+                if (!res.ok) continue;
+                const data = await res.json();
                 const arr = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : null);
                 if (!arr) continue;
-                saveStoredDb(file.name, arr);
+                saveStoredDb(filename, arr);
                 count++;
-                // Добавляем в список если нет
-                if (!dbList.find(d => d.name === file.name)) {
-                    dbList.push({ name: file.name, source: 'git' });
+                if (!dbList.find(d => d.name === filename)) {
+                    dbList.push({ name: filename, source: 'git' });
                 } else {
-                    const entry = dbList.find(d => d.name === file.name);
-                    entry.source = 'git';
+                    dbList.find(d => d.name === filename).source = 'git';
                 }
             } catch (e) { /* пропускаем битые файлы */ }
         }
 
         saveDbList(dbList);
-
         if (!currentDbName && dbList.length > 0) currentDbName = dbList[0].name;
         updateDbSelectUI();
         loadCurrentDb();
-        showToast(`Загружено ${count} баз из GitHub`, 'success');
+        showToast(`Загружено ${count} баз из Git`, 'success');
 
     } catch (err) {
-        showToast('Ошибка GitHub: ' + err.message, 'error');
-        document.getElementById('emptyState').textContent = 'Ошибка загрузки из GitHub.';
+        showToast('Ошибка: ' + err.message, 'error');
+        if (emptyEl) emptyEl.textContent = 'Ошибка загрузки. Проверь настройки ⚙️ Git.';
     }
 }
 

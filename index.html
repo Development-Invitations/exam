@@ -111,39 +111,42 @@
             transition: background 0.25s, color 0.25s, border-color 0.25s;
         }
 
+        /* ── Фирменный жёлтый (цвет логотипа 1С) — не зависит от темы ── */
+        :root {
+            --brand-yellow:       #FFD100;
+            --brand-yellow-hover: #E6BC00;
+            --brand-yellow-fg:    #1a1a1a;
+        }
+
+        .btn-small, .btn-theme, .btn-add, .btn-file-action {
+            background: var(--brand-yellow) !important;
+            color: var(--brand-yellow-fg) !important;
+            border: none;
+        }
+        .btn-small:hover, .btn-theme:hover, .btn-add:hover, .btn-file-action:hover {
+            background: var(--brand-yellow-hover) !important;
+            color: var(--brand-yellow-fg) !important;
+        }
+
         .btn-small {
             padding: 8px 10px;
-            background: var(--btn-default-bg);
-            border: none;
             border-radius: 6px;
-            color: var(--btn-default-fg);
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s, color 0.2s;
             white-space: nowrap;
         }
-        .btn-small:hover { background: var(--btn-default-hv); color: var(--text-primary); }
-        .btn-small.danger { background: #7f1d1d; color: #fca5a5; }
-        .btn-small.danger:hover { background: #991b1b; color: #fff; }
-        .btn-small.refresh { background: #065f46; color: #a7f3d0; }
-        .btn-small.refresh:hover { background: #047857; color: #fff; }
-        .btn-small.settings { background: #1e3a5f; color: #93c5fd; }
-        .btn-small.settings:hover { background: #1e40af; color: #fff; }
 
         /* Кнопка темы */
         .btn-theme {
             padding: 8px 10px;
-            background: var(--btn-default-bg);
-            border: 1px solid var(--border);
             border-radius: 6px;
-            color: var(--text-secondary);
             font-size: 15px;
             cursor: pointer;
             transition: background 0.2s, border-color 0.2s;
             line-height: 1;
         }
-        .btn-theme:hover { background: var(--btn-default-hv); border-color: var(--border-focus); }
 
         .search-container {
             padding: 12px 15px;
@@ -163,6 +166,19 @@
             transition: border-color 0.2s, background 0.25s, color 0.25s;
         }
         .search-input:focus, .form-input:focus, .form-textarea:focus { border-color: var(--border-focus); }
+
+        .search-wrap { position: relative; }
+        .search-wrap .search-input { padding-right: 34px; }
+        .search-clear {
+            position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+            width: 22px; height: 22px; border: none; border-radius: 50%;
+            background: var(--btn-default-bg); color: var(--text-secondary);
+            font-size: 13px; line-height: 1; cursor: pointer;
+            display: none; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s;
+        }
+        .search-clear:hover { background: var(--btn-default-hv); color: var(--text-primary); }
+        .search-clear.show { display: flex; }
 
         .questions-list { overflow-y: auto; flex-grow: 1; padding: 15px; }
         .question-item {
@@ -189,19 +205,17 @@
         .form-textarea { resize: vertical; height: 50px; }
         .btn-add {
             width: 100%; padding: 10px;
-            background: #0ea5e9; border: none; border-radius: 6px;
-            color: #fff; font-weight: 600; cursor: pointer; transition: background 0.2s;
+            border-radius: 6px;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
         }
-        .btn-add:hover { background: #0284c7; }
 
         .db-file-actions { display: flex; gap: 6px; margin-top: 8px; }
         .btn-file-action {
             flex: 1; padding: 8px 6px;
-            background: #0369a1; border: none; border-radius: 6px;
-            color: #fff; font-size: 12px; font-weight: 600;
+            border-radius: 6px;
+            font-size: 12px; font-weight: 600;
             cursor: pointer; transition: background 0.2s; text-align: center;
         }
-        .btn-file-action:hover { background: #0284c7; }
 
         .right-pane {
             width: 58%; padding: 30px; overflow-y: auto;
@@ -266,7 +280,8 @@
         .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
         .modal-btn { padding: 9px 18px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
         .modal-btn.cancel { background: var(--btn-default-bg); color: var(--btn-default-fg); }
-        .modal-btn.confirm { background: #0ea5e9; color: #fff; }
+        .modal-btn.confirm { background: var(--brand-yellow); color: var(--brand-yellow-fg); }
+        .modal-btn.confirm:hover { background: var(--brand-yellow-hover); }
         .modal-btn.danger { background: #ef4444; color: #fff; }
 
         /* Toast */
@@ -284,6 +299,79 @@
         .toast.error { border-color: #7f1d1d; color: #ef4444; }
 
         .loading-text { color: var(--text-muted); font-size: 13px; padding: 15px; text-align: center; }
+
+        /* ── Адаптив: планшеты/узкие окна ─────────────────────────────── */
+        @media (max-width: 900px) {
+            .left-pane { width: 46%; min-width: 300px; }
+            .right-pane { width: 54%; }
+        }
+
+        /* ── Адаптив: мобильные (~480px и ниже) ───────────────────────── */
+        @media (max-width: 480px) {
+            body {
+                flex-direction: column;
+                height: 100dvh;
+                overflow: hidden;
+            }
+            .left-pane {
+                width: 100%;
+                min-width: 0;
+                height: 52vh;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .right-pane {
+                width: 100%;
+                flex: 1;
+                min-height: 0;
+                padding: 16px 12px 90px;
+            }
+            .db-selector-container { padding: 10px 12px; }
+            .db-header-row { flex-wrap: wrap; }
+            .db-select { min-width: 0; font-size: 12px; }
+            .btn-small { padding: 8px; font-size: 11px; }
+            .btn-theme { padding: 8px; }
+
+            .search-container { padding: 10px 12px; }
+
+            .questions-list { padding: 10px 12px; }
+            .question-item { padding: 10px 12px; margin-bottom: 6px; }
+            .q-title { font-size: 13px; }
+
+            .add-form-container { padding: 10px 12px; }
+            .form-textarea { height: 44px; }
+
+            .db-file-actions { flex-wrap: wrap; }
+            .btn-file-action { flex: 1 1 45%; font-size: 11px; padding: 8px 4px; }
+
+            .current-db-title { font-size: 11px; margin-bottom: 10px; }
+            .answer-card { padding: 14px; margin-bottom: 14px; }
+            .answer-header-row { padding-right: 60px; }
+            .answer-title { font-size: 16px; }
+            .answer-text { font-size: 14px; }
+            .btn-delete { top: 14px; right: 14px; font-size: 11px; padding: 3px 6px; }
+
+            .modal-box { width: 100%; max-width: 92%; padding: 18px; }
+            .modal-title { font-size: 16px; }
+            .modal-desc { font-size: 13px; }
+            .modal-buttons { flex-wrap: wrap; }
+            .modal-btn { flex: 1 1 auto; }
+
+            .toast {
+                left: 12px; right: 12px; bottom: 12px;
+                text-align: center; font-size: 13px;
+            }
+        }
+
+        /* ── Адаптив: совсем узкие (~375px и ниже) ────────────────────── */
+        @media (max-width: 375px) {
+            .left-pane { height: 55vh; }
+            .db-header-row { gap: 6px; }
+            .btn-small { font-size: 10px; padding: 7px 6px; }
+            .search-input, .form-input, .form-textarea { font-size: 13px; padding: 8px 10px; }
+            .btn-file-action { flex: 1 1 100%; }
+            .btn-delete { top: 12px; right: 12px; font-size: 10px; padding: 3px 5px; }
+        }
     </style>
 </head>
 <body>
@@ -293,16 +381,18 @@
         <div class="db-header-row">
             <select id="dbSelect" class="db-select" title="Выбрать базу данных"></select>
             <button class="btn-theme" id="btnTheme" title="Сменить тему">🌙</button>
-            <button class="btn-small settings" id="btnSettings" title="Настройки GitHub">⚙️ Git</button>
         </div>
         <div class="db-header-row">
-            <button class="btn-small refresh" id="btnRefresh" style="flex:1;" title="Загрузить базы из GitHub репозитория">🔄 Обновить из Git</button>
-            <button class="btn-small danger" id="btnDeleteDb" style="flex:1;" title="Удалить текущую базу (только локально)">Удалить базу</button>
+            <button class="btn-small refresh" id="btnRefresh" style="flex:1;" title="Обновить список баз из GitHub">🔄 Обновить</button>
+            <button class="btn-small danger" id="btnDeleteDb" style="flex:1;" title="Удалить текущую базу из репозитория GitHub">Удалить базу</button>
         </div>
     </div>
 
     <div class="search-container">
-        <input type="text" id="searchBox" class="search-input" placeholder="🔍 Поиск по тексту..." autofocus>
+        <div class="search-wrap">
+            <input type="text" id="searchBox" class="search-input" placeholder="🔍 Поиск по тексту..." autofocus>
+            <button type="button" id="btnClearSearch" class="search-clear" title="Очистить поиск">✕</button>
+        </div>
     </div>
 
     <div id="questionsList" class="questions-list"></div>
@@ -318,7 +408,7 @@
 
         <div class="db-file-actions">
             <button class="btn-file-action" id="btnExport" title="Скачать текущую базу на ПК">💾 Скачать на ПК</button>
-            <button class="btn-file-action" id="btnImport" title="Загрузить базу с ПК">📂 Загрузить с ПК</button>
+            <button class="btn-file-action" id="btnImport" title="Загрузить базу с ПК в GitHub-репозиторий">📂 Загрузить с ПК</button>
             <input type="file" id="filePicker" accept=".json" style="display: none;" multiple>
         </div>
     </div>
@@ -326,7 +416,7 @@
 
 <div class="right-pane" id="rightPane">
     <div id="dbNameLabel" class="current-db-title">Текущая база: — (0 вопросов)</div>
-    <div id="emptyState" class="empty-placeholder">Настройте GitHub в ⚙️ Git и нажмите 🔄 Обновить из Git</div>
+    <div id="emptyState" class="empty-placeholder">⏳ Загрузка баз...</div>
 </div>
 
 <!-- Modal -->
@@ -346,21 +436,14 @@
 <div id="toast" class="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════════════════════════════
-//  🔧 НАСТРОЙКИ РЕПОЗИТОРИЯ — заполни и залей в Git
-//  Все пользователи получат эти базы автоматически при нажатии "Обновить"
-// ══════════════════════════════════════════════════════════════════════
-const DEFAULT_CONFIG = {
-    owner:  'Development-Invitations',     // GitHub логин, например: ivanov123
-    repo:   'exam', // Название репо, например: exam-notes
-    branch: 'main'           // Ветка (обычно main или master)
-};
-// ══════════════════════════════════════════════════════════════════════
+// Все базы читаются/пишутся через серверные функции /api/dbs (см. api/dbs.js),
+// которые от имени сервера обращаются к GitHub Contents API. Токен GitHub
+// хранится только в переменных окружения Vercel и никогда не попадает в браузер.
 
 // ── Состояние ──────────────────────────────────────────────────────────
-let dbList = [];          // [{ name, source: 'git'|'local' }]
+let dbList = [];          // ['имя1.json', 'имя2.json', ...]
 let currentDbName = '';
-let currentDbData = [];   // текущие данные (из localStorage)
+let currentDbData = [];   // вопросы текущей базы
 
 // ── Тема ───────────────────────────────────────────────────────────────
 function applyTheme(theme) {
@@ -398,36 +481,45 @@ function showToast(msg, type = '') {
     el._timer = setTimeout(() => { el.className = 'toast'; }, 3000);
 }
 
-// ── Config GitHub ──────────────────────────────────────────────────────
-function getGhConfig() {
-    // Сначала смотрим localStorage (настройки пользователя), потом дефолт из кода
-    try {
-        const saved = JSON.parse(localStorage.getItem('gh_config') || 'null');
-        if (saved && saved.owner && saved.repo) return saved;
-    } catch {}
-    // Используем вшитые настройки если они заполнены
-    if (DEFAULT_CONFIG.owner && DEFAULT_CONFIG.owner !== 'ВАШ_ЛОГИН') return DEFAULT_CONFIG;
-    return null;
-}
-function saveGhConfig(cfg) {
-    localStorage.setItem('gh_config', JSON.stringify(cfg));
+// ── API: базы хранятся и меняются на GitHub через серверную функцию ────
+async function apiListDbs() {
+    const res = await fetch('/api/dbs');
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
 }
 
-// ── Хранилище баз (localStorage) ──────────────────────────────────────
-function getStoredDb(name) {
-    try { return JSON.parse(localStorage.getItem('db_' + name) || 'null'); } catch { return null; }
+async function apiGetDb(name) {
+    const res = await fetch(`/api/dbs?name=${encodeURIComponent(name)}`);
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
 }
-function saveStoredDb(name, data) {
-    localStorage.setItem('db_' + name, JSON.stringify(data));
+
+async function apiSaveDb(name, data) {
+    const res = await fetch('/api/dbs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, data }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
 }
-function removeStoredDb(name) {
-    localStorage.removeItem('db_' + name);
-}
-function getDbList() {
-    try { return JSON.parse(localStorage.getItem('dbList') || '[]'); } catch { return []; }
-}
-function saveDbList(list) {
-    localStorage.setItem('dbList', JSON.stringify(list));
+
+async function apiDeleteDb(name) {
+    const res = await fetch(`/api/dbs?name=${encodeURIComponent(name)}`, { method: 'DELETE' });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
 }
 
 // ── Modal ──────────────────────────────────────────────────────────────
@@ -455,7 +547,7 @@ function showModal(options) {
     } else if (options.type === 'prompt') {
         const input = document.createElement('input');
         input.className = 'modal-input';
-        input.type = 'text';
+        input.type = options.inputType || 'text';
         input.id = 'mfield_single';
         input.placeholder = options.placeholder || '';
         input.value = options.defaultValue || '';
@@ -507,79 +599,40 @@ function showModal(options) {
     });
 }
 
-// ── Загрузка через raw.githubusercontent.com (без API, без лимитов) ────
-async function fetchFromGithub() {
-    const cfg = getGhConfig();
-    if (!cfg || !cfg.owner || !cfg.repo) {
-        showToast('Сначала настройте GitHub репозиторий (⚙️ Git)', 'error');
-        return;
+// ── Пароль на удаление ───────────────────────────────────────────────
+const DELETE_PASSWORD = '0404';
+async function confirmDeleteWithPassword(desc) {
+    const pass = await showModal({
+        title: 'Подтверждение удаления',
+        desc: desc || 'Введите пароль для удаления:',
+        type: 'prompt',
+        inputType: 'password',
+        placeholder: 'Пароль',
+        confirmText: 'Удалить',
+        confirmClass: 'danger'
+    });
+    if (pass === null) return false;
+    if (pass !== DELETE_PASSWORD) {
+        showToast('Неверный пароль', 'error');
+        return false;
     }
+    return true;
+}
 
-    const branch = cfg.branch || 'main';
-    const rawBase = `https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${branch}/baza`;
-    const bust = '?t=' + Date.now();
-
+// ── Обновление списка баз с сервера (реальное состояние репозитория) ───
+async function refreshDbList(keepActive = true) {
     const emptyEl = document.getElementById('emptyState');
-    if (emptyEl) emptyEl.textContent = '⏳ Загружаю из Git...';
-
+    if (emptyEl) emptyEl.textContent = '⏳ Загружаю список баз...';
     try {
-        // Читаем manifest.json — список файлов без GitHub API
-        const manifestRes = await fetch(`${rawBase}/manifest.json${bust}`);
-        if (!manifestRes.ok) {
-            throw new Error(
-                'Файл baza/manifest.json не найден в репозитории. ' +
-                'Создай его — инструкция в описании ниже.'
-            );
+        dbList = await apiListDbs();
+        if (!keepActive || !currentDbName || !dbList.includes(currentDbName)) {
+            currentDbName = dbList.length > 0 ? dbList[0] : '';
         }
-        const manifest = await manifestRes.json();
-        if (!Array.isArray(manifest) || manifest.length === 0) {
-            showToast('manifest.json пустой или неверный формат', 'error');
-            return;
-        }
-
-        let count = 0;
-        for (const filename of manifest) {
-            if (!filename.endsWith('.json') || filename === 'manifest.json') continue;
-            try {
-                // encodeURIComponent нужен для кириллических имён файлов
-                const encodedName = filename.split('/').map(encodeURIComponent).join('/');
-                const res = await fetch(`${rawBase}/${encodedName}${bust}`);
-                if (!res.ok) {
-                    console.warn(`Не удалось загрузить "${filename}": HTTP ${res.status}`);
-                    continue;
-                }
-                const text = await res.text();
-                let data;
-                try { data = JSON.parse(text); } catch(e) {
-                    console.warn(`Неверный JSON в "${filename}":`, e.message);
-                    continue;
-                }
-                const arr = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : null);
-                if (!arr) {
-                    console.warn(`"${filename}" не является массивом`);
-                    continue;
-                }
-                saveStoredDb(filename, arr);
-                count++;
-                if (!dbList.find(d => d.name === filename)) {
-                    dbList.push({ name: filename, source: 'git' });
-                } else {
-                    dbList.find(d => d.name === filename).source = 'git';
-                }
-            } catch (e) {
-                console.warn(`Ошибка при загрузке "${filename}":`, e.message);
-            }
-        }
-
-        saveDbList(dbList);
-        if (!currentDbName && dbList.length > 0) currentDbName = dbList[0].name;
         updateDbSelectUI();
-        loadCurrentDb();
-        showToast(`Загружено ${count} баз из Git`, 'success');
-
+        await loadCurrentDb();
     } catch (err) {
         showToast('Ошибка: ' + err.message, 'error');
-        if (emptyEl) emptyEl.textContent = 'Ошибка загрузки. Проверь настройки ⚙️ Git.';
+        if (emptyEl) emptyEl.textContent = 'Не удалось загрузить список баз с сервера.';
     }
 }
 
@@ -587,11 +640,11 @@ async function fetchFromGithub() {
 function updateDbSelectUI() {
     const sel = document.getElementById('dbSelect');
     sel.innerHTML = '';
-    dbList.forEach(db => {
+    dbList.forEach(name => {
         const opt = document.createElement('option');
-        opt.value = db.name;
-        opt.textContent = db.name.replace('.json', '') + (db.source === 'git' ? ' ✓' : ' (локал.)');
-        if (db.name === currentDbName) opt.selected = true;
+        opt.value = name;
+        opt.textContent = name.replace('.json', '');
+        if (name === currentDbName) opt.selected = true;
         sel.appendChild(opt);
     });
     updateDbLabel();
@@ -602,10 +655,16 @@ function updateDbLabel() {
         `Текущая база: ${currentDbName.replace('.json','') || '—'} — (Вопросов: ${currentDbData.length})`;
 }
 
-function loadCurrentDb() {
+async function loadCurrentDb() {
     if (!currentDbName) { currentDbData = []; renderCards(); return; }
-    currentDbData = getStoredDb(currentDbName) || [];
-    renderCards();
+    try {
+        currentDbData = await apiGetDb(currentDbName);
+        renderCards();
+    } catch (err) {
+        currentDbData = [];
+        renderCards();
+        showToast('Не удалось загрузить базу: ' + err.message, 'error');
+    }
 }
 
 function renderCards() {
@@ -670,7 +729,9 @@ function buildSearchList() {
 }
 
 function applySearch() {
-    const q = document.getElementById('searchBox').value.trim().toLowerCase();
+    const searchBox = document.getElementById('searchBox');
+    const q = searchBox.value.trim().toLowerCase();
+    document.getElementById('btnClearSearch').classList.toggle('show', q.length > 0);
     document.querySelectorAll('.question-item').forEach(item => {
         if (!q) { item.style.display = 'none'; return; }
         const match = q.split(/\s+/).every(t => item.getAttribute('data-search').includes(t));
@@ -680,51 +741,35 @@ function applySearch() {
 
 // ── События ────────────────────────────────────────────────────────────
 document.getElementById('searchBox').addEventListener('input', applySearch);
+document.getElementById('btnClearSearch').addEventListener('click', () => {
+    const searchBox = document.getElementById('searchBox');
+    searchBox.value = '';
+    applySearch();
+    searchBox.focus();
+});
 
-document.getElementById('dbSelect').addEventListener('change', e => {
+document.getElementById('dbSelect').addEventListener('change', async e => {
     currentDbName = e.target.value;
     document.getElementById('searchBox').value = '';
-    loadCurrentDb();
+    await loadCurrentDb();
 });
 
-document.getElementById('btnRefresh').addEventListener('click', fetchFromGithub);
-
-document.getElementById('btnSettings').addEventListener('click', async () => {
-    const cfg = getGhConfig() || DEFAULT_CONFIG;
-    const result = await showModal({
-        title: '⚙️ Настройки GitHub',
-        desc: 'Репозиторий должен быть публичным. Папка baza/ должна быть в корне.',
-        fields: [
-            { name: 'owner', label: 'GitHub логин (username)', placeholder: 'например: ivanov123', value: cfg.owner !== 'ВАШ_ЛОГИН' ? cfg.owner : '' },
-            { name: 'repo',  label: 'Название репозитория',    placeholder: 'например: exam-notes', value: cfg.repo  !== 'ВАШ_РЕПОЗИТОРИЙ' ? cfg.repo : '' },
-            { name: 'branch',label: 'Ветка (обычно main)',     placeholder: 'main',                 value: cfg.branch || 'main' },
-        ],
-        confirmText: 'Сохранить'
-    });
-    if (!result) return;
-    if (!result.owner || !result.repo) {
-        showToast('Заполни логин и репозиторий', 'error'); return;
-    }
-    if (!result.branch) result.branch = 'main';
-    saveGhConfig(result);
-    showToast('Настройки сохранены! Нажми 🔄 Обновить из Git', 'success');
-});
+document.getElementById('btnRefresh').addEventListener('click', () => refreshDbList(true));
 
 document.getElementById('btnDeleteDb').addEventListener('click', async () => {
     if (!currentDbName) return;
-    const ok = await showModal({
-        title: 'Удаление',
-        desc: `Удалить базу «${currentDbName.replace('.json','')}» из браузера? (файл в Git останется)`,
-        type: 'confirm', confirmText: 'Удалить', confirmClass: 'danger'
-    });
+    const ok = await confirmDeleteWithPassword(`Удалить базу «${currentDbName.replace('.json','')}» из репозитория GitHub? Это необратимо. Введите пароль:`);
     if (!ok) return;
-    removeStoredDb(currentDbName);
-    dbList = dbList.filter(d => d.name !== currentDbName);
-    saveDbList(dbList);
-    currentDbName = dbList.length > 0 ? dbList[0].name : '';
-    updateDbSelectUI();
-    loadCurrentDb();
-    showToast('База удалена из браузера', 'success');
+    try {
+        await apiDeleteDb(currentDbName);
+        dbList = dbList.filter(n => n !== currentDbName);
+        currentDbName = dbList.length > 0 ? dbList[0] : '';
+        updateDbSelectUI();
+        await loadCurrentDb();
+        showToast('База удалена из репозитория', 'success');
+    } catch (err) {
+        showToast('Не удалось удалить базу: ' + err.message, 'error');
+    }
 });
 
 document.getElementById('btnAdd').addEventListener('click', async () => {
@@ -735,6 +780,16 @@ document.getElementById('btnAdd').addEventListener('click', async () => {
     if (!title || !text) {
         await showModal({ title: 'Внимание', desc: 'Заполни оба поля!', type: 'alert' }); return;
     }
+    const isDuplicate = currentDbData.some(item =>
+        item.title.trim().toLowerCase() === title.toLowerCase() &&
+        item.text.trim().toLowerCase() === text.toLowerCase()
+    );
+    if (isDuplicate) {
+        showToast('Такой вопрос уже есть в базе — повторное добавление отменено', 'error');
+        return;
+    }
+    let isNewDb = false;
+    let dbNameForNew = currentDbName;
     if (!currentDbName) {
         // Предложим создать новую базу
         const name = await showModal({
@@ -745,28 +800,49 @@ document.getElementById('btnAdd').addEventListener('click', async () => {
         if (!name || !name.trim()) return;
         let fn = name.trim();
         if (!fn.endsWith('.json')) fn += '.json';
-        currentDbName = fn;
-        dbList.push({ name: fn, source: 'local' });
-        saveDbList(dbList);
-        currentDbData = [];
-        updateDbSelectUI();
+        if (dbList.includes(fn)) { showToast('База с таким именем уже существует', 'error'); return; }
+        dbNameForNew = fn;
+        isNewDb = true;
     }
-    currentDbData.push({ id: Date.now().toString(), title, text });
-    saveStoredDb(currentDbName, currentDbData);
-    titleEl.value = ''; textEl.value = '';
-    renderCards();
-    document.getElementById('searchBox').focus();
+
+    const newItem = { id: Date.now().toString(), title, text };
+    const dataToSave = [...currentDbData, newItem];
+
+    const btnAddEl = document.getElementById('btnAdd');
+    btnAddEl.disabled = true;
+    try {
+        await apiSaveDb(dbNameForNew, dataToSave);
+        if (isNewDb) {
+            dbList.push(dbNameForNew);
+            currentDbName = dbNameForNew;
+            updateDbSelectUI();
+        }
+        currentDbData = dataToSave;
+        titleEl.value = ''; textEl.value = '';
+        renderCards();
+        document.getElementById('searchBox').focus();
+        showToast('Вопрос сохранён в GitHub', 'success');
+    } catch (err) {
+        showToast('Не удалось сохранить в GitHub: ' + err.message, 'error');
+    } finally {
+        btnAddEl.disabled = false;
+    }
 });
 
 async function deleteCard(id) {
-    const ok = await showModal({
-        title: 'Удаление', desc: 'Удалить этот вопрос?',
-        type: 'confirm', confirmText: 'Удалить', confirmClass: 'danger'
-    });
+    const ok = await confirmDeleteWithPassword('Удалить этот вопрос? Введите пароль:');
     if (!ok) return;
-    currentDbData = currentDbData.filter(i => i.id !== id);
-    saveStoredDb(currentDbName, currentDbData);
-    renderCards();
+    const previousData = currentDbData;
+    const newData = currentDbData.filter(i => i.id !== id);
+    try {
+        await apiSaveDb(currentDbName, newData);
+        currentDbData = newData;
+        renderCards();
+        showToast('Вопрос удалён из GitHub', 'success');
+    } catch (err) {
+        showToast('Не удалось удалить: ' + err.message, 'error');
+        currentDbData = previousData;
+    }
 }
 
 document.getElementById('btnExport').addEventListener('click', () => {
@@ -791,18 +867,16 @@ document.getElementById('filePicker').addEventListener('change', e => {
                 const data = Array.isArray(json) ? json : (Array.isArray(json.data) ? json.data : null);
                 if (!data) { showToast(`${file.name}: не массив`, 'error'); return; }
                 const fn = file.name.endsWith('.json') ? file.name : file.name + '.json';
-                saveStoredDb(fn, data);
-                if (!dbList.find(d => d.name === fn)) {
-                    dbList.push({ name: fn, source: 'local' });
-                    saveDbList(dbList);
-                }
+
+                await apiSaveDb(fn, data);
+                if (!dbList.includes(fn)) dbList.push(fn);
                 currentDbName = fn;
                 currentDbData = data;
                 updateDbSelectUI();
                 renderCards();
-                showToast(`Загружено: ${fn}`, 'success');
+                showToast(`Загружено в GitHub: ${fn}`, 'success');
             } catch(err) {
-                showToast('Ошибка JSON: ' + file.name, 'error');
+                showToast(`Ошибка загрузки "${file.name}": ` + err.message, 'error');
             }
         };
         reader.readAsText(file);
@@ -811,25 +885,7 @@ document.getElementById('filePicker').addEventListener('change', e => {
 });
 
 // ── Инициализация ──────────────────────────────────────────────────────
-function init() {
-    dbList = getDbList();
-    if (dbList.length > 0) {
-        currentDbName = dbList[0].name;
-        updateDbSelectUI();
-        loadCurrentDb();
-    } else {
-        const cfg = getGhConfig();
-        if (cfg) {
-            // Конфиг есть — сразу грузим из Git автоматически
-            document.getElementById('emptyState').textContent = '⏳ Загружаю базы из Git...';
-            fetchFromGithub();
-        } else {
-            document.getElementById('emptyState').textContent = 'Нажми ⚙️ Git чтобы указать репозиторий, затем 🔄 Обновить из Git';
-        }
-    }
-}
-
-init();
+refreshDbList();
 </script>
 </body>
 </html>

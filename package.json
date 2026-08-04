@@ -1,8 +1,19 @@
 {
   "name": "exam-baza-app",
   "version": "1.0.0",
+<<<<<<< Updated upstream
   "private": true,
   "engines": {
     "node": ">=18"
+=======
+  "description": "Spy app with Node.js backend database",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.6.1",
+    "express": "^4.22.2"
+>>>>>>> Stashed changes
   }
 }

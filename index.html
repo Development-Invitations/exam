@@ -781,11 +781,10 @@ document.getElementById('btnAdd').addEventListener('click', async () => {
         await showModal({ title: 'Внимание', desc: 'Заполни оба поля!', type: 'alert' }); return;
     }
     const isDuplicate = currentDbData.some(item =>
-        item.title.trim().toLowerCase() === title.toLowerCase() &&
-        item.text.trim().toLowerCase() === text.toLowerCase()
+        item.title.trim().toLowerCase() === title.toLowerCase()
     );
     if (isDuplicate) {
-        showToast('Такой вопрос уже есть в базе — повторное добавление отменено', 'error');
+        showToast('Вопрос с таким заголовком уже есть в базе — повторное добавление отменено', 'error');
         return;
     }
     let isNewDb = false;

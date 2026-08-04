@@ -5,67 +5,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Шпаргалки</title>
     <style>
+        /* ── Тёмная тема (по умолчанию) ─────────────────────────────── */
+        :root {
+            --bg-base:       #0f172a;
+            --bg-pane:       #1e293b;
+            --bg-right:      #0b0f19;
+            --bg-input:      #0f172a;
+            --bg-item:       #0f172a;
+            --bg-item-hover: #1e293b;
+            --bg-item-active:#1e3a8a;
+            --border:        #334155;
+            --border-focus:  #38bdf8;
+            --border-input:  #475569;
+            --text-primary:  #f8fafc;
+            --text-secondary:#94a3b8;
+            --text-muted:    #64748b;
+            --text-item:     #f8fafc;
+            --accent:        #38bdf8;
+            --accent-bg:     #0f172a;
+            --btn-default-bg:#334155;
+            --btn-default-fg:#cbd5e1;
+            --btn-default-hv:#475569;
+            --modal-overlay: rgba(15,23,42,0.85);
+            --modal-bg:      #1e293b;
+            --toast-bg:      #1e293b;
+            --shadow:        rgba(0,0,0,0.4);
+            --card-bg:       #1e293b;
+        }
+
+        /* ── Светлая тема ────────────────────────────────────────────── */
+        body.light {
+            --bg-base:       #f1f5f9;
+            --bg-pane:       #ffffff;
+            --bg-right:      #f8fafc;
+            --bg-input:      #f1f5f9;
+            --bg-item:       #f8fafc;
+            --bg-item-hover: #e2e8f0;
+            --bg-item-active:#dbeafe;
+            --border:        #e2e8f0;
+            --border-focus:  #0ea5e9;
+            --border-input:  #cbd5e1;
+            --text-primary:  #0f172a;
+            --text-secondary:#475569;
+            --text-muted:    #94a3b8;
+            --text-item:     #1e293b;
+            --accent:        #0ea5e9;
+            --accent-bg:     #e0f2fe;
+            --btn-default-bg:#e2e8f0;
+            --btn-default-fg:#475569;
+            --btn-default-hv:#cbd5e1;
+            --modal-overlay: rgba(15,23,42,0.5);
+            --modal-bg:      #ffffff;
+            --toast-bg:      #ffffff;
+            --shadow:        rgba(0,0,0,0.12);
+            --card-bg:       #ffffff;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-input); }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #0f172a;
-            color: #f8fafc;
+            background: var(--bg-base);
+            color: var(--text-primary);
             display: flex;
             height: 100vh;
             overflow: hidden;
+            transition: background 0.25s, color 0.25s;
         }
 
         .left-pane {
             width: 42%;
             min-width: 340px;
-            border-right: 1px solid #334155;
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            background: #1e293b;
+            background: var(--bg-pane);
+            transition: background 0.25s, border-color 0.25s;
         }
 
         .db-selector-container {
             padding: 12px 15px;
-            background: #0f172a;
-            border-bottom: 1px solid #334155;
+            background: var(--bg-base);
+            border-bottom: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             gap: 8px;
+            transition: background 0.25s;
         }
-        .db-header-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
+        .db-header-row { display: flex; gap: 8px; align-items: center; }
+
         .db-select {
             flex-grow: 1;
             padding: 8px 10px;
-            background: #1e293b;
-            border: 1px solid #475569;
+            background: var(--bg-pane);
+            border: 1px solid var(--border-input);
             border-radius: 6px;
-            color: #fff;
+            color: var(--text-primary);
             font-size: 13px;
             outline: none;
             cursor: pointer;
+            transition: background 0.25s, color 0.25s, border-color 0.25s;
         }
+
         .btn-small {
             padding: 8px 10px;
-            background: #334155;
+            background: var(--btn-default-bg);
             border: none;
             border-radius: 6px;
-            color: #cbd5e1;
+            color: var(--btn-default-fg);
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, color 0.2s;
             white-space: nowrap;
         }
-        .btn-small:hover { background: #475569; color: #fff; }
+        .btn-small:hover { background: var(--btn-default-hv); color: var(--text-primary); }
         .btn-small.danger { background: #7f1d1d; color: #fca5a5; }
         .btn-small.danger:hover { background: #991b1b; color: #fff; }
         .btn-small.refresh { background: #065f46; color: #a7f3d0; }
@@ -73,110 +131,105 @@
         .btn-small.settings { background: #1e3a5f; color: #93c5fd; }
         .btn-small.settings:hover { background: #1e40af; color: #fff; }
 
+        /* Кнопка темы */
+        .btn-theme {
+            padding: 8px 10px;
+            background: var(--btn-default-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            line-height: 1;
+        }
+        .btn-theme:hover { background: var(--btn-default-hv); border-color: var(--border-focus); }
+
         .search-container {
             padding: 12px 15px;
-            border-bottom: 1px solid #334155;
-            background: #1e293b;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-pane);
+            transition: background 0.25s;
         }
         .search-input, .form-input, .form-textarea {
             width: 100%;
             padding: 10px 14px;
-            background: #0f172a;
-            border: 1px solid #475569;
+            background: var(--bg-input);
+            border: 1px solid var(--border-input);
             border-radius: 6px;
-            color: #fff;
+            color: var(--text-primary);
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, background 0.25s, color 0.25s;
         }
-        .search-input:focus, .form-input:focus, .form-textarea:focus { border-color: #38bdf8; }
+        .search-input:focus, .form-input:focus, .form-textarea:focus { border-color: var(--border-focus); }
 
-        .questions-list {
-            overflow-y: auto;
-            flex-grow: 1;
-            padding: 15px;
-        }
+        .questions-list { overflow-y: auto; flex-grow: 1; padding: 15px; }
         .question-item {
             display: none;
             padding: 12px 15px;
             margin-bottom: 8px;
-            background: #0f172a;
-            border: 1px solid #334155;
+            background: var(--bg-item);
+            border: 1px solid var(--border);
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .question-item:hover { border-color: #38bdf8; background: #1e293b; }
-        .question-item.active { border-color: #38bdf8; background: #1e3a8a; }
-        .q-title { font-weight: 600; font-size: 14px; color: #f8fafc; word-break: break-word; }
+        .question-item:hover { border-color: var(--border-focus); background: var(--bg-item-hover); }
+        .question-item.active { border-color: var(--border-focus); background: var(--bg-item-active); }
+        .q-title { font-weight: 600; font-size: 14px; color: var(--text-item); word-break: break-word; }
 
         .add-form-container {
             padding: 15px;
-            border-top: 1px solid #334155;
-            background: #1e293b;
+            border-top: 1px solid var(--border);
+            background: var(--bg-pane);
+            transition: background 0.25s;
         }
         .form-group { margin-bottom: 8px; }
         .form-textarea { resize: vertical; height: 50px; }
         .btn-add {
-            width: 100%;
-            padding: 10px;
-            background: #0ea5e9;
-            border: none;
-            border-radius: 6px;
-            color: #fff;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
+            width: 100%; padding: 10px;
+            background: #0ea5e9; border: none; border-radius: 6px;
+            color: #fff; font-weight: 600; cursor: pointer; transition: background 0.2s;
         }
         .btn-add:hover { background: #0284c7; }
 
-        .db-file-actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-        }
+        .db-file-actions { display: flex; gap: 6px; margin-top: 8px; }
         .btn-file-action {
-            flex: 1;
-            padding: 8px 6px;
-            background: #0369a1;
-            border: none;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            text-align: center;
+            flex: 1; padding: 8px 6px;
+            background: #0369a1; border: none; border-radius: 6px;
+            color: #fff; font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s; text-align: center;
         }
         .btn-file-action:hover { background: #0284c7; }
 
         .right-pane {
-            width: 58%;
-            padding: 30px;
-            overflow-y: auto;
-            background: #0b0f19;
+            width: 58%; padding: 30px; overflow-y: auto;
+            background: var(--bg-right);
+            transition: background 0.25s;
         }
         .current-db-title {
-            font-size: 13px;
-            color: #64748b;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 13px; color: var(--text-muted);
+            margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        .empty-placeholder { color: #64748b; text-align: center; margin-top: 50px; font-size: 15px; }
+        .empty-placeholder { color: var(--text-muted); text-align: center; margin-top: 50px; font-size: 15px; }
+
         .answer-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            position: relative;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px; padding: 20px; margin-bottom: 20px; position: relative;
+            transition: background 0.25s, border-color 0.25s;
+            box-shadow: 0 1px 4px var(--shadow);
         }
-        .answer-card.highlight { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
+        .answer-card.highlight { border-color: var(--border-focus); box-shadow: 0 0 15px rgba(56,189,248,0.2); }
         .answer-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-right: 70px; }
-        .answer-number { font-size: 12px; font-weight: 600; color: #38bdf8; background: #0f172a; padding: 3px 8px; border-radius: 4px; border: 1px solid #334155; }
-        .answer-title { font-size: 18px; font-weight: bold; color: #f8fafc; margin-bottom: 10px; word-break: break-word; }
-        .answer-text { color: #94a3b8; line-height: 1.5; font-size: 15px; word-break: break-word; white-space: pre-wrap; }
+        .answer-number {
+            font-size: 12px; font-weight: 600; color: var(--accent);
+            background: var(--accent-bg); padding: 3px 8px;
+            border-radius: 4px; border: 1px solid var(--border);
+        }
+        .answer-title { font-size: 18px; font-weight: bold; color: var(--text-primary); margin-bottom: 10px; word-break: break-word; }
+        .answer-text { color: var(--text-secondary); line-height: 1.5; font-size: 15px; word-break: break-word; white-space: pre-wrap; }
         .btn-delete {
             position: absolute; top: 20px; right: 20px;
             background: transparent; border: 1px solid #ef4444; color: #ef4444;
@@ -185,58 +238,52 @@
         }
         .btn-delete:hover { background: #ef4444; color: #fff; }
 
-        /* Статус GitHub */
-        .gh-status {
-            font-size: 11px;
-            padding: 3px 8px;
-            border-radius: 4px;
-            margin-left: 6px;
-        }
+        .gh-status { font-size: 11px; padding: 3px 8px; border-radius: 4px; margin-left: 6px; }
         .gh-status.from-git { background: #064e3b; color: #6ee7b7; }
         .gh-status.local-only { background: #1c1917; color: #a8a29e; }
 
         /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(3px);
+            background: var(--modal-overlay); backdrop-filter: blur(3px);
             display: flex; justify-content: center; align-items: center;
             z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.2s ease;
         }
         .modal-overlay.open { opacity: 1; visibility: visible; }
         .modal-box {
-            background: #1e293b; border: 1px solid #334155; border-radius: 10px;
-            width: 450px; max-width: 95%; padding: 24px; box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            background: var(--modal-bg); border: 1px solid var(--border); border-radius: 10px;
+            width: 450px; max-width: 95%; padding: 24px; box-shadow: 0 15px 30px var(--shadow);
         }
-        .modal-title { font-size: 18px; font-weight: 600; color: #f8fafc; margin-bottom: 10px; }
-        .modal-desc { font-size: 14px; color: #94a3b8; margin-bottom: 16px; line-height: 1.5; }
+        .modal-title { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+        .modal-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
         .modal-input {
-            width: 100%; padding: 10px 14px; background: #0f172a;
-            border: 1px solid #475569; border-radius: 6px; color: #fff; font-size: 14px;
-            outline: none; margin-bottom: 12px;
+            width: 100%; padding: 10px 14px; background: var(--bg-input);
+            border: 1px solid var(--border-input); border-radius: 6px;
+            color: var(--text-primary); font-size: 14px; outline: none; margin-bottom: 12px;
         }
-        .modal-input:focus { border-color: #38bdf8; }
-        .modal-label { font-size: 12px; color: #64748b; margin-bottom: 4px; display: block; }
+        .modal-input:focus { border-color: var(--border-focus); }
+        .modal-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block; }
         .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
         .modal-btn { padding: 9px 18px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
-        .modal-btn.cancel { background: #334155; color: #cbd5e1; }
+        .modal-btn.cancel { background: var(--btn-default-bg); color: var(--btn-default-fg); }
         .modal-btn.confirm { background: #0ea5e9; color: #fff; }
         .modal-btn.danger { background: #ef4444; color: #fff; }
 
         /* Toast */
         .toast {
             position: fixed; bottom: 24px; right: 24px;
-            background: #1e293b; border: 1px solid #334155;
+            background: var(--toast-bg); border: 1px solid var(--border);
             border-radius: 8px; padding: 12px 18px;
-            font-size: 14px; color: #f8fafc;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            font-size: 14px; color: var(--text-primary);
+            box-shadow: 0 8px 20px var(--shadow);
             transform: translateY(20px); opacity: 0;
             transition: all 0.3s ease; pointer-events: none; z-index: 99999;
         }
         .toast.show { transform: translateY(0); opacity: 1; }
-        .toast.success { border-color: #065f46; color: #6ee7b7; }
-        .toast.error { border-color: #7f1d1d; color: #fca5a5; }
+        .toast.success { border-color: #065f46; color: #059669; }
+        .toast.error { border-color: #7f1d1d; color: #ef4444; }
 
-        .loading-text { color: #64748b; font-size: 13px; padding: 15px; text-align: center; }
+        .loading-text { color: var(--text-muted); font-size: 13px; padding: 15px; text-align: center; }
     </style>
 </head>
 <body>
@@ -245,6 +292,7 @@
     <div class="db-selector-container">
         <div class="db-header-row">
             <select id="dbSelect" class="db-select" title="Выбрать базу данных"></select>
+            <button class="btn-theme" id="btnTheme" title="Сменить тему">🌙</button>
             <button class="btn-small settings" id="btnSettings" title="Настройки GitHub">⚙️ Git</button>
         </div>
         <div class="db-header-row">
@@ -313,6 +361,29 @@ const DEFAULT_CONFIG = {
 let dbList = [];          // [{ name, source: 'git'|'local' }]
 let currentDbName = '';
 let currentDbData = [];   // текущие данные (из localStorage)
+
+// ── Тема ───────────────────────────────────────────────────────────────
+function applyTheme(theme) {
+    const btn = document.getElementById('btnTheme');
+    if (theme === 'light') {
+        document.body.classList.add('light');
+        btn.textContent = '🌙';
+        btn.title = 'Переключить на тёмную тему';
+    } else {
+        document.body.classList.remove('light');
+        btn.textContent = '☀️';
+        btn.title = 'Переключить на светлую тему';
+    }
+    localStorage.setItem('theme', theme);
+}
+
+document.getElementById('btnTheme').addEventListener('click', () => {
+    const isDark = !document.body.classList.contains('light');
+    applyTheme(isDark ? 'light' : 'dark');
+});
+
+// Применяем сохранённую тему (по умолчанию — светлая)
+applyTheme(localStorage.getItem('theme') || 'light');
 
 // ── Утилиты ────────────────────────────────────────────────────────────
 function escapeHtml(t) {

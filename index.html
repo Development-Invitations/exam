@@ -78,33 +78,30 @@
         }
 
         .left-pane {
-            position: relative;
             width: 42%;
             min-width: 340px;
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             background: var(--bg-pane);
-            transition: background 0.25s, border-color 0.25s, width 0.25s, min-width 0.25s;
-        }
-        .left-pane.collapsed {
-            width: 0 !important;
-            min-width: 0 !important;
-            border-right: none;
-            overflow: hidden;
+            transition: background 0.25s, border-color 0.25s;
         }
 
+        /* Сворачиваемая «шторка» с формой добавления вопроса и кнопками ПК —
+           сворачивает ТОЛЬКО этот блок, список вопросов и поиск всегда видны */
+        .add-form-panel { position: relative; flex-shrink: 0; }
+        #addFormContainer.collapsed { display: none; }
+
         .panel-toggle {
-            position: absolute; top: 50%; right: -14px; transform: translateY(-50%);
-            width: 28px; height: 56px; border-radius: 0 8px 8px 0;
+            position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            width: 56px; height: 28px; border-radius: 8px 8px 0 0;
             background: var(--brand-yellow); color: var(--brand-yellow-fg);
-            border: none; cursor: pointer; font-size: 13px; z-index: 500;
+            border: none; cursor: pointer; font-size: 13px; z-index: 50;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.2);
-            transition: background 0.2s, right 0.25s;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+            transition: background 0.2s;
         }
         .panel-toggle:hover { background: var(--brand-yellow-hover); }
-        .left-pane.collapsed .panel-toggle { right: -28px; }
 
         .db-selector-container {
             padding: 12px 15px;
@@ -457,18 +454,6 @@
                 border-bottom: 1px solid var(--border);
                 overflow: hidden;
             }
-            .left-pane.collapsed {
-                max-height: 0 !important;
-                border-bottom: none;
-            }
-            .panel-toggle {
-                top: auto; right: auto; bottom: -14px; left: 50%;
-                transform: translateX(-50%);
-                width: 56px; height: 28px;
-                border-radius: 0 0 8px 8px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            }
-            .left-pane.collapsed .panel-toggle { bottom: -28px; }
             .db-selector-container,
             .search-container {
                 flex-shrink: 0;
@@ -555,7 +540,6 @@
 <body>
 
 <div class="left-pane" id="leftPane">
-    <button id="panelToggle" class="panel-toggle" title="Скрыть панель">◀</button>
     <div class="db-selector-container">
         <div class="db-header-row">
             <select id="dbSelect" class="db-select" title="Выбрать базу данных"></select>
@@ -577,13 +561,16 @@
     <div class="left-scroll">
         <div id="questionsList" class="questions-list"></div>
 
-        <div class="add-form-container">
-            <button id="btnAdd" class="btn-add">+ Добавить вопрос в базу</button>
+        <div class="add-form-panel">
+            <button id="panelToggle" class="panel-toggle" title="Скрыть панель">▼</button>
+            <div class="add-form-container" id="addFormContainer">
+                <button id="btnAdd" class="btn-add">+ Добавить вопрос в базу</button>
 
-            <div class="db-file-actions">
-                <button class="btn-file-action" id="btnExport" title="Скачать текущую базу на ПК">💾 Скачать на ПК</button>
-                <button class="btn-file-action" id="btnImport" title="Загрузить базу с ПК в GitHub-репозиторий">📂 Загрузить с ПК</button>
-                <input type="file" id="filePicker" accept=".json" style="display: none;" multiple>
+                <div class="db-file-actions">
+                    <button class="btn-file-action" id="btnExport" title="Скачать текущую базу на ПК">💾 Скачать на ПК</button>
+                    <button class="btn-file-action" id="btnImport" title="Загрузить базу с ПК в GitHub-репозиторий">📂 Загрузить с ПК</button>
+                    <input type="file" id="filePicker" accept=".json" style="display: none;" multiple>
+                </div>
             </div>
         </div>
     </div>
@@ -1273,6 +1260,34 @@ chatInput.addEventListener('keydown', e => {
 chatInput.addEventListener('input', () => {
     chatInput.style.height = '38px';
     chatInput.style.height = Math.min(chatInput.scrollHeight, 90) + 'px';
+});
+
+// ── Скрыть/показать блок добавления вопроса (состояние сохраняется) ─────
+const addFormContainer = document.getElementById('addFormContainer');
+const panelToggle = document.getElementById('panelToggle');
+
+function applyFormCollapsed(collapsed) {
+    addFormContainer.classList.toggle('collapsed', collapsed);
+    panelToggle.textContent = collapsed ? '▲' : '▼';
+    panelToggle.title = collapsed ? 'Показать панель добавления' : 'Скрыть панель добавления';
+}
+
+applyFormCollapsed(localStorage.getItem('addFormCollapsed') === '1');
+
+panelToggle.addEventListener('click', () => {
+    const collapsed = !addFormContainer.classList.contains('collapsed');
+    applyFormCollapsed(collapsed);
+    localStorage.setItem('addFormCollapsed', collapsed ? '1' : '0');
+});
+
+// ── Закрытие чата по Esc и клику вне окна ────────────────────────────────
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && chatIsOpen) closeChat();
+});
+document.addEventListener('click', e => {
+    if (chatIsOpen && !chatPanel.contains(e.target) && !chatFab.contains(e.target)) {
+        closeChat();
+    }
 });
 
 // ── Инициализация ──────────────────────────────────────────────────────

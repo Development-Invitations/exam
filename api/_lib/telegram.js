@@ -5,21 +5,34 @@
 const { getJson, updateJson, deleteFile, getFile } = require('./github');
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID;
 const TELEGRAM_ALLOWED_IDS = String(process.env.TELEGRAM_ALLOWED_IDS || '')
     .split(',')
     .map(s => s.trim())
     .filter(Boolean);
 
+// Поддерживаем несколько получателей: TELEGRAM_ADMIN_CHAT_ID,
+// TELEGRAM_ADMIN_CHAT_ID_2, TELEGRAM_ADMIN_CHAT_ID_3, ... — вопрос с сайта
+// уходит во все сразу (личка нескольким людям или, лучше, ID группы —
+// см. рекомендацию в чате).
+function getAdminChatIds() {
+    const ids = [];
+    if (process.env.TELEGRAM_ADMIN_CHAT_ID) ids.push(process.env.TELEGRAM_ADMIN_CHAT_ID);
+    for (let i = 2; i <= 10; i++) {
+        const v = process.env[`TELEGRAM_ADMIN_CHAT_ID_${i}`];
+        if (v) ids.push(v);
+    }
+    return ids;
+}
+
 const CHAT_DIR = 'chat-sessions';
 const MSG_MAP_PATH = `${CHAT_DIR}/_msgmap.json`;
 const LAST_SESSION_PATH = `${CHAT_DIR}/_last-session.json`;
 const MAX_MESSAGES = 100;
-const MSG_MAP_MAX_ENTRIES = 50;
+const MSG_MAP_MAX_ENTRIES = 100;
 
 function assertTelegramConfig() {
-    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_ADMIN_CHAT_ID) {
-        throw new Error('Telegram-чат не настроен: задайте TELEGRAM_BOT_TOKEN и TELEGRAM_ADMIN_CHAT_ID в переменных окружения Vercel');
+    if (!TELEGRAM_BOT_TOKEN || getAdminChatIds().length === 0) {
+        throw new Error('Telegram-чат не настроен: задайте TELEGRAM_BOT_TOKEN и хотя бы TELEGRAM_ADMIN_CHAT_ID в переменных окружения Vercel');
     }
 }
 
@@ -41,9 +54,13 @@ function sessionLogPath(sessionId) {
     return `${CHAT_DIR}/${safe}.json`;
 }
 
-async function appendMessage(sessionId, from, text) {
+async function appendMessage(sessionId, from, text, authorName) {
     const path = sessionLogPath(sessionId);
-    const entry = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, from, text, ts: Date.now() };
+    const entry = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        from, text, ts: Date.now(),
+        ...(authorName ? { authorName } : {}),
+    };
     const newLog = await updateJson(
         path, [],
         log => [...(Array.isArray(log) ? log : []), entry].slice(-MAX_MESSAGES),
@@ -62,14 +79,20 @@ async function clearLog(sessionId) {
     if (file) await deleteFile(sessionLogPath(sessionId), `Чат [${sessionId.slice(0, 8)}]: очистка`, file.sha);
 }
 
-// Сопоставление message_id (в Telegram) -> sessionId, чтобы понимать, кому
-// адресован ответ администратора, если он использует "Reply" в Telegram.
-async function rememberMessageSession(telegramMessageId, sessionId) {
+// Сопоставление "chatId:messageId" (в Telegram) -> sessionId, чтобы понимать,
+// кому адресован ответ, если администратор использует "Reply" в Telegram.
+// chatId нужен в ключе, т.к. message_id уникален только в рамках одного чата —
+// у разных получателей (при рассылке в несколько чатов) он может совпасть.
+function mapKey(chatId, messageId) {
+    return `${chatId}:${messageId}`;
+}
+
+async function rememberMessageSession(chatId, telegramMessageId, sessionId) {
     await updateJson(
         MSG_MAP_PATH, {},
         map => {
             const entries = Object.entries(map).slice(-(MSG_MAP_MAX_ENTRIES - 1));
-            entries.push([String(telegramMessageId), { sessionId, ts: Date.now() }]);
+            entries.push([mapKey(chatId, telegramMessageId), { sessionId, ts: Date.now() }]);
             return Object.fromEntries(entries);
         },
         `Чат: привязка сообщения ${telegramMessageId} к сессии`
@@ -78,10 +101,11 @@ async function rememberMessageSession(telegramMessageId, sessionId) {
 }
 
 async function resolveSessionForReply(update) {
-    const replyTo = update.message && update.message.reply_to_message;
-    if (replyTo) {
+    const msg = update.message;
+    const replyTo = msg && msg.reply_to_message;
+    if (replyTo && msg.chat) {
         const { data: map } = await getJson(MSG_MAP_PATH, {});
-        const found = map[String(replyTo.message_id)];
+        const found = map[mapKey(msg.chat.id, replyTo.message_id)];
         if (found) return found.sessionId;
     }
     const { data: last } = await getJson(LAST_SESSION_PATH, {});
@@ -92,8 +116,14 @@ function isAllowedTelegramUser(userId) {
     return TELEGRAM_ALLOWED_IDS.includes(String(userId));
 }
 
+function telegramDisplayName(from) {
+    if (!from) return 'Аноним';
+    const name = [from.first_name, from.last_name].filter(Boolean).join(' ');
+    return name || (from.username ? '@' + from.username : 'Аноним');
+}
+
 module.exports = {
-    TELEGRAM_ADMIN_CHAT_ID,
+    getAdminChatIds,
     assertTelegramConfig,
     telegramApi,
     appendMessage,
@@ -102,4 +132,5 @@ module.exports = {
     rememberMessageSession,
     resolveSessionForReply,
     isAllowedTelegramUser,
+    telegramDisplayName,
 };

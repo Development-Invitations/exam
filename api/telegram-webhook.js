@@ -1,7 +1,7 @@
 // Telegram вызывает этот URL при каждом новом сообщении в чате с ботом
 // (регистрируется один раз через setWebhook, см. инструкцию в README/чате).
 const { assertGithubConfig } = require('./_lib/github');
-const { appendMessage, resolveSessionForReply, isAllowedTelegramUser } = require('./_lib/telegram');
+const { appendMessage, resolveSessionForReply, isAllowedTelegramUser, telegramDisplayName } = require('./_lib/telegram');
 
 const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
 
@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
             return res.status(200).end(); // некому маршрутизировать ответ
         }
 
-        await appendMessage(sessionId, 'admin', message.text);
+        await appendMessage(sessionId, 'admin', message.text, telegramDisplayName(message.from));
         return res.status(200).end();
     } catch (err) {
         console.error(err);

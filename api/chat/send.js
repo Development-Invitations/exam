@@ -1,5 +1,5 @@
 const { assertGithubConfig } = require('../_lib/github');
-const { TELEGRAM_ADMIN_CHAT_ID, assertTelegramConfig, telegramApi, appendMessage, rememberMessageSession } = require('../_lib/telegram');
+const { getAdminChatIds, assertTelegramConfig, telegramApi, appendMessage, rememberMessageSession } = require('../_lib/telegram');
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Метод не поддерживается' });
@@ -15,12 +15,32 @@ module.exports = async (req, res) => {
         if (trimmed.length > 4000) return res.status(400).json({ error: 'Сообщение слишком длинное (макс. 4000 символов)' });
 
         const shortId = sessionId.slice(0, 8);
-        const sent = await telegramApi('sendMessage', {
-            chat_id: TELEGRAM_ADMIN_CHAT_ID,
-            text: `💬 Вопрос с сайта [${shortId}]:\n\n${trimmed}`,
-        });
+        const adminChatIds = getAdminChatIds();
 
-        await rememberMessageSession(sent.message_id, sessionId);
+        // Рассылаем во все настроенные чаты (несколько личных чатов или ID группы).
+        // Каждый успешный send.message_id запоминаем отдельно — так реплай
+        // от ЛЮБОГО получателя корректно найдёт нужную сессию.
+        const results = await Promise.allSettled(
+            adminChatIds.map(chatId => telegramApi('sendMessage', {
+                chat_id: chatId,
+                text: `💬 Вопрос с сайта [${shortId}]:\n\n${trimmed}`,
+            }))
+        );
+
+        let delivered = 0;
+        for (let i = 0; i < results.length; i++) {
+            const r = results[i];
+            if (r.status === 'fulfilled') {
+                delivered++;
+                await rememberMessageSession(adminChatIds[i], r.value.message_id, sessionId);
+            } else {
+                console.error(`Не удалось отправить в чат ${adminChatIds[i]}:`, r.reason && r.reason.message);
+            }
+        }
+        if (delivered === 0) {
+            throw new Error('Не удалось доставить сообщение ни в один Telegram-чат: ' + (results[0].reason && results[0].reason.message));
+        }
+
         const { entry } = await appendMessage(sessionId, 'user', trimmed);
 
         return res.status(200).json({ success: true, entry });

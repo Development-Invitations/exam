@@ -1,0 +1,95 @@
+// Общие хелперы для работы с GitHub Contents API.
+// Токен — только из переменных окружения Vercel, никогда в коде/репозитории.
+
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_OWNER = process.env.GITHUB_OWNER;
+const GITHUB_REPO = process.env.GITHUB_REPO;
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
+const GH_API = 'https://api.github.com';
+
+function assertGithubConfig() {
+    if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
+        throw new Error('Сервер не настроен: задайте GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO в переменных окружения Vercel');
+    }
+}
+
+function encodeGithubPath(p) {
+    return p.split('/').map(encodeURIComponent).join('/');
+}
+
+function b64encode(str) { return Buffer.from(str, 'utf-8').toString('base64'); }
+function b64decode(str) { return Buffer.from(str, 'base64').toString('utf-8'); }
+
+async function ghFetch(path, options = {}) {
+    return fetch(`${GH_API}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
+        ...options,
+        headers: {
+            'Authorization': `Bearer ${GITHUB_TOKEN}`,
+            'Accept': 'application/vnd.github+json',
+            'User-Agent': 'exam-baza-app',
+            ...(options.headers || {}),
+        },
+    });
+}
+
+async function getFile(path) {
+    const res = await ghFetch(`${encodeGithubPath(path)}?ref=${encodeURIComponent(GITHUB_BRANCH)}`);
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`GitHub API (${res.status}) при чтении "${path}": ${await res.text()}`);
+    const json = await res.json();
+    if (Array.isArray(json)) throw new Error(`"${path}" — это папка, а не файл`);
+    return { sha: json.sha, content: b64decode(String(json.content || '').replace(/\n/g, '')) };
+}
+
+async function putFile(path, content, message, sha) {
+    const body = { message, content: b64encode(content), branch: GITHUB_BRANCH };
+    if (sha) body.sha = sha;
+    const res = await ghFetch(encodeGithubPath(path), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`Ошибка сохранения "${path}" (${res.status}): ${await res.text()}`);
+    return res.json();
+}
+
+async function deleteFile(path, message, sha) {
+    const res = await ghFetch(encodeGithubPath(path), {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, sha, branch: GITHUB_BRANCH }),
+    });
+    if (!res.ok) throw new Error(`Ошибка удаления "${path}" (${res.status}): ${await res.text()}`);
+    return res.json();
+}
+
+// Читает JSON-файл, при 404 отдаёт fallback. Возвращает { data, sha }.
+async function getJson(path, fallback) {
+    const file = await getFile(path);
+    if (!file) return { data: fallback, sha: null };
+    try {
+        return { data: JSON.parse(file.content), sha: file.sha };
+    } catch {
+        return { data: fallback, sha: file.sha };
+    }
+}
+
+// Атомарно читает-изменяет-пишет JSON-файл. mutate(data) -> newData.
+// Не бросает при конфликте sha (best-effort) — вызывающий код сам решает,
+// критична ли операция.
+async function updateJson(path, fallback, mutate, message) {
+    const { data, sha } = await getJson(path, fallback);
+    const newData = mutate(data);
+    await putFile(path, JSON.stringify(newData, null, 2) + '\n', message, sha || undefined);
+    return newData;
+}
+
+module.exports = {
+    assertGithubConfig,
+    encodeGithubPath,
+    getFile,
+    putFile,
+    deleteFile,
+    getJson,
+    updateJson,
+};

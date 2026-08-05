@@ -78,14 +78,33 @@
         }
 
         .left-pane {
+            position: relative;
             width: 42%;
             min-width: 340px;
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             background: var(--bg-pane);
-            transition: background 0.25s, border-color 0.25s;
+            transition: background 0.25s, border-color 0.25s, width 0.25s, min-width 0.25s;
         }
+        .left-pane.collapsed {
+            width: 0 !important;
+            min-width: 0 !important;
+            border-right: none;
+            overflow: hidden;
+        }
+
+        .panel-toggle {
+            position: absolute; top: 50%; right: -14px; transform: translateY(-50%);
+            width: 28px; height: 56px; border-radius: 0 8px 8px 0;
+            background: var(--brand-yellow); color: var(--brand-yellow-fg);
+            border: none; cursor: pointer; font-size: 13px; z-index: 500;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+            transition: background 0.2s, right 0.25s;
+        }
+        .panel-toggle:hover { background: var(--brand-yellow-hover); }
+        .left-pane.collapsed .panel-toggle { right: -28px; }
 
         .db-selector-container {
             padding: 12px 15px;
@@ -230,6 +249,12 @@
             font-size: 13px; color: var(--text-muted);
             margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;
         }
+        .category-badge {
+            display: inline-block; margin-left: 6px; padding: 2px 8px;
+            border-radius: 4px; font-size: 11px; font-weight: 700;
+            text-transform: none; letter-spacing: normal;
+            background: var(--brand-yellow); color: var(--brand-yellow-fg);
+        }
         .empty-placeholder { color: var(--text-muted); text-align: center; margin-top: 50px; font-size: 15px; }
 
         .answer-card {
@@ -294,21 +319,114 @@
         .modal-btn.confirm:hover { background: var(--brand-yellow-hover); }
         .modal-btn.danger { background: #ef4444; color: #fff; }
 
-        /* Toast */
+        /* Toast (слева, чтобы не перекрывать плавающую кнопку чата справа) */
         .toast {
-            position: fixed; bottom: 24px; right: 24px;
+            position: fixed; bottom: 24px; left: 24px;
             background: var(--toast-bg); border: 1px solid var(--border);
             border-radius: 8px; padding: 12px 18px;
             font-size: 14px; color: var(--text-primary);
             box-shadow: 0 8px 20px var(--shadow);
             transform: translateY(20px); opacity: 0;
             transition: all 0.3s ease; pointer-events: none; z-index: 99999;
+            max-width: min(360px, calc(100vw - 48px));
         }
         .toast.show { transform: translateY(0); opacity: 1; }
         .toast.success { border-color: #065f46; color: #059669; }
         .toast.error { border-color: #7f1d1d; color: #ef4444; }
 
         .loading-text { color: var(--text-muted); font-size: 13px; padding: 15px; text-align: center; }
+
+        /* ── Плавающий Telegram-чат ────────────────────────────────────── */
+        .chat-fab {
+            position: fixed; bottom: 24px; right: 24px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--brand-yellow); color: var(--brand-yellow-fg);
+            border: none; cursor: pointer; font-size: 26px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+            z-index: 10000; transition: transform 0.15s, background 0.2s;
+        }
+        .chat-fab:hover { background: var(--brand-yellow-hover); transform: scale(1.06); }
+        .chat-fab .badge {
+            position: absolute; top: -2px; right: -2px;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: #ef4444; display: none;
+        }
+        .chat-fab .badge.show { display: block; }
+
+        .chat-panel {
+            position: fixed; bottom: 92px; right: 24px;
+            width: 340px; max-width: calc(100vw - 32px);
+            height: 460px; max-height: calc(100vh - 140px);
+            background: var(--modal-bg); border: 1px solid var(--border); border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            display: flex; flex-direction: column; overflow: hidden;
+            z-index: 10000;
+            opacity: 0; visibility: hidden; transform: translateY(12px);
+            transition: all 0.2s ease;
+        }
+        .chat-panel.open { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        .chat-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 14px; background: var(--bg-base); border-bottom: 1px solid var(--border);
+        }
+        .chat-header-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        .chat-header-actions { display: flex; gap: 6px; }
+        .chat-icon-btn {
+            width: 28px; height: 28px; border-radius: 6px; border: none;
+            background: var(--btn-default-bg); color: var(--btn-default-fg);
+            cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s;
+        }
+        .chat-icon-btn:hover { background: var(--btn-default-hv); color: var(--text-primary); }
+
+        .chat-messages {
+            flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px;
+        }
+        .chat-empty { color: var(--text-muted); font-size: 13px; text-align: center; margin-top: 20px; }
+        .chat-bubble {
+            max-width: 82%; padding: 8px 12px; border-radius: 12px;
+            font-size: 13px; line-height: 1.4; word-break: break-word; white-space: pre-wrap;
+        }
+        .chat-bubble.user {
+            align-self: flex-end;
+            background: var(--brand-yellow); color: var(--brand-yellow-fg);
+            border-bottom-right-radius: 3px;
+        }
+        .chat-bubble.admin {
+            align-self: flex-start;
+            background: var(--btn-default-bg); color: var(--text-primary);
+            border-bottom-left-radius: 3px;
+        }
+        .chat-bubble-time { font-size: 10px; opacity: 0.65; margin-top: 3px; }
+
+        .chat-input-row {
+            display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--border); background: var(--bg-pane);
+        }
+        .chat-input {
+            flex: 1; resize: none; height: 38px; max-height: 90px;
+            padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border-input);
+            background: var(--bg-input); color: var(--text-primary); font-size: 13px;
+            font-family: inherit; outline: none;
+        }
+        .chat-input:focus { border-color: var(--border-focus); }
+        .chat-send-btn {
+            width: 38px; height: 38px; border-radius: 8px; border: none;
+            background: var(--brand-yellow); color: var(--brand-yellow-fg);
+            cursor: pointer; font-size: 16px; flex-shrink: 0;
+        }
+        .chat-send-btn:hover { background: var(--brand-yellow-hover); }
+        .chat-send-btn:disabled { opacity: 0.5; cursor: default; }
+
+        @media (max-width: 480px) {
+            .chat-fab { bottom: 16px; right: 16px; width: 52px; height: 52px; font-size: 22px; }
+            .chat-panel {
+                bottom: 0; right: 0; left: 0; top: auto;
+                width: 100%; max-width: 100%; height: 70vh; max-height: 70vh;
+                border-radius: 12px 12px 0 0;
+            }
+        }
 
         /* ── Адаптив: планшеты/узкие окна ─────────────────────────────── */
         @media (max-width: 900px) {
@@ -339,6 +457,18 @@
                 border-bottom: 1px solid var(--border);
                 overflow: hidden;
             }
+            .left-pane.collapsed {
+                max-height: 0 !important;
+                border-bottom: none;
+            }
+            .panel-toggle {
+                top: auto; right: auto; bottom: -14px; left: 50%;
+                transform: translateX(-50%);
+                width: 56px; height: 28px;
+                border-radius: 0 0 8px 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            }
+            .left-pane.collapsed .panel-toggle { bottom: -28px; }
             .db-selector-container,
             .search-container {
                 flex-shrink: 0;
@@ -424,7 +554,8 @@
 </head>
 <body>
 
-<div class="left-pane">
+<div class="left-pane" id="leftPane">
+    <button id="panelToggle" class="panel-toggle" title="Скрыть панель">◀</button>
     <div class="db-selector-container">
         <div class="db-header-row">
             <select id="dbSelect" class="db-select" title="Выбрать базу данных"></select>
@@ -478,6 +609,28 @@
 
 <!-- Toast -->
 <div id="toast" class="toast"></div>
+
+<!-- Плавающая кнопка Telegram-чата -->
+<button id="chatFab" class="chat-fab" title="Быстрый вопрос в Telegram">
+    💬<span id="chatBadge" class="badge"></span>
+</button>
+
+<div id="chatPanel" class="chat-panel">
+    <div class="chat-header">
+        <div class="chat-header-title">💬 Быстрый вопрос</div>
+        <div class="chat-header-actions">
+            <button id="chatClearBtn" class="chat-icon-btn" title="Очистить чат">🗑</button>
+            <button id="chatCloseBtn" class="chat-icon-btn" title="Закрыть">✕</button>
+        </div>
+    </div>
+    <div id="chatMessages" class="chat-messages">
+        <div class="chat-empty">Напишите вопрос — он придёт нам в Telegram, ответ появится здесь.</div>
+    </div>
+    <div class="chat-input-row">
+        <textarea id="chatInput" class="chat-input" placeholder="Ваш вопрос..." rows="1"></textarea>
+        <button id="chatSendBtn" class="chat-send-btn" title="Отправить">➤</button>
+    </div>
+</div>
 
 <script>
 // Все базы читаются/пишутся через серверные функции /api/dbs (см. api/dbs.js),
@@ -544,11 +697,13 @@ async function apiGetDb(name) {
     return res.json();
 }
 
-async function apiSaveDb(name, data) {
+async function apiSaveDb(name, data, category) {
+    const body = { name, data };
+    if (category !== undefined) body.category = category;
     const res = await fetch('/api/dbs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, data }),
+        body: JSON.stringify(body),
     });
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -665,13 +820,14 @@ async function confirmDeleteWithPassword(desc) {
 }
 
 // ── Обновление списка баз с сервера (реальное состояние репозитория) ───
+// dbList: [{ name: 'файл.json', category: 'Категория или пусто' }, ...]
 async function refreshDbList(keepActive = true) {
     const emptyEl = document.getElementById('emptyState');
     if (emptyEl) emptyEl.textContent = '⏳ Загружаю список баз...';
     try {
         dbList = await apiListDbs();
-        if (!keepActive || !currentDbName || !dbList.includes(currentDbName)) {
-            currentDbName = dbList.length > 0 ? dbList[0] : '';
+        if (!keepActive || !currentDbName || !dbList.some(e => e.name === currentDbName)) {
+            currentDbName = dbList.length > 0 ? dbList[0].name : '';
         }
         updateDbSelectUI();
         await loadCurrentDb();
@@ -685,19 +841,52 @@ async function refreshDbList(keepActive = true) {
 function updateDbSelectUI() {
     const sel = document.getElementById('dbSelect');
     sel.innerHTML = '';
-    dbList.forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name.replace('.json', '');
-        if (name === currentDbName) opt.selected = true;
-        sel.appendChild(opt);
+
+    // Группируем по категории — некатегоризированные идут отдельным блоком
+    const groups = new Map();
+    dbList.forEach(entry => {
+        const cat = entry.category || '';
+        if (!groups.has(cat)) groups.set(cat, []);
+        groups.get(cat).push(entry);
     });
+
+    const appendOptions = (container, entries) => {
+        entries.forEach(entry => {
+            const opt = document.createElement('option');
+            opt.value = entry.name;
+            opt.textContent = entry.name.replace('.json', '');
+            if (entry.name === currentDbName) opt.selected = true;
+            container.appendChild(opt);
+        });
+    };
+
+    // Сначала именованные категории, потом "Без категории"
+    Array.from(groups.keys()).filter(c => c).sort().forEach(cat => {
+        const group = document.createElement('optgroup');
+        group.label = cat;
+        appendOptions(group, groups.get(cat));
+        sel.appendChild(group);
+    });
+    if (groups.has('')) {
+        const uncategorized = groups.get('');
+        if (groups.size > 1) {
+            const group = document.createElement('optgroup');
+            group.label = 'Без категории';
+            appendOptions(group, uncategorized);
+            sel.appendChild(group);
+        } else {
+            appendOptions(sel, uncategorized);
+        }
+    }
+
     updateDbLabel();
 }
 
 function updateDbLabel() {
-    document.getElementById('dbNameLabel').textContent =
-        `Текущая база: ${currentDbName.replace('.json','') || '—'} — (Вопросов: ${currentDbData.length})`;
+    const entry = dbList.find(e => e.name === currentDbName);
+    const category = entry && entry.category ? ` [${escapeHtml(entry.category)}]` : '';
+    document.getElementById('dbNameLabel').innerHTML =
+        `Текущая база: ${escapeHtml(currentDbName.replace('.json','') || '—')}${category ? `<span class="category-badge">${category}</span>` : ''} — (Вопросов: ${currentDbData.length})`;
 }
 
 async function loadCurrentDb() {
@@ -766,7 +955,7 @@ function buildSearchList() {
             item.classList.add('active');
             cards.forEach(c => c.classList.remove('highlight'));
             card.classList.add('highlight');
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            card.scrollIntoView({ behavior: 'auto', block: 'center' });
         });
         list.appendChild(item);
     });
@@ -807,8 +996,8 @@ document.getElementById('btnDeleteDb').addEventListener('click', async () => {
     if (!ok) return;
     try {
         await apiDeleteDb(currentDbName);
-        dbList = dbList.filter(n => n !== currentDbName);
-        currentDbName = dbList.length > 0 ? dbList[0] : '';
+        dbList = dbList.filter(e => e.name !== currentDbName);
+        currentDbName = dbList.length > 0 ? dbList[0].name : '';
         updateDbSelectUI();
         await loadCurrentDb();
         showToast('База удалена из репозитория', 'success');
@@ -842,18 +1031,23 @@ document.getElementById('btnAdd').addEventListener('click', async () => {
     }
     let isNewDb = false;
     let dbNameForNew = currentDbName;
+    let categoryForNew;
     if (!currentDbName) {
         // Предложим создать новую базу
-        const name = await showModal({
+        const newDb = await showModal({
             title: 'Новая база',
-            desc: 'Введи название новой базы:',
-            type: 'prompt', defaultValue: 'новая_база', confirmText: 'Создать'
+            fields: [
+                { name: 'dbname', label: 'Название базы', placeholder: 'новая_база' },
+                { name: 'category', label: 'Категория (необязательно)', placeholder: 'например: 1С Платформа' },
+            ],
+            confirmText: 'Создать'
         });
-        if (!name || !name.trim()) return;
-        let fn = name.trim();
+        if (!newDb || !newDb.dbname) return;
+        let fn = newDb.dbname;
         if (!fn.endsWith('.json')) fn += '.json';
-        if (dbList.includes(fn)) { showToast('База с таким именем уже существует', 'error'); return; }
+        if (dbList.some(e => e.name === fn)) { showToast('База с таким именем уже существует', 'error'); return; }
         dbNameForNew = fn;
+        categoryForNew = newDb.category || '';
         isNewDb = true;
     }
 
@@ -861,9 +1055,9 @@ document.getElementById('btnAdd').addEventListener('click', async () => {
     const dataToSave = [...currentDbData, newItem];
 
     try {
-        await apiSaveDb(dbNameForNew, dataToSave);
+        await apiSaveDb(dbNameForNew, dataToSave, isNewDb ? categoryForNew : undefined);
         if (isNewDb) {
-            dbList.push(dbNameForNew);
+            dbList.push({ name: dbNameForNew, category: categoryForNew });
             currentDbName = dbNameForNew;
             updateDbSelectUI();
         }
@@ -915,7 +1109,7 @@ document.getElementById('filePicker').addEventListener('change', e => {
                 const fn = file.name.endsWith('.json') ? file.name : file.name + '.json';
 
                 await apiSaveDb(fn, data);
-                if (!dbList.includes(fn)) dbList.push(fn);
+                if (!dbList.some(e => e.name === fn)) dbList.push({ name: fn, category: '' });
                 currentDbName = fn;
                 currentDbData = data;
                 updateDbSelectUI();
@@ -928,6 +1122,157 @@ document.getElementById('filePicker').addEventListener('change', e => {
         reader.readAsText(file);
     });
     e.target.value = '';
+});
+
+// ── Telegram-чат (плавающая кнопка) ─────────────────────────────────────
+function getChatSessionId() {
+    let id = localStorage.getItem('chatSessionId');
+    if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+        localStorage.setItem('chatSessionId', id);
+    }
+    return id;
+}
+const chatSessionId = getChatSessionId();
+
+const chatFab = document.getElementById('chatFab');
+const chatBadge = document.getElementById('chatBadge');
+const chatPanel = document.getElementById('chatPanel');
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const chatSendBtn = document.getElementById('chatSendBtn');
+
+let chatPollTimer = null;
+let chatRenderedIds = new Set();
+let chatIsOpen = false;
+let chatHasUnread = false;
+
+function formatChatTime(ts) {
+    const d = new Date(ts);
+    return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderChatMessages(messages) {
+    if (messages.length === 0) {
+        chatMessages.innerHTML = '<div class="chat-empty">Напишите вопрос — он придёт нам в Telegram, ответ появится здесь.</div>';
+        chatRenderedIds = new Set();
+        return;
+    }
+    const wasAtBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 40;
+    const newIds = new Set(messages.map(m => m.id));
+    const hasNewAdminMessage = messages.some(m => m.from === 'admin' && !chatRenderedIds.has(m.id));
+
+    chatMessages.innerHTML = messages.map(m => `
+        <div class="chat-bubble ${m.from === 'admin' ? 'admin' : 'user'}">
+            ${escapeHtml(m.text)}
+            <div class="chat-bubble-time">${formatChatTime(m.ts)}</div>
+        </div>
+    `).join('');
+    chatRenderedIds = newIds;
+
+    if (wasAtBottom || hasNewAdminMessage) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    if (hasNewAdminMessage && !chatIsOpen) {
+        chatHasUnread = true;
+        chatBadge.classList.add('show');
+    }
+}
+
+async function chatPollOnce() {
+    try {
+        const res = await fetch(`/api/chat/poll?sessionId=${encodeURIComponent(chatSessionId)}`);
+        if (!res.ok) return;
+        const { messages } = await res.json();
+        renderChatMessages(messages || []);
+    } catch {
+        // тихо игнорируем сетевые сбои поллинга
+    }
+}
+
+function startChatPolling() {
+    if (chatPollTimer) return;
+    chatPollOnce();
+    chatPollTimer = setInterval(chatPollOnce, 3000);
+}
+function stopChatPolling() {
+    clearInterval(chatPollTimer);
+    chatPollTimer = null;
+}
+
+function openChat() {
+    chatIsOpen = true;
+    chatPanel.classList.add('open');
+    chatHasUnread = false;
+    chatBadge.classList.remove('show');
+    startChatPolling();
+    setTimeout(() => chatInput.focus(), 100);
+}
+function closeChat() {
+    chatIsOpen = false;
+    chatPanel.classList.remove('open');
+    stopChatPolling();
+}
+
+chatFab.addEventListener('click', () => {
+    if (chatIsOpen) closeChat(); else openChat();
+});
+document.getElementById('chatCloseBtn').addEventListener('click', closeChat);
+
+document.getElementById('chatClearBtn').addEventListener('click', async () => {
+    const ok = await showModal({
+        title: 'Очистить чат?',
+        desc: 'История переписки будет удалена безвозвратно.',
+        type: 'confirm', confirmText: 'Очистить', confirmClass: 'danger'
+    });
+    if (!ok) return;
+    try {
+        await fetch('/api/chat/clear', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: chatSessionId }),
+        });
+        renderChatMessages([]);
+        showToast('Чат очищен', 'success');
+    } catch (err) {
+        showToast('Не удалось очистить чат: ' + err.message, 'error');
+    }
+});
+
+async function sendChatMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    chatSendBtn.disabled = true;
+    try {
+        const res = await fetch('/api/chat/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: chatSessionId, text }),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `Ошибка сервера (${res.status})`);
+        }
+        chatInput.value = '';
+        chatInput.style.height = '38px';
+        await chatPollOnce();
+    } catch (err) {
+        showToast('Не удалось отправить: ' + err.message, 'error');
+    } finally {
+        chatSendBtn.disabled = false;
+    }
+}
+
+chatSendBtn.addEventListener('click', sendChatMessage);
+chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
+    }
+});
+chatInput.addEventListener('input', () => {
+    chatInput.style.height = '38px';
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 90) + 'px';
 });
 
 // ── Инициализация ──────────────────────────────────────────────────────

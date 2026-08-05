@@ -1189,12 +1189,22 @@ function updateChatBadge() {
 
 function renderChatMessages(messages) {
     if (messages.length === 0) {
-        chatMessages.innerHTML = '<div class="chat-empty">Напишите вопрос — он придёт нам в Telegram, ответ появится здесь.</div>';
-        chatRenderedIds = new Set();
+        if (chatRenderedIds.size !== 0) {
+            chatMessages.innerHTML = '<div class="chat-empty">Напишите вопрос — он придёт нам в Telegram, ответ появится здесь.</div>';
+            chatRenderedIds = new Set();
+        }
         return;
     }
-    const wasAtBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 40;
+
     const newIds = new Set(messages.map(m => m.id));
+    // Ничего не изменилось с прошлого опроса — не трогаем DOM вообще,
+    // иначе innerHTML пересоздаётся каждые 3 сек и CSS-анимация появления
+    // пузырей перезапускается на всех сообщениях разом (тот самый "моргает").
+    if (newIds.size === chatRenderedIds.size && [...newIds].every(id => chatRenderedIds.has(id))) {
+        return;
+    }
+
+    const wasAtBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 40;
     const newAdminMessages = messages.filter(m => m.from === 'admin' && !chatRenderedIds.has(m.id));
 
     // Подпись с именем показываем только на первом сообщении в подряд идущей

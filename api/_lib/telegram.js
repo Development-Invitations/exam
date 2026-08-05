@@ -87,17 +87,26 @@ function mapKey(chatId, messageId) {
     return `${chatId}:${messageId}`;
 }
 
-async function rememberMessageSession(chatId, telegramMessageId, sessionId) {
-    await updateJson(
-        MSG_MAP_PATH, {},
-        map => {
-            const entries = Object.entries(map).slice(-(MSG_MAP_MAX_ENTRIES - 1));
-            entries.push([mapKey(chatId, telegramMessageId), { sessionId, ts: Date.now() }]);
-            return Object.fromEntries(entries);
-        },
-        `Чат: привязка сообщения ${telegramMessageId} к сессии`
-    );
-    await updateJson(LAST_SESSION_PATH, {}, () => ({ sessionId, ts: Date.now() }), 'Чат: последняя активная сессия');
+// Принимает массив { chatId, messageId } — одним запросом к GitHub записывает
+// привязку сразу для всех получателей (иначе рассылка в N чатов означала бы
+// N последовательных чтений/записей одного и того же файла и заметно тормозила
+// бы отправку сообщения из виджета).
+async function rememberMessageSessions(pairs, sessionId) {
+    if (pairs.length === 0) return;
+    await Promise.all([
+        updateJson(
+            MSG_MAP_PATH, {},
+            map => {
+                const entries = Object.entries(map).slice(-(MSG_MAP_MAX_ENTRIES - pairs.length));
+                pairs.forEach(({ chatId, messageId }) => {
+                    entries.push([mapKey(chatId, messageId), { sessionId, ts: Date.now() }]);
+                });
+                return Object.fromEntries(entries);
+            },
+            `Чат: привязка сообщений к сессии ${sessionId.slice(0, 8)}`
+        ),
+        updateJson(LAST_SESSION_PATH, {}, () => ({ sessionId, ts: Date.now() }), 'Чат: последняя активная сессия'),
+    ]);
 }
 
 async function resolveSessionForReply(update) {
@@ -129,7 +138,7 @@ module.exports = {
     appendMessage,
     getLog,
     clearLog,
-    rememberMessageSession,
+    rememberMessageSessions,
     resolveSessionForReply,
     isAllowedTelegramUser,
     telegramDisplayName,

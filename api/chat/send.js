@@ -43,7 +43,16 @@ module.exports = async (req, res) => {
         if (delivered === 0) {
             throw new Error('Не удалось доставить сообщение ни в один Telegram-чат: ' + (results[0].reason && results[0].reason.message));
         }
-        await rememberMessageSessions(pairs, sessionId);
+
+        // Привязка message_id -> сессия нужна только для маршрутизации ответа
+        // администратора — это вспомогательная запись, а не сама отправка.
+        // Сбой здесь не должен превращать реально доставленное сообщение
+        // в ошибку на стороне сайта.
+        try {
+            await rememberMessageSessions(pairs, sessionId);
+        } catch (err) {
+            console.error('Не удалось сохранить привязку сессии (не критично):', err.message);
+        }
 
         return res.status(200).json({ success: true, entry });
     } catch (err) {

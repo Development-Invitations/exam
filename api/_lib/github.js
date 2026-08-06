@@ -41,6 +41,24 @@ async function getFile(path) {
     return { sha: json.sha, content: b64decode(String(json.content || '').replace(/\n/g, '')) };
 }
 
+// Безопасная диагностика: показывает первые символы и длину токена, но не сам
+// секрет (реальная энтропия токена — в оставшихся ~80 символах). Нужно, чтобы
+// проверить, действительно ли до сервера долетает нормальный токен, а не
+// пустая строка/обрезанное значение — не раскрывая его целиком в логах/тостах.
+function tokenFingerprint() {
+    if (!GITHUB_TOKEN) return '(пусто/undefined)';
+    return `"${GITHUB_TOKEN.slice(0, 12)}..." (длина: ${GITHUB_TOKEN.length})`;
+}
+
+// 403 с этим текстом — почти всегда означает, что у GITHUB_TOKEN нет права
+// записи (Contents: Read-only вместо Read and write), а не проблему в коде.
+function friendlyWriteErrorHint(status, text) {
+    if (status === 403 && /Resource not accessible/i.test(text)) {
+        return ` — похоже, у GITHUB_TOKEN нет прав на запись, ЛИБО это не тот токен, что вы проверяли на GitHub. Fingerprint токена, который реально видит сервер: ${tokenFingerprint()}. Проверьте, что это совпадает с началом вашего токена в GitHub (Settings → Developer settings → Fine-grained tokens).`;
+    }
+    return '';
+}
+
 async function putFile(path, content, message, sha) {
     const body = { message, content: b64encode(content), branch: GITHUB_BRANCH };
     if (sha) body.sha = sha;
@@ -49,7 +67,10 @@ async function putFile(path, content, message, sha) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error(`Ошибка сохранения "${path}" (${res.status}): ${await res.text()}`);
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Ошибка сохранения "${path}" (${res.status}): ${text}${friendlyWriteErrorHint(res.status, text)}`);
+    }
     return res.json();
 }
 
@@ -59,7 +80,10 @@ async function deleteFile(path, message, sha) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message, sha, branch: GITHUB_BRANCH }),
     });
-    if (!res.ok) throw new Error(`Ошибка удаления "${path}" (${res.status}): ${await res.text()}`);
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Ошибка удаления "${path}" (${res.status}): ${text}${friendlyWriteErrorHint(res.status, text)}`);
+    }
     return res.json();
 }
 

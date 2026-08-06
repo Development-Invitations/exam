@@ -98,14 +98,26 @@ async function getJson(path, fallback) {
     }
 }
 
-// Атомарно читает-изменяет-пишет JSON-файл. mutate(data) -> newData.
-// Не бросает при конфликте sha (best-effort) — вызывающий код сам решает,
-// критична ли операция.
-async function updateJson(path, fallback, mutate, message) {
+function isShaConflict(err) {
+    return /\(409\)/.test(err.message);
+}
+
+// Читает-изменяет-пишет JSON-файл. При гонке (409 — файл изменился между
+// чтением sha и записью, например два сообщения чата почти одновременно)
+// перечитывает актуальный sha и повторяет попытку, а не падает сразу —
+// иначе любая параллельная активность в одном файле теряла бы данные.
+async function updateJson(path, fallback, mutate, message, attempt = 1) {
     const { data, sha } = await getJson(path, fallback);
     const newData = mutate(data);
-    await putFile(path, JSON.stringify(newData, null, 2) + '\n', message, sha || undefined);
-    return newData;
+    try {
+        await putFile(path, JSON.stringify(newData, null, 2) + '\n', message, sha || undefined);
+        return newData;
+    } catch (err) {
+        if (isShaConflict(err) && attempt < 3) {
+            return updateJson(path, fallback, mutate, message, attempt + 1);
+        }
+        throw err;
+    }
 }
 
 module.exports = {

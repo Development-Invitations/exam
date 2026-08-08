@@ -369,7 +369,8 @@
         body.mode-public #btnRefresh,
         body.mode-public .btn-delete,
         body.mode-public .btn-edit-question,
-        body.mode-public #btnCabinetTools {
+        body.mode-public #btnCabinetTools,
+        body.mode-public #btnNewSection {
             display: none !important;
         }
         body.mode-public .db-select { pointer-events: none; opacity: 0.85; }
@@ -724,7 +725,7 @@
 
 <!-- Панель инструментов кабинета: смена пароля + коды доступа -->
 <div id="cabinetPanel" class="chat-panel" style="left: 24px; right: auto; bottom: 24px;">
-    <div class="chat-header">
+    <div class="chat-header" id="cabinetPanelHeader" style="cursor: move;" title="Перетащите, чтобы переместить">
         <div class="chat-header-avatar">🔑</div>
         <div class="chat-header-info">
             <div class="chat-header-title">Кабинет</div>
@@ -745,7 +746,8 @@
             <div class="cabinet-section-title">Новый код доступа</div>
             <select id="cabCodeTemplate" class="modal-input"></select>
             <input type="text" id="cabCodeLabel" class="modal-input" placeholder="Для кого (необязательно)">
-            <input type="number" id="cabCodeDays" class="modal-input" placeholder="Дней действия" value="7" min="1">
+            <label class="modal-label">Действует до (дата и время)</label>
+            <input type="datetime-local" id="cabCodeUntil" class="modal-input">
             <button id="cabCreateCodeBtn" class="btn-add">Создать код</button>
         </div>
         <div>
@@ -765,6 +767,9 @@
         <div class="db-header-row">
             <button class="btn-small refresh" id="btnRefresh" style="flex:1;" title="Обновить список баз из GitHub">🔄 Обновить</button>
             <button class="btn-small danger" id="btnDeleteDb" style="flex:1;" title="Удалить текущую базу из репозитория GitHub">Удалить базу</button>
+        </div>
+        <div class="db-header-row">
+            <button class="btn-small" id="btnNewSection" style="flex:1;" title="Создать новый раздел с вопросами">+ Новый раздел</button>
         </div>
     </div>
 
@@ -967,11 +972,11 @@ async function apiListCodes() {
     return res.json();
 }
 
-async function apiCreateCode(template, label, days) {
+async function apiCreateCode(template, label, expiresAt) {
     const res = await fetch('/api/admin/codes', {
         method: 'POST',
         headers: adminHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({ template, label, days }),
+        body: JSON.stringify({ template, label, expiresAt }),
     });
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -1306,6 +1311,34 @@ document.getElementById('btnDeleteDb').addEventListener('click', async () => {
         showToast('База удалена из репозитория', 'success');
     } catch (err) {
         showToast('Не удалось удалить базу: ' + err.message, 'error');
+    }
+});
+
+document.getElementById('btnNewSection').addEventListener('click', async () => {
+    const newDb = await showModal({
+        title: '+ Новый раздел',
+        desc: 'Например: «ЗУП Профессионал», «1С Платформа». Раздел создастся пустым — вопросы добавите после.',
+        fields: [
+            { name: 'dbname', label: 'Название раздела', placeholder: 'например: зуп_профессионал' },
+        ],
+        confirmText: 'Создать'
+    });
+    if (!newDb || !newDb.dbname) return;
+    let fn = newDb.dbname.trim();
+    if (!fn) return;
+    if (!fn.endsWith('.json')) fn += '.json';
+    if (dbList.some(e => e.name === fn)) { showToast('Раздел с таким именем уже существует', 'error'); return; }
+
+    try {
+        await apiSaveDb(fn, []);
+        dbList.push({ name: fn, category: '' });
+        currentDbName = fn;
+        currentDbData = [];
+        updateDbSelectUI();
+        renderCards();
+        showToast('Раздел создан — теперь можно добавлять вопросы', 'success');
+    } catch (err) {
+        showToast('Не удалось создать раздел: ' + err.message, 'error');
     }
 });
 
@@ -1772,6 +1805,8 @@ async function enterCabinet(password) {
     await refreshDbList();
 }
 
+let accessExpiryTimer = null;
+
 function enterPublic(code, template, data) {
     sessionStorage.setItem('accessMode', 'public');
     sessionStorage.setItem('accessCode', code);
@@ -1784,6 +1819,22 @@ function enterPublic(code, template, data) {
     updateDbSelectUI();
     renderCards();
     applyLocked(false);
+
+    // Код может закончиться, пока вкладка открыта — перепроверяем его
+    // регулярно, чтобы сайт заблокировался сам, без обновления страницы.
+    clearInterval(accessExpiryTimer);
+    accessExpiryTimer = setInterval(async () => {
+        try {
+            await apiValidateAccessCode(code);
+        } catch {
+            clearInterval(accessExpiryTimer);
+            sessionStorage.removeItem('accessMode');
+            sessionStorage.removeItem('accessCode');
+            sessionStorage.removeItem('accessTemplate');
+            showToast('Срок действия кода доступа истёк', 'error');
+            applyLocked(true);
+        }
+    }, 60000);
 }
 
 function showGateError(msg) {
@@ -1837,9 +1888,50 @@ document.getElementById('btnCabinetTools').addEventListener('click', async () =>
 });
 document.getElementById('cabinetCloseBtn').addEventListener('click', () => cabinetPanel.classList.remove('open'));
 
+// ── Перетаскивание панели кабинета за шапку ──────────────────────────────
+function makeDraggable(panel, handle) {
+    let dragging = false, offsetX = 0, offsetY = 0;
+
+    handle.addEventListener('pointerdown', e => {
+        if (e.target.closest('button')) return; // не мешаем кнопке "закрыть"
+        dragging = true;
+        const rect = panel.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        // Переключаемся с bottom/left-якоря на явные top/left в пикселях,
+        // иначе перетаскивание "прыгает" при первом движении.
+        panel.style.left = rect.left + 'px';
+        panel.style.top = rect.top + 'px';
+        panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
+        handle.setPointerCapture(e.pointerId);
+    });
+    handle.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const maxX = window.innerWidth - panel.offsetWidth;
+        const maxY = window.innerHeight - panel.offsetHeight;
+        panel.style.left = Math.max(0, Math.min(maxX, e.clientX - offsetX)) + 'px';
+        panel.style.top = Math.max(0, Math.min(maxY, e.clientY - offsetY)) + 'px';
+    });
+    handle.addEventListener('pointerup', () => { dragging = false; });
+    handle.addEventListener('pointercancel', () => { dragging = false; });
+}
+makeDraggable(cabinetPanel, document.getElementById('cabinetPanelHeader'));
+
+function toDatetimeLocalValue(date) {
+    const pad = n => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 async function refreshCabinetPanel() {
     const select = document.getElementById('cabCodeTemplate');
     select.innerHTML = dbList.map(e => `<option value="${e.name}">${e.name.replace('.json', '')}</option>`).join('');
+
+    const untilInput = document.getElementById('cabCodeUntil');
+    if (!untilInput.value) {
+        const weekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        untilInput.value = toDatetimeLocalValue(weekFromNow);
+    }
 
     try {
         const codes = await apiListCodes();
@@ -1895,11 +1987,15 @@ document.getElementById('cabChangePassBtn').addEventListener('click', async () =
 document.getElementById('cabCreateCodeBtn').addEventListener('click', async () => {
     const template = document.getElementById('cabCodeTemplate').value;
     const label = document.getElementById('cabCodeLabel').value.trim();
-    const days = document.getElementById('cabCodeDays').value;
+    const untilValue = document.getElementById('cabCodeUntil').value;
     if (!template) { showToast('Нет доступных баз для кода', 'error'); return; }
+    if (!untilValue) { showToast('Укажите дату окончания действия кода', 'error'); return; }
+    const expiresAt = new Date(untilValue).getTime();
+    if (!expiresAt || expiresAt <= Date.now()) { showToast('Дата окончания должна быть в будущем', 'error'); return; }
     try {
-        const entry = await apiCreateCode(template, label, days);
+        const entry = await apiCreateCode(template, label, expiresAt);
         document.getElementById('cabCodeLabel').value = '';
+        document.getElementById('cabCodeUntil').value = '';
         await refreshCabinetPanel();
         await showModal({
             title: 'Код создан',

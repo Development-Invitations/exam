@@ -13,8 +13,8 @@ module.exports = async (req, res) => {
         }
 
         if (req.method === 'POST') {
-            const { template, label, days } = req.body || {};
-            const entry = await createAccessCode({ template, label, days });
+            const { template, label, expiresAt, days } = req.body || {};
+            const entry = await createAccessCode({ template, label, expiresAt, days });
             return res.status(200).json(entry);
         }
 

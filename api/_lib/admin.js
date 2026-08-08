@@ -40,15 +40,21 @@ async function listAccessCodes() {
     return Array.isArray(data) ? data : [];
 }
 
-async function createAccessCode({ template, label, days }) {
+async function createAccessCode({ template, label, expiresAt, days }) {
     if (!template) throw new Error('Не указан шаблон для кода доступа');
-    const durationDays = Number(days) > 0 ? Number(days) : 7;
+    // expiresAt — точная дата/время окончания (мс), приходит с клиента (datetime-local).
+    // days оставлен как резервный способ (на случай старых вызовов) — N дней от сейчас.
+    let expiry = Number(expiresAt);
+    if (!expiry || expiry <= Date.now()) {
+        const durationDays = Number(days) > 0 ? Number(days) : 7;
+        expiry = Date.now() + durationDays * 24 * 60 * 60 * 1000;
+    }
     const entry = {
         code: randomCode(),
         template,
         label: label || '',
         createdAt: Date.now(),
-        expiresAt: Date.now() + durationDays * 24 * 60 * 60 * 1000,
+        expiresAt: expiry,
     };
     await updateJson(CODES_PATH, [], list => [...list, entry], `Кабинет: новый код доступа для "${template}"`);
     return entry;

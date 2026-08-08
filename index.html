@@ -1632,8 +1632,14 @@ function renderChatMessages(messages) {
         </div>`;
     }).join('');
     chatRenderedIds = newIds;
+    // Галерея по всей переписке — можно листать между всеми присланными
+    // скриншотами, а не только смотреть по одному вне контекста.
+    const chatImageUrls = messages.filter(m => m.imageUrl).map(m => m.imageUrl);
     chatMessages.querySelectorAll('.chat-bubble-img').forEach(img => {
-        img.addEventListener('click', () => openLightbox(img.dataset.src));
+        img.addEventListener('click', () => {
+            const idx = chatImageUrls.indexOf(img.dataset.src);
+            openLightbox(chatImageUrls, idx === -1 ? 0 : idx);
+        });
     });
 
     if (wasAtBottom || newAdminMessages.length > 0) {
@@ -1729,7 +1735,13 @@ function renderChatPendingImage() {
         </span>
     `).join('');
     preview.querySelectorAll('button[data-idx]').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', e => {
+            // Кнопка может целиком удалиться из DOM (когда убрали последнее
+            // вложение) прямо во время обработки собственного клика — тогда
+            // документный обработчик "клик вне чата" уже не найдёт e.target
+            // внутри .chat-panel и ошибочно закроет чат. Не даём событию
+            // всплыть вообще.
+            e.stopPropagation();
             chatPendingImages.splice(Number(btn.dataset.idx), 1);
             renderChatPendingImage();
         });
@@ -1903,10 +1915,10 @@ async function copyImageToClipboard(url) {
     }
 }
 
-document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
-document.getElementById('lightboxPrev').addEventListener('click', lightboxShowPrev);
-document.getElementById('lightboxNext').addEventListener('click', lightboxShowNext);
-document.getElementById('lightboxCopy').addEventListener('click', () => copyImageToClipboard(lightboxUrls[lightboxIndex]));
+document.getElementById('lightboxClose').addEventListener('click', e => { e.stopPropagation(); closeLightbox(); });
+document.getElementById('lightboxPrev').addEventListener('click', e => { e.stopPropagation(); lightboxShowPrev(); });
+document.getElementById('lightboxNext').addEventListener('click', e => { e.stopPropagation(); lightboxShowNext(); });
+document.getElementById('lightboxCopy').addEventListener('click', e => { e.stopPropagation(); copyImageToClipboard(lightboxUrls[lightboxIndex]); });
 lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
 document.addEventListener('keydown', e => {
     if (!lightbox.classList.contains('open')) return;

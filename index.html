@@ -1852,11 +1852,26 @@ function lightboxShowNext() {
     renderLightboxImage();
 }
 
+// Буфер обмена браузера умеет копировать изображения только в PNG — если
+// скриншот хранится как JPEG/WEBP/GIF, write() падает с ошибкой формата.
+// Поэтому всегда перекодируем в PNG через canvas перед копированием.
+async function imageBlobToPng(blob) {
+    const bitmap = await createImageBitmap(blob);
+    const canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    canvas.getContext('2d').drawImage(bitmap, 0, 0);
+    return new Promise((resolve, reject) => {
+        canvas.toBlob(b => b ? resolve(b) : reject(new Error('Не удалось подготовить PNG')), 'image/png');
+    });
+}
+
 async function copyImageToClipboard(url) {
     try {
         const res = await fetch(url);
         const blob = await res.blob();
-        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        const pngBlob = blob.type === 'image/png' ? blob : await imageBlobToPng(blob);
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
         showToast('Скопировано — вставьте в чат сочетанием Ctrl+V', 'success');
     } catch (err) {
         showToast('Не удалось скопировать: ' + err.message, 'error');

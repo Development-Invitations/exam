@@ -1,6 +1,6 @@
 // Публичная загрузка скриншота для виджета чата — паролем НЕ гейтится
 // (чат доступен всем посетителям, как и отправка текстовых сообщений).
-const { assertGithubConfig, putBinaryFile, getRawUrl } = require('../_lib/github');
+const { assertGithubConfig, putBinaryFile, getImageUrl } = require('../_lib/github');
 
 const CHAT_SCREENSHOTS_DIR = 'chat-screenshots';
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
         const path = `${CHAT_SCREENSHOTS_DIR}/${filename}`;
         await putBinaryFile(path, base64, `Чат: скриншот ${filename}`);
 
-        return res.status(200).json({ url: getRawUrl(path) });
+        return res.status(200).json({ url: getImageUrl(path) });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: err.message });

@@ -1,4 +1,4 @@
-const { assertGithubConfig, putBinaryFile, getRawUrl } = require('../_lib/github');
+const { assertGithubConfig, putBinaryFile, getImageUrl } = require('../_lib/github');
 const { verifyAdminPassword } = require('../_lib/admin');
 
 const SCREENSHOTS_DIR = 'screenshots';
@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
 
         await putBinaryFile(path, base64, `Кабинет: загрузка скриншота ${filename}`);
 
-        return res.status(200).json({ success: true, url: getRawUrl(path), path });
+        return res.status(200).json({ success: true, url: getImageUrl(path), path });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: err.message });

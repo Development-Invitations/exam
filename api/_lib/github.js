@@ -13,10 +13,25 @@ function assertGithubConfig() {
     }
 }
 
-// Публичная ссылка на файл в репозитории (репозиторий публичный — это тот же
-// способ, каким уже читаются базы через raw.githubusercontent.com).
-function getRawUrl(path) {
-    return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${path}`;
+// Ссылка на картинку через СВОЙ сервер (не напрямую на GitHub) — работает
+// независимо от того, публичный репозиторий или приватный, т.к. сервер сам
+// авторизуется токеном. Раньше ссылки шли напрямую на raw.githubusercontent.com,
+// которая отдаёт файл только если репозиторий публичный — стоило кому-то
+// случайно включить приватность, все скриншоты переставали открываться.
+function getImageUrl(path) {
+    return `/api/image?path=${encodeURIComponent(path)}`;
+}
+
+// Старые скриншоты в уже сохранённых данных могут содержать прежние прямые
+// ссылки на raw.githubusercontent.com — приводим их к своему прокси на лету,
+// чтобы не пришлось руками чинить/перезаливать уже загруженные картинки.
+function normalizeImageUrl(url) {
+    if (typeof url !== 'string') return url;
+    const prefix = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`;
+    if (url.startsWith(prefix)) {
+        return getImageUrl(url.slice(prefix.length));
+    }
+    return url;
 }
 
 function encodeGithubPath(p) {
@@ -45,6 +60,18 @@ async function getFile(path) {
     const json = await res.json();
     if (Array.isArray(json)) throw new Error(`"${path}" — это папка, а не файл`);
     return { sha: json.sha, content: b64decode(String(json.content || '').replace(/\n/g, '')) };
+}
+
+// Для бинарных файлов (картинок) — getFile() декодирует содержимое как UTF-8
+// строку, что портит произвольные байты изображения. Здесь content остаётся
+// настоящим Buffer.
+async function getBinaryFile(path) {
+    const res = await ghFetch(`${encodeGithubPath(path)}?ref=${encodeURIComponent(GITHUB_BRANCH)}`);
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`GitHub API (${res.status}) при чтении "${path}": ${await res.text()}`);
+    const json = await res.json();
+    if (Array.isArray(json)) throw new Error(`"${path}" — это папка, а не файл`);
+    return Buffer.from(String(json.content || '').replace(/\n/g, ''), 'base64');
 }
 
 // Безопасная диагностика: показывает первые символы и длину токена, но не сам
@@ -141,10 +168,12 @@ module.exports = {
     assertGithubConfig,
     encodeGithubPath,
     getFile,
+    getBinaryFile,
     putFile,
     putBinaryFile,
     deleteFile,
     getJson,
     updateJson,
-    getRawUrl,
+    getImageUrl,
+    normalizeImageUrl,
 };

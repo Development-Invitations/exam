@@ -1,4 +1,4 @@
-const { assertGithubConfig } = require('../_lib/github');
+const { assertGithubConfig, normalizeImageUrl } = require('../_lib/github');
 const { getLog } = require('../_lib/telegram');
 
 module.exports = async (req, res) => {
@@ -9,7 +9,9 @@ module.exports = async (req, res) => {
         if (!sessionId || typeof sessionId !== 'string') {
             return res.status(400).json({ error: 'sessionId обязателен' });
         }
-        const messages = await getLog(sessionId);
+        const messages = (await getLog(sessionId)).map(m =>
+            m.imageUrl ? { ...m, imageUrl: normalizeImageUrl(m.imageUrl) } : m
+        );
         return res.status(200).json({ messages });
     } catch (err) {
         console.error(err);

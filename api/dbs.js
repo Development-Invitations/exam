@@ -2,11 +2,21 @@
 // Токен GitHub хранится ТОЛЬКО в переменных окружения Vercel (Project Settings → Environment
 // Variables), никогда не попадает в код и не коммитится в репозиторий.
 
-const { assertGithubConfig, getFile, putFile, deleteFile, updateJson } = require('./_lib/github');
+const { assertGithubConfig, getFile, putFile, deleteFile, updateJson, normalizeImageUrl } = require('./_lib/github');
 const { verifyAdminPassword } = require('./_lib/admin');
 
 const BAZA_DIR = 'baza';
 const MANIFEST_PATH = `${BAZA_DIR}/manifest.json`;
+
+// Скриншоты, сохранённые до перехода на прокси-ссылки, могли содержать прямые
+// raw.githubusercontent.com URL — приводим их к /api/image на лету при чтении.
+function normalizeQuestionScreenshots(data) {
+    if (!Array.isArray(data)) return data;
+    return data.map(item => {
+        if (!item || !Array.isArray(item.screenshots)) return item;
+        return { ...item, screenshots: item.screenshots.map(s => ({ ...s, url: normalizeImageUrl(s.url) })) };
+    });
+}
 
 function normalizeName(name) {
     let filename = String(name || '').split('/').pop().split('\\').pop();
@@ -58,7 +68,7 @@ module.exports = async (req, res) => {
             try { data = JSON.parse(file.content); } catch {
                 return res.status(500).json({ error: 'Файл базы повреждён (невалидный JSON)' });
             }
-            return res.status(200).json(Array.isArray(data) ? data : []);
+            return res.status(200).json(normalizeQuestionScreenshots(Array.isArray(data) ? data : []));
         }
 
         if (req.method === 'POST') {

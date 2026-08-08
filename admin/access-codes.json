@@ -5,5 +5,12 @@
     "label": "",
     "createdAt": 1786177595151,
     "expiresAt": 1786177680000
+  },
+  {
+    "code": "SN4DSPQV",
+    "template": "1с-екзамен_database.json",
+    "label": "",
+    "createdAt": 1786179261525,
+    "expiresAt": 1786179360000
   }
 ]

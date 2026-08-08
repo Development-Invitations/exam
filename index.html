@@ -564,13 +564,15 @@
         .chat-bubble-time { font-size: 10px; color: var(--text-muted); margin: 2px 4px 0; }
 
         .chat-pending-preview {
-            display: flex; align-items: center; gap: 8px; padding: 8px 10px 0;
+            display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 10px 0;
             background: var(--bg-pane);
         }
-        .chat-pending-preview img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
-        .chat-pending-preview button {
-            width: 20px; height: 20px; border-radius: 50%; border: none; background: #ef4444; color: #fff;
-            font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        .chat-pending-thumb { position: relative; display: inline-block; }
+        .chat-pending-thumb img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); display: block; }
+        .chat-pending-thumb button {
+            position: absolute; top: -6px; right: -6px;
+            width: 18px; height: 18px; border-radius: 50%; border: none; background: #ef4444; color: #fff;
+            font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
         .chat-bubble-img { max-width: 100%; border-radius: 10px; display: block; cursor: pointer; }
 
@@ -1706,11 +1708,11 @@ document.getElementById('chatClearBtn').addEventListener('click', async () => {
     }
 });
 
-let chatPendingImage = null; // { url } — вставленный, но ещё не отправленный скриншот
+let chatPendingImages = []; // [{ url }, ...] — вставленные, но ещё не отправленные скриншоты
 
 function renderChatPendingImage() {
     let preview = document.getElementById('chatPendingPreview');
-    if (!chatPendingImage) {
+    if (chatPendingImages.length === 0) {
         if (preview) preview.remove();
         return;
     }
@@ -1720,40 +1722,56 @@ function renderChatPendingImage() {
         preview.className = 'chat-pending-preview';
         document.querySelector('.chat-input-row').before(preview);
     }
-    preview.innerHTML = `
-        <img src="${chatPendingImage.url}" alt="Скриншот">
-        <button type="button" id="chatPendingRemove" title="Убрать">✕</button>
-    `;
-    document.getElementById('chatPendingRemove').addEventListener('click', () => {
-        chatPendingImage = null;
-        renderChatPendingImage();
+    preview.innerHTML = chatPendingImages.map((img, idx) => `
+        <span class="chat-pending-thumb">
+            <img src="${img.url}" alt="Скриншот">
+            <button type="button" data-idx="${idx}" title="Убрать">✕</button>
+        </span>
+    `).join('');
+    preview.querySelectorAll('button[data-idx]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            chatPendingImages.splice(Number(btn.dataset.idx), 1);
+            renderChatPendingImage();
+        });
     });
 }
 
 async function sendChatMessage() {
     const text = chatInput.value.trim();
-    const imageUrl = chatPendingImage ? chatPendingImage.url : undefined;
-    if (!text && !imageUrl) return;
+    const images = chatPendingImages;
+    if (!text && images.length === 0) return;
     chatSendBtn.disabled = true;
     try {
-        const res = await fetch('/api/chat/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessionId: chatSessionId, text, imageUrl }),
-        });
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || `Ошибка сервера (${res.status})`);
+        if (images.length === 0) {
+            await sendOneChatMessage(text, undefined);
+        } else {
+            // Несколько вложений — каждое своим сообщением в Telegram,
+            // текст (если есть) идёт подписью только к первому фото.
+            for (let i = 0; i < images.length; i++) {
+                await sendOneChatMessage(i === 0 ? text : '', images[i].url);
+            }
         }
         chatInput.value = '';
         chatInput.style.height = '38px';
-        chatPendingImage = null;
+        chatPendingImages = [];
         renderChatPendingImage();
         await chatPollOnce();
     } catch (err) {
         showToast('Не удалось отправить: ' + err.message, 'error');
     } finally {
         chatSendBtn.disabled = false;
+    }
+}
+
+async function sendOneChatMessage(text, imageUrl) {
+    const res = await fetch('/api/chat/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: chatSessionId, text, imageUrl }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
     }
 }
 
@@ -1766,7 +1784,7 @@ async function handleChatImageFile(file) {
             reader.readAsDataURL(file);
         });
         const { url } = await apiUploadChatScreenshot(dataUrl);
-        chatPendingImage = { url };
+        chatPendingImages.push({ url });
         renderChatPendingImage();
     } catch (err) {
         showToast('Не удалось загрузить скриншот: ' + err.message, 'error');
@@ -1775,11 +1793,13 @@ async function handleChatImageFile(file) {
 
 chatInput.addEventListener('paste', e => {
     const items = Array.from(e.clipboardData ? e.clipboardData.items : []);
-    const imageItem = items.find(it => it.type.startsWith('image/'));
-    if (!imageItem) return; // обычная вставка текста — не мешаем
+    const imageItems = items.filter(it => it.type.startsWith('image/'));
+    if (imageItems.length === 0) return; // обычная вставка текста — не мешаем
     e.preventDefault();
-    const file = imageItem.getAsFile();
-    if (file) handleChatImageFile(file);
+    imageItems.forEach(item => {
+        const file = item.getAsFile();
+        if (file) handleChatImageFile(file);
+    });
 });
 
 chatSendBtn.addEventListener('click', sendChatMessage);

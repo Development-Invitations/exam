@@ -12,7 +12,19 @@ module.exports = async (req, res) => {
     // только если он задан при вызове setWebhook с тем же secret_token.
     if (WEBHOOK_SECRET) {
         const incoming = req.headers['x-telegram-bot-api-secret-token'];
-        if (incoming !== WEBHOOK_SECRET) return res.status(401).end();
+        if (incoming !== WEBHOOK_SECRET) {
+            // Безопасный отпечаток в СЕРВЕРНЫЙ лог (не в ответ Telegram) — длины
+            // и первые символы, не сами секреты целиком. Чтобы наконец увидеть,
+            // что сервер реально сравнивает, вместо гадания вслепую.
+            console.warn('Webhook secret mismatch:', {
+                incomingPresent: incoming !== undefined,
+                incomingLength: incoming ? incoming.length : 0,
+                incomingPrefix: incoming ? incoming.slice(0, 3) : null,
+                expectedLength: WEBHOOK_SECRET.length,
+                expectedPrefix: WEBHOOK_SECRET.slice(0, 3),
+            });
+            return res.status(401).end();
+        }
     }
 
     try {

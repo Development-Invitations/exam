@@ -1423,7 +1423,12 @@
   {
     "id": "1785922630501",
     "title": "В каком случае в окне конфигурации доступно действие изменения конфигурации?",
-    "text": "Только для основной конфигурации"
+    "text": "Только для основной конфигурации",
+    "screenshots": [
+      {
+        "url": "/api/image?path=screenshots%2F1786190010796-a6fpvj.jpg"
+      }
+    ]
   },
   {
     "id": "1785922647343",
@@ -4466,7 +4471,7 @@
     "text": "Система откажется проводить документ, т.к. для него разрешено оперативное проведение, а дата больше текущей даты",
     "screenshots": [
       {
-        "url": "https://raw.githubusercontent.com/Development-Invitations/exam/main/screenshots/1786187002565-cctodt.jpg"
+        "url": "/api/image?path=screenshots%2F1786187002565-cctodt.jpg"
       }
     ]
   },
@@ -4476,7 +4481,7 @@
     "text": "Система, безусловно, проведет документ в неоперативном режиме, т.к. для него разрешено оперативное проведение, а дата документа меньше текущей даты",
     "screenshots": [
       {
-        "url": "https://raw.githubusercontent.com/Development-Invitations/exam/main/screenshots/1786187088305-0ei5pf.jpg"
+        "url": "/api/image?path=screenshots%2F1786187088305-0ei5pf.jpg"
       }
     ]
   },
@@ -4486,7 +4491,7 @@
     "text": "Система, безусловно, проведет документ в оперативном режиме, т.к. для него разрешено оперативное проведение, при этом время сменится на текущее",
     "screenshots": [
       {
-        "url": "https://raw.githubusercontent.com/Development-Invitations/exam/main/screenshots/1786187167394-etx0ae.jpg"
+        "url": "/api/image?path=screenshots%2F1786187167394-etx0ae.jpg"
       }
     ]
   },
@@ -4526,7 +4531,7 @@
     "text": "Верны варианты 1 и 2",
     "screenshots": [
       {
-        "url": "https://raw.githubusercontent.com/Development-Invitations/exam/main/screenshots/1786187668259-bxmhwe.png"
+        "url": "/api/image?path=screenshots%2F1786187668259-bxmhwe.png"
       }
     ]
   },

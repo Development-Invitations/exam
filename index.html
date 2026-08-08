@@ -533,6 +533,17 @@
         }
         .chat-bubble-time { font-size: 10px; color: var(--text-muted); margin: 2px 4px 0; }
 
+        .chat-pending-preview {
+            display: flex; align-items: center; gap: 8px; padding: 8px 10px 0;
+            background: var(--bg-pane);
+        }
+        .chat-pending-preview img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+        .chat-pending-preview button {
+            width: 20px; height: 20px; border-radius: 50%; border: none; background: #ef4444; color: #fff;
+            font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .chat-bubble-img { max-width: 100%; border-radius: 10px; display: block; cursor: pointer; }
+
         .chat-input-row {
             display: flex; align-items: flex-end; gap: 8px; padding: 10px; border-top: 1px solid var(--border); background: var(--bg-pane);
         }
@@ -998,6 +1009,20 @@ async function apiUploadScreenshot(imageDataUrl) {
     const res = await fetch('/api/admin/screenshot', {
         method: 'POST',
         headers: adminHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ imageDataUrl }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
+}
+
+// Загрузка скриншота из виджета чата — без пароля кабинета, чат публичный.
+async function apiUploadChatScreenshot(imageDataUrl) {
+    const res = await fetch('/api/chat/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageDataUrl }),
     });
     if (!res.ok) {
@@ -1552,11 +1577,17 @@ function renderChatMessages(messages) {
         return `
         <div class="chat-row ${m.from === 'admin' ? 'admin' : 'user'}">
             ${showAuthor ? `<div class="chat-author-name">${escapeHtml(m.authorName)}</div>` : ''}
-            <div class="chat-bubble">${escapeHtml(m.text)}</div>
+            <div class="chat-bubble">
+                ${m.imageUrl ? `<img class="chat-bubble-img" src="${m.imageUrl}" alt="Скриншот" data-src="${m.imageUrl}">` : ''}
+                ${m.text ? escapeHtml(m.text) : ''}
+            </div>
             <div class="chat-bubble-time">${formatChatTime(m.ts)}</div>
         </div>`;
     }).join('');
     chatRenderedIds = newIds;
+    chatMessages.querySelectorAll('.chat-bubble-img').forEach(img => {
+        img.addEventListener('click', () => openLightbox(img.dataset.src));
+    });
 
     if (wasAtBottom || newAdminMessages.length > 0) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -1565,7 +1596,8 @@ function renderChatMessages(messages) {
         chatUnreadCount += newAdminMessages.length;
         updateChatBadge();
         const last = newAdminMessages[newAdminMessages.length - 1];
-        showToast(`💬 ${last.authorName ? last.authorName + ': ' : ''}${last.text.slice(0, 80)}`, 'success');
+        const preview = last.imageUrl ? '📷 Скриншот' : last.text.slice(0, 80);
+        showToast(`💬 ${last.authorName ? last.authorName + ': ' : ''}${preview}`, 'success');
     }
 }
 
@@ -1629,15 +1661,40 @@ document.getElementById('chatClearBtn').addEventListener('click', async () => {
     }
 });
 
+let chatPendingImage = null; // { url } — вставленный, но ещё не отправленный скриншот
+
+function renderChatPendingImage() {
+    let preview = document.getElementById('chatPendingPreview');
+    if (!chatPendingImage) {
+        if (preview) preview.remove();
+        return;
+    }
+    if (!preview) {
+        preview = document.createElement('div');
+        preview.id = 'chatPendingPreview';
+        preview.className = 'chat-pending-preview';
+        document.querySelector('.chat-input-row').before(preview);
+    }
+    preview.innerHTML = `
+        <img src="${chatPendingImage.url}" alt="Скриншот">
+        <button type="button" id="chatPendingRemove" title="Убрать">✕</button>
+    `;
+    document.getElementById('chatPendingRemove').addEventListener('click', () => {
+        chatPendingImage = null;
+        renderChatPendingImage();
+    });
+}
+
 async function sendChatMessage() {
     const text = chatInput.value.trim();
-    if (!text) return;
+    const imageUrl = chatPendingImage ? chatPendingImage.url : undefined;
+    if (!text && !imageUrl) return;
     chatSendBtn.disabled = true;
     try {
         const res = await fetch('/api/chat/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessionId: chatSessionId, text }),
+            body: JSON.stringify({ sessionId: chatSessionId, text, imageUrl }),
         });
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
@@ -1645,6 +1702,8 @@ async function sendChatMessage() {
         }
         chatInput.value = '';
         chatInput.style.height = '38px';
+        chatPendingImage = null;
+        renderChatPendingImage();
         await chatPollOnce();
     } catch (err) {
         showToast('Не удалось отправить: ' + err.message, 'error');
@@ -1652,6 +1711,31 @@ async function sendChatMessage() {
         chatSendBtn.disabled = false;
     }
 }
+
+async function handleChatImageFile(file) {
+    try {
+        const dataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+        const { url } = await apiUploadChatScreenshot(dataUrl);
+        chatPendingImage = { url };
+        renderChatPendingImage();
+    } catch (err) {
+        showToast('Не удалось загрузить скриншот: ' + err.message, 'error');
+    }
+}
+
+chatInput.addEventListener('paste', e => {
+    const items = Array.from(e.clipboardData ? e.clipboardData.items : []);
+    const imageItem = items.find(it => it.type.startsWith('image/'));
+    if (!imageItem) return; // обычная вставка текста — не мешаем
+    e.preventDefault();
+    const file = imageItem.getAsFile();
+    if (file) handleChatImageFile(file);
+});
 
 chatSendBtn.addEventListener('click', sendChatMessage);
 chatInput.addEventListener('keydown', e => {

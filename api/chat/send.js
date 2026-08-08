@@ -6,28 +6,30 @@ module.exports = async (req, res) => {
     try {
         assertTelegramConfig();
         assertGithubConfig();
-        const { sessionId, text } = req.body || {};
+        const { sessionId, text, imageUrl } = req.body || {};
         if (!sessionId || typeof sessionId !== 'string') {
             return res.status(400).json({ error: 'sessionId обязателен' });
         }
         const trimmed = String(text || '').trim();
-        if (!trimmed) return res.status(400).json({ error: 'Пустое сообщение' });
+        if (!trimmed && !imageUrl) return res.status(400).json({ error: 'Пустое сообщение' });
         if (trimmed.length > 4000) return res.status(400).json({ error: 'Сообщение слишком длинное (макс. 4000 символов)' });
 
         const shortId = sessionId.slice(0, 8);
         const adminChatIds = getAdminChatIds();
+        const caption = trimmed
+            ? `💬 Вопрос с сайта [${shortId}]:\n\n${trimmed}`
+            : `💬 Скриншот от посетителя [${shortId}]`;
 
         // Рассылаем во все настроенные чаты (несколько личных чатов или ID группы)
         // и одновременно пишем свою же реплику в лог — параллельно, а не по очереди,
         // чтобы не копить задержку на каждый лишний чат/GitHub-запрос.
         const [results, { entry }] = await Promise.all([
             Promise.allSettled(
-                adminChatIds.map(chatId => telegramApi('sendMessage', {
-                    chat_id: chatId,
-                    text: `💬 Вопрос с сайта [${shortId}]:\n\n${trimmed}`,
-                }))
+                adminChatIds.map(chatId => imageUrl
+                    ? telegramApi('sendPhoto', { chat_id: chatId, photo: imageUrl, caption })
+                    : telegramApi('sendMessage', { chat_id: chatId, text: caption }))
             ),
-            appendMessage(sessionId, 'user', trimmed),
+            appendMessage(sessionId, 'user', trimmed, null, imageUrl || undefined),
         ]);
 
         const pairs = [];

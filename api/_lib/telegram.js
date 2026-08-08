@@ -36,6 +36,11 @@ function assertTelegramConfig() {
     }
 }
 
+async function getTelegramFileUrl(fileId) {
+    const file = await telegramApi('getFile', { file_id: fileId });
+    return `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${file.file_path}`;
+}
+
 async function telegramApi(method, payload) {
     const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`, {
         method: 'POST',
@@ -54,12 +59,13 @@ function sessionLogPath(sessionId) {
     return `${CHAT_DIR}/${safe}.json`;
 }
 
-async function appendMessage(sessionId, from, text, authorName) {
+async function appendMessage(sessionId, from, text, authorName, imageUrl) {
     const path = sessionLogPath(sessionId);
     const entry = {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        from, text, ts: Date.now(),
+        from, text: text || '', ts: Date.now(),
         ...(authorName ? { authorName } : {}),
+        ...(imageUrl ? { imageUrl } : {}),
     };
     const newLog = await updateJson(
         path, [],
@@ -142,4 +148,5 @@ module.exports = {
     resolveSessionForReply,
     isAllowedTelegramUser,
     telegramDisplayName,
+    getTelegramFileUrl,
 };

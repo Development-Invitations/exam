@@ -1,7 +1,7 @@
 // Telegram вызывает этот URL при каждом новом сообщении в чате с ботом
 // (регистрируется один раз через setWebhook, см. инструкцию в README/чате).
 const { assertGithubConfig } = require('./_lib/github');
-const { appendMessage, resolveSessionForReply, isAllowedTelegramUser, telegramDisplayName } = require('./_lib/telegram');
+const { appendMessage, resolveSessionForReply, isAllowedTelegramUser, telegramDisplayName, getTelegramFileUrl } = require('./_lib/telegram');
 
 const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
 
@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
         assertGithubConfig();
         const update = req.body || {};
         const message = update.message;
-        if (!message || !message.text || !message.from) {
+        if (!message || !message.from || (!message.text && !message.photo)) {
             return res.status(200).end(); // нечего обрабатывать, но Telegram ждёт 200
         }
 
@@ -45,7 +45,15 @@ module.exports = async (req, res) => {
             return res.status(200).end(); // некому маршрутизировать ответ
         }
 
-        await appendMessage(sessionId, 'admin', message.text, telegramDisplayName(message.from));
+        const authorName = telegramDisplayName(message.from);
+        if (message.photo && message.photo.length > 0) {
+            // Telegram присылает несколько размеров одного фото — берём самое крупное
+            const largest = message.photo[message.photo.length - 1];
+            const imageUrl = await getTelegramFileUrl(largest.file_id);
+            await appendMessage(sessionId, 'admin', message.caption || '', authorName, imageUrl);
+        } else {
+            await appendMessage(sessionId, 'admin', message.text, authorName);
+        }
         return res.status(200).end();
     } catch (err) {
         console.error(err);

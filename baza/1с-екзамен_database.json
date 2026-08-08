@@ -4468,5 +4468,15 @@
         "url": "https://raw.githubusercontent.com/Development-Invitations/exam/main/screenshots/1786187002565-cctodt.jpg"
       }
     ]
+  },
+  {
+    "id": "1786187097707",
+    "title": "Опишите действия системы при попытке провести документ (документу разрешено оперативное проведение, текущая дата/время 31.01.2021 17:24:00)? 2-ой вариант",
+    "text": "Система, безусловно, проведет документ в неоперативном режиме, т.к. для него разрешено оперативное проведение, а дата документа меньше текущей даты",
+    "screenshots": [
+      {
+        "url": "https://raw.githubusercontent.com/Development-Invitations/exam/main/screenshots/1786187088305-0ei5pf.jpg"
+      }
+    ]
   }
 ]

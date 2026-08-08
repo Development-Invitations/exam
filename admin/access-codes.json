@@ -5,5 +5,12 @@
     "label": "",
     "createdAt": 1786171617147,
     "expiresAt": 1786776360000
+  },
+  {
+    "code": "RP6XF2WC",
+    "template": "1с-екзамен_database.json",
+    "label": "",
+    "createdAt": 1786171618696,
+    "expiresAt": 1786776360000
   }
 ]

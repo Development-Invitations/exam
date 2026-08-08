@@ -13,6 +13,12 @@ function assertGithubConfig() {
     }
 }
 
+// Публичная ссылка на файл в репозитории (репозиторий публичный — это тот же
+// способ, каким уже читаются базы через raw.githubusercontent.com).
+function getRawUrl(path) {
+    return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${path}`;
+}
+
 function encodeGithubPath(p) {
     return p.split('/').map(encodeURIComponent).join('/');
 }
@@ -59,8 +65,8 @@ function friendlyWriteErrorHint(status, text) {
     return '';
 }
 
-async function putFile(path, content, message, sha) {
-    const body = { message, content: b64encode(content), branch: GITHUB_BRANCH };
+async function putFileRaw(path, base64Content, message, sha) {
+    const body = { message, content: base64Content, branch: GITHUB_BRANCH };
     if (sha) body.sha = sha;
     const res = await ghFetch(encodeGithubPath(path), {
         method: 'PUT',
@@ -72,6 +78,17 @@ async function putFile(path, content, message, sha) {
         throw new Error(`Ошибка сохранения "${path}" (${res.status}): ${text}${friendlyWriteErrorHint(res.status, text)}`);
     }
     return res.json();
+}
+
+// content — обычная текстовая строка (JSON и т.п.), будет закодирована сама.
+// Для бинарных файлов (картинки) используйте putBinaryFile — там content уже
+// base64, повторное кодирование испортило бы байты.
+async function putFile(path, content, message, sha) {
+    return putFileRaw(path, b64encode(content), message, sha);
+}
+
+async function putBinaryFile(path, base64Content, message, sha) {
+    return putFileRaw(path, base64Content, message, sha);
 }
 
 async function deleteFile(path, message, sha) {
@@ -125,7 +142,9 @@ module.exports = {
     encodeGithubPath,
     getFile,
     putFile,
+    putBinaryFile,
     deleteFile,
     getJson,
     updateJson,
+    getRawUrl,
 };

@@ -3,6 +3,7 @@
 // Variables), никогда не попадает в код и не коммитится в репозиторий.
 
 const { assertGithubConfig, getFile, putFile, deleteFile, updateJson } = require('./_lib/github');
+const { verifyAdminPassword } = require('./_lib/admin');
 
 const BAZA_DIR = 'baza';
 const MANIFEST_PATH = `${BAZA_DIR}/manifest.json`;
@@ -32,9 +33,17 @@ async function getManifest() {
     }
 }
 
+// Этот эндпоинт — часть кабинета (полный список/содержимое/правка любого
+// шаблона). Публичный просмотр по коду доступа идёт через отдельный
+// api/access.js, который отдаёт только ОДИН конкретный разрешённый шаблон.
 module.exports = async (req, res) => {
     try {
         assertGithubConfig();
+
+        const password = req.headers['x-admin-password'];
+        if (!(await verifyAdminPassword(password))) {
+            return res.status(401).json({ error: 'Неверный пароль кабинета' });
+        }
 
         if (req.method === 'GET' && !req.query.name) {
             const { list } = await getManifest();

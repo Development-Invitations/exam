@@ -268,7 +268,8 @@
             box-shadow: 0 0 0 3px rgba(255, 209, 0, 0.35), 0 0 20px rgba(255, 209, 0, 0.45);
             background: color-mix(in srgb, var(--brand-yellow) 10%, var(--card-bg));
         }
-        .answer-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-right: 70px; }
+        .answer-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-right: 150px; }
+        body.mode-public .answer-header-row { padding-right: 70px; }
         .answer-number {
             font-size: 12px; font-weight: 600; color: var(--accent);
             background: var(--accent-bg); padding: 3px 8px;
@@ -333,6 +334,108 @@
         .toast.error { border-color: #7f1d1d; color: #ef4444; }
 
         .loading-text { color: var(--text-muted); font-size: 13px; padding: 15px; text-align: center; }
+
+        /* ── Шлюз доступа (код / пароль кабинета) ─────────────────────────── */
+        body.locked .left-pane, body.locked .right-pane,
+        body.locked .chat-fab, body.locked .chat-panel {
+            display: none !important;
+        }
+        .gate-overlay {
+            position: fixed; inset: 0; z-index: 20000;
+            background: var(--bg-base);
+            display: none; align-items: center; justify-content: center;
+        }
+        body.locked .gate-overlay { display: flex; }
+        .gate-box {
+            width: 360px; max-width: 90vw; padding: 28px;
+            background: var(--modal-bg); border: 1px solid var(--border); border-radius: 14px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .gate-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .gate-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; line-height: 1.4; }
+        .gate-error { font-size: 13px; color: #ef4444; min-height: 18px; }
+        .gate-admin-toggle {
+            margin-top: 10px; font-size: 12px; color: var(--text-muted);
+            cursor: pointer; text-align: right; text-decoration: underline;
+        }
+        .gate-admin-toggle:hover { color: var(--text-primary); }
+        .gate-admin-box { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 12px; }
+
+        /* Публичный режим (доступ по коду) — только просмотр, без админ-кнопок */
+        body.mode-public .db-file-actions,
+        body.mode-public .add-form-panel,
+        body.mode-public #btnDeleteDb,
+        body.mode-public #btnRefresh,
+        body.mode-public .btn-delete,
+        body.mode-public .btn-edit-question,
+        body.mode-public #btnCabinetTools {
+            display: none !important;
+        }
+        body.mode-public .db-select { pointer-events: none; opacity: 0.85; }
+
+        #btnLogout {
+            position: fixed; top: 10px; right: 10px; z-index: 500;
+            padding: 6px 10px; font-size: 11px; border-radius: 6px; border: none;
+            background: var(--btn-default-bg); color: var(--btn-default-fg); cursor: pointer;
+        }
+        #btnLogout:hover { background: var(--btn-default-hv); color: var(--text-primary); }
+        body.locked #btnLogout { display: none; }
+
+        #cabinetPanel { display: none; }
+        #cabinetPanel.open { display: flex; }
+        body.mode-public #btnCabinetTools, body.mode-public #cabinetPanel { display: none !important; }
+        .cabinet-section-title { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+        #cabinetPanel .modal-input { margin-bottom: 8px; }
+        .cabinet-codes-list { display: flex; flex-direction: column; gap: 6px; }
+        .cabinet-code-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            padding: 8px 10px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
+            font-size: 12px;
+        }
+        .cabinet-code-row .code-info { min-width: 0; }
+        .cabinet-code-row .code-value { font-weight: 700; color: var(--brand-yellow-hover); letter-spacing: 1px; }
+        .cabinet-code-row .code-meta { color: var(--text-muted); font-size: 11px; word-break: break-word; }
+        .cabinet-code-row .code-expired { color: #ef4444; }
+        .cabinet-code-row button {
+            flex-shrink: 0; border: none; background: #ef4444; color: #fff;
+            padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 11px;
+        }
+
+        /* ── Лайтбокс для скриншотов ───────────────────────────────────── */
+        .lightbox-overlay {
+            position: fixed; inset: 0; z-index: 30000;
+            background: rgba(0,0,0,0.85);
+            display: none; align-items: center; justify-content: center;
+        }
+        .lightbox-overlay.open { display: flex; }
+        .lightbox-img { max-width: 92vw; max-height: 92vh; border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .lightbox-close {
+            position: fixed; top: 16px; right: 20px; width: 40px; height: 40px;
+            border-radius: 50%; border: none; background: rgba(255,255,255,0.15); color: #fff;
+            font-size: 18px; cursor: pointer;
+        }
+        .lightbox-close:hover { background: rgba(255,255,255,0.3); }
+
+        /* ── Скриншоты вопроса ─────────────────────────────────────────── */
+        .question-screenshots { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .question-screenshot-thumb {
+            width: 72px; height: 72px; object-fit: cover; border-radius: 6px;
+            border: 1px solid var(--border); cursor: pointer; transition: transform 0.15s;
+        }
+        .question-screenshot-thumb:hover { transform: scale(1.05); border-color: var(--border-focus); }
+        .qe-thumb-wrap { position: relative; display: inline-block; }
+        .qe-thumb-remove {
+            position: absolute; top: -6px; right: -6px; width: 18px; height: 18px;
+            border-radius: 50%; border: none; background: #ef4444; color: #fff;
+            font-size: 11px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-edit-question {
+            position: absolute; top: 20px; right: 90px;
+            background: transparent; border: 1px solid var(--border-focus); color: var(--border-focus);
+            padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;
+        }
+        .btn-edit-question:hover { background: var(--border-focus); color: #fff; }
 
         /* ── Плавающий Telegram-чат (в стиле мессенджера) ─────────────────── */
         @keyframes chatFabPulse {
@@ -533,9 +636,11 @@
 
             .current-db-title { font-size: 11px; margin-bottom: 10px; }
             .answer-card { padding: 14px; margin-bottom: 14px; }
-            .answer-header-row { padding-right: 60px; }
+            .answer-header-row { padding-right: 130px; }
+            body.mode-public .answer-header-row { padding-right: 60px; }
             .answer-title { padding-right: 60px; font-size: 16px; }
             .answer-text { font-size: 14px; }
+            .btn-edit-question { top: 14px; right: 74px; font-size: 11px; padding: 3px 6px; }
             .btn-delete { top: 14px; right: 14px; font-size: 11px; padding: 3px 6px; }
 
             .modal-overlay { padding: 16px; }
@@ -570,13 +675,92 @@
         }
     </style>
 </head>
-<body>
+<body class="locked">
+
+<!-- Шлюз доступа: код клиента ИЛИ пароль кабинета — до входа сайт ничего не показывает -->
+<div id="gateOverlay" class="gate-overlay">
+    <div class="gate-box">
+        <div class="gate-title">🔒 Доступ по коду</div>
+        <div class="gate-desc">Введите код, который вам выдали, чтобы открыть шаблон вопросов.</div>
+        <input type="text" id="gateCodeInput" class="modal-input" placeholder="Код доступа" autocomplete="off">
+        <button id="gateCodeBtn" class="btn-add" style="margin-top: 4px;">Открыть</button>
+        <div id="gateError" class="gate-error"></div>
+
+        <div class="gate-admin-toggle" id="gateAdminToggle">Я администратор →</div>
+        <div id="gateAdminBox" class="gate-admin-box" style="display:none;">
+            <input type="password" id="gateAdminInput" class="modal-input" placeholder="Пароль кабинета" autocomplete="off">
+            <button id="gateAdminBtn" class="btn-add">Войти в кабинет</button>
+        </div>
+    </div>
+</div>
+
+<!-- Лайтбокс для скриншотов -->
+<div id="lightbox" class="lightbox-overlay">
+    <button id="lightboxClose" class="lightbox-close" title="Закрыть">✕</button>
+    <img id="lightboxImg" class="lightbox-img" src="" alt="Скриншот">
+</div>
+
+<!-- Редактор вопроса: используется и для добавления, и для правки -->
+<div id="qeOverlay" class="modal-overlay">
+    <div class="modal-box" style="width: 480px;">
+        <div class="modal-title" id="qeTitleLabel">Новый вопрос</div>
+        <label class="modal-label">Заголовок / вопрос</label>
+        <input type="text" id="qeTitleInput" class="modal-input" placeholder="Введите вопрос...">
+        <label class="modal-label">Текст ответа</label>
+        <textarea id="qeTextInput" class="modal-input modal-textarea" placeholder="Введите ответ..."></textarea>
+        <label class="modal-label">Скриншоты</label>
+        <div id="qeScreenshots" class="question-screenshots" style="margin-bottom: 10px;"></div>
+        <input type="file" id="qeFileInput" accept="image/*" style="display:none" multiple>
+        <button id="qeAddScreenshotBtn" type="button" class="btn-file-action" style="width:100%; margin-bottom: 8px;">📷 Добавить скриншот</button>
+        <div class="modal-buttons">
+            <button id="qeRevertBtn" type="button" class="modal-btn cancel">↺ Восстановить исходное</button>
+            <button id="qeCancelBtn" type="button" class="modal-btn cancel">Отмена</button>
+            <button id="qeSaveBtn" type="button" class="modal-btn confirm">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<button id="btnLogout" title="Выйти">🔒 Выйти</button>
+
+<!-- Панель инструментов кабинета: смена пароля + коды доступа -->
+<div id="cabinetPanel" class="chat-panel" style="left: 24px; right: auto; bottom: 24px;">
+    <div class="chat-header">
+        <div class="chat-header-avatar">🔑</div>
+        <div class="chat-header-info">
+            <div class="chat-header-title">Кабинет</div>
+            <div class="chat-header-status">Пароль и коды доступа</div>
+        </div>
+        <div class="chat-header-actions">
+            <button id="cabinetCloseBtn" class="chat-icon-btn" title="Закрыть">✕</button>
+        </div>
+    </div>
+    <div class="chat-messages" style="gap: 16px;">
+        <div>
+            <div class="cabinet-section-title">Сменить пароль кабинета</div>
+            <input type="password" id="cabCurrentPass" class="modal-input" placeholder="Текущий пароль" autocomplete="off">
+            <input type="password" id="cabNewPass" class="modal-input" placeholder="Новый пароль" autocomplete="off">
+            <button id="cabChangePassBtn" class="btn-add">Сменить пароль</button>
+        </div>
+        <div>
+            <div class="cabinet-section-title">Новый код доступа</div>
+            <select id="cabCodeTemplate" class="modal-input"></select>
+            <input type="text" id="cabCodeLabel" class="modal-input" placeholder="Для кого (необязательно)">
+            <input type="number" id="cabCodeDays" class="modal-input" placeholder="Дней действия" value="7" min="1">
+            <button id="cabCreateCodeBtn" class="btn-add">Создать код</button>
+        </div>
+        <div>
+            <div class="cabinet-section-title">Активные коды</div>
+            <div id="cabCodesList" class="cabinet-codes-list"></div>
+        </div>
+    </div>
+</div>
 
 <div class="left-pane" id="leftPane">
     <div class="db-selector-container">
         <div class="db-header-row">
             <select id="dbSelect" class="db-select" title="Выбрать базу данных"></select>
             <button class="btn-theme" id="btnTheme" title="Сменить тему">🌙</button>
+            <button class="btn-small" id="btnCabinetTools" title="Коды доступа и пароль кабинета">🔑</button>
         </div>
         <div class="db-header-row">
             <button class="btn-small refresh" id="btnRefresh" style="flex:1;" title="Обновить список баз из GitHub">🔄 Обновить</button>
@@ -703,8 +887,14 @@ function showToast(msg, type = '') {
 }
 
 // ── API: базы хранятся и меняются на GitHub через серверную функцию ────
+// Все запросы к /api/dbs теперь требуют пароль кабинета — сервер проверяет
+// его сам, интерфейс лишь передаёт то, что ввёл администратор при входе.
+function adminHeaders(extra) {
+    return { 'x-admin-password': getAdminPassword(), ...(extra || {}) };
+}
+
 async function apiListDbs() {
-    const res = await fetch('/api/dbs');
+    const res = await fetch('/api/dbs', { headers: adminHeaders() });
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || `Ошибка сервера (${res.status})`);
@@ -713,7 +903,7 @@ async function apiListDbs() {
 }
 
 async function apiGetDb(name) {
-    const res = await fetch(`/api/dbs?name=${encodeURIComponent(name)}`);
+    const res = await fetch(`/api/dbs?name=${encodeURIComponent(name)}`, { headers: adminHeaders() });
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || `Ошибка сервера (${res.status})`);
@@ -726,7 +916,7 @@ async function apiSaveDb(name, data, category) {
     if (category !== undefined) body.category = category;
     const res = await fetch('/api/dbs', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(body),
     });
     if (!res.ok) {
@@ -737,7 +927,87 @@ async function apiSaveDb(name, data, category) {
 }
 
 async function apiDeleteDb(name) {
-    const res = await fetch(`/api/dbs?name=${encodeURIComponent(name)}`, { method: 'DELETE' });
+    const res = await fetch(`/api/dbs?name=${encodeURIComponent(name)}`, { method: 'DELETE', headers: adminHeaders() });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
+}
+
+// ── API: кабинет (пароль, коды доступа, скриншоты) ──────────────────────
+async function apiAdminLogin(password) {
+    const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+    });
+    return res.ok;
+}
+
+async function apiChangePassword(currentPassword, newPassword) {
+    const res = await fetch('/api/admin/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
+}
+
+async function apiListCodes() {
+    const res = await fetch('/api/admin/codes', { headers: adminHeaders() });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
+}
+
+async function apiCreateCode(template, label, days) {
+    const res = await fetch('/api/admin/codes', {
+        method: 'POST',
+        headers: adminHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ template, label, days }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
+}
+
+async function apiRevokeCode(code) {
+    const res = await fetch(`/api/admin/codes?code=${encodeURIComponent(code)}`, { method: 'DELETE', headers: adminHeaders() });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
+}
+
+async function apiUploadScreenshot(imageDataUrl) {
+    const res = await fetch('/api/admin/screenshot', {
+        method: 'POST',
+        headers: adminHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ imageDataUrl }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
+}
+
+async function apiValidateAccessCode(code) {
+    const res = await fetch('/api/access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+    });
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || `Ошибка сервера (${res.status})`);
@@ -823,20 +1093,22 @@ function showModal(options) {
     });
 }
 
-// ── Пароль на удаление ───────────────────────────────────────────────
-const DELETE_PASSWORD = '0404';
-async function confirmDeleteWithPassword(desc) {
+// ── Пароль на удаление/редактирование ───────────────────────────────────
+// Пароль теперь редактируемый и проверяется сервером (не захардкожен в JS),
+// поэтому здесь всегда идём на /api/admin/login, а не сравниваем локально.
+async function confirmDeleteWithPassword(desc, confirmText) {
     const pass = await showModal({
-        title: 'Подтверждение удаления',
-        desc: desc || 'Введите пароль для удаления:',
+        title: 'Подтверждение',
+        desc: desc || 'Введите пароль:',
         type: 'prompt',
         inputType: 'password',
         placeholder: 'Пароль',
-        confirmText: 'Удалить',
+        confirmText: confirmText || 'Удалить',
         confirmClass: 'danger'
     });
     if (pass === null) return false;
-    if (pass !== DELETE_PASSWORD) {
+    const ok = await apiAdminLogin(pass);
+    if (!ok) {
         showToast('Неверный пароль', 'error');
         return false;
     }
@@ -943,18 +1215,25 @@ function renderCards() {
     } else {
         if (emptyState) emptyState.remove();
         currentDbData.forEach((item, i) => {
+            const screenshots = Array.isArray(item.screenshots) ? item.screenshots : [];
             const card = document.createElement('div');
             card.className = 'answer-card';
             card.setAttribute('data-id', item.id);
             card.innerHTML = `
+                <button class="btn-edit-question" data-id="${item.id}">✏ Изменить</button>
                 <button class="btn-delete" data-id="${item.id}">Удалить</button>
                 <div class="answer-header-row">
                     <span class="answer-number">№ ${i + 1} из ${currentDbData.length}</span>
                 </div>
                 <div class="answer-title">${escapeHtml(item.title)}</div>
                 <div class="answer-text">${escapeHtml(item.text)}</div>
+                ${screenshots.length ? `<div class="question-screenshots">${screenshots.map(s => `<img class="question-screenshot-thumb" src="${s.url}" alt="Скриншот">`).join('')}</div>` : ''}
             `;
             card.querySelector('.btn-delete').addEventListener('click', () => deleteCard(item.id));
+            card.querySelector('.btn-edit-question').addEventListener('click', () => editQuestion(item.id));
+            card.querySelectorAll('.question-screenshot-thumb').forEach(img => {
+                img.addEventListener('click', () => openLightbox(img.src));
+            });
             pane.appendChild(card);
         });
     }
@@ -1031,14 +1310,7 @@ document.getElementById('btnDeleteDb').addEventListener('click', async () => {
 });
 
 document.getElementById('btnAdd').addEventListener('click', async () => {
-    const result = await showModal({
-        title: '+ Новый вопрос',
-        fields: [
-            { name: 'title', label: 'Заголовок / вопрос', type: 'text', placeholder: 'Введите вопрос...' },
-            { name: 'text', label: 'Текст ответа', type: 'textarea', placeholder: 'Введите ответ...' },
-        ],
-        confirmText: 'Добавить'
-    });
+    const result = await openQuestionEditor({ mode: 'add' });
     if (!result) return;
 
     const title = result.title.trim();
@@ -1075,7 +1347,7 @@ document.getElementById('btnAdd').addEventListener('click', async () => {
         isNewDb = true;
     }
 
-    const newItem = { id: Date.now().toString(), title, text };
+    const newItem = { id: Date.now().toString(), title, text, screenshots: result.screenshots || [] };
     const dataToSave = [...currentDbData, newItem];
 
     try {
@@ -1105,6 +1377,37 @@ async function deleteCard(id) {
         showToast('Вопрос удалён из GitHub', 'success');
     } catch (err) {
         showToast('Не удалось удалить: ' + err.message, 'error');
+        currentDbData = previousData;
+    }
+}
+
+async function editQuestion(id) {
+    const item = currentDbData.find(i => i.id === id);
+    if (!item) return;
+
+    const result = await openQuestionEditor({ mode: 'edit', originalItem: item });
+    if (!result) return;
+
+    const title = result.title.trim();
+    const text = result.text.trim();
+    if (!title || !text) {
+        await showModal({ title: 'Внимание', desc: 'Заполни оба поля!', type: 'alert' }); return;
+    }
+
+    const ok = await confirmDeleteWithPassword('Сохранить изменения вопроса? Введите пароль:', 'Сохранить');
+    if (!ok) return;
+
+    const previousData = currentDbData;
+    const newData = currentDbData.map(i => i.id === id
+        ? { ...i, title, text, screenshots: result.screenshots || [] }
+        : i);
+    try {
+        await apiSaveDb(currentDbName, newData);
+        currentDbData = newData;
+        renderCards();
+        showToast('Вопрос обновлён в GitHub', 'success');
+    } catch (err) {
+        showToast('Не удалось сохранить изменения: ' + err.message, 'error');
         currentDbData = previousData;
     }
 }
@@ -1357,8 +1660,284 @@ document.addEventListener('click', e => {
     }
 });
 
-// ── Инициализация ──────────────────────────────────────────────────────
-refreshDbList();
+// ── Лайтбокс для скриншотов ──────────────────────────────────────────────
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+function openLightbox(src) {
+    lightboxImg.src = src;
+    lightbox.classList.add('open');
+}
+function closeLightbox() {
+    lightbox.classList.remove('open');
+    lightboxImg.src = '';
+}
+document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox(); });
+
+// ── Редактор вопроса (добавление и правка, со скриншотами) ──────────────
+const qeOverlay = document.getElementById('qeOverlay');
+const qeTitleLabel = document.getElementById('qeTitleLabel');
+const qeTitleInput = document.getElementById('qeTitleInput');
+const qeTextInput = document.getElementById('qeTextInput');
+const qeScreenshotsEl = document.getElementById('qeScreenshots');
+const qeFileInput = document.getElementById('qeFileInput');
+
+let qeScreenshots = [];
+let qeOriginal = null;
+let qeResolve = null;
+
+function renderQeScreenshots() {
+    qeScreenshotsEl.innerHTML = qeScreenshots.map((s, idx) => `
+        <span class="qe-thumb-wrap">
+            <img class="question-screenshot-thumb" src="${s.url}" data-idx="${idx}" alt="Скриншот">
+            <button type="button" class="qe-thumb-remove" data-idx="${idx}" title="Удалить">✕</button>
+        </span>
+    `).join('');
+    qeScreenshotsEl.querySelectorAll('.question-screenshot-thumb').forEach(img => {
+        img.addEventListener('click', () => openLightbox(img.src));
+    });
+    qeScreenshotsEl.querySelectorAll('.qe-thumb-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+            qeScreenshots.splice(Number(btn.dataset.idx), 1);
+            renderQeScreenshots();
+        });
+    });
+}
+
+function openQuestionEditor({ mode, originalItem }) {
+    qeTitleLabel.textContent = mode === 'edit' ? 'Изменить вопрос' : 'Новый вопрос';
+    qeOriginal = originalItem || { title: '', text: '', screenshots: [] };
+    qeTitleInput.value = qeOriginal.title || '';
+    qeTextInput.value = qeOriginal.text || '';
+    qeScreenshots = Array.isArray(qeOriginal.screenshots) ? [...qeOriginal.screenshots] : [];
+    renderQeScreenshots();
+    qeOverlay.classList.add('open');
+    setTimeout(() => qeTitleInput.focus(), 50);
+
+    return new Promise(resolve => { qeResolve = resolve; });
+}
+
+function closeQuestionEditor(result) {
+    qeOverlay.classList.remove('open');
+    if (qeResolve) { qeResolve(result); qeResolve = null; }
+}
+
+document.getElementById('qeAddScreenshotBtn').addEventListener('click', () => qeFileInput.click());
+qeFileInput.addEventListener('change', async e => {
+    const files = Array.from(e.target.files || []);
+    for (const file of files) {
+        try {
+            const dataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+            const { url } = await apiUploadScreenshot(dataUrl);
+            qeScreenshots.push({ url });
+            renderQeScreenshots();
+        } catch (err) {
+            showToast(`Не удалось загрузить "${file.name}": ` + err.message, 'error');
+        }
+    }
+    qeFileInput.value = '';
+});
+document.getElementById('qeRevertBtn').addEventListener('click', () => {
+    qeTitleInput.value = qeOriginal.title || '';
+    qeTextInput.value = qeOriginal.text || '';
+    qeScreenshots = Array.isArray(qeOriginal.screenshots) ? [...qeOriginal.screenshots] : [];
+    renderQeScreenshots();
+});
+document.getElementById('qeCancelBtn').addEventListener('click', () => closeQuestionEditor(null));
+document.getElementById('qeSaveBtn').addEventListener('click', () => {
+    closeQuestionEditor({ title: qeTitleInput.value, text: qeTextInput.value, screenshots: qeScreenshots });
+});
+
+// ── Шлюз доступа: код клиента ИЛИ пароль кабинета ────────────────────────
+function getAdminPassword() {
+    return sessionStorage.getItem('adminPassword') || '';
+}
+
+function applyLocked(locked) {
+    document.body.classList.toggle('locked', locked);
+}
+
+async function enterCabinet(password) {
+    sessionStorage.setItem('adminPassword', password);
+    sessionStorage.setItem('accessMode', 'cabinet');
+    document.body.classList.remove('mode-public');
+    document.body.classList.add('mode-cabinet');
+    applyLocked(false);
+    await refreshDbList();
+}
+
+function enterPublic(code, template, data) {
+    sessionStorage.setItem('accessMode', 'public');
+    sessionStorage.setItem('accessCode', code);
+    sessionStorage.setItem('accessTemplate', template);
+    document.body.classList.remove('mode-cabinet');
+    document.body.classList.add('mode-public');
+    dbList = [{ name: template, category: '' }];
+    currentDbName = template;
+    currentDbData = data;
+    updateDbSelectUI();
+    renderCards();
+    applyLocked(false);
+}
+
+function showGateError(msg) {
+    document.getElementById('gateError').textContent = msg || '';
+}
+
+document.getElementById('gateCodeBtn').addEventListener('click', async () => {
+    const code = document.getElementById('gateCodeInput').value.trim();
+    if (!code) return;
+    showGateError('');
+    try {
+        const { template, data } = await apiValidateAccessCode(code);
+        enterPublic(code.toUpperCase(), template, data);
+    } catch (err) {
+        showGateError(err.message);
+    }
+});
+document.getElementById('gateCodeInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('gateCodeBtn').click();
+});
+
+document.getElementById('gateAdminToggle').addEventListener('click', () => {
+    const box = document.getElementById('gateAdminBox');
+    box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+});
+document.getElementById('gateAdminBtn').addEventListener('click', async () => {
+    const password = document.getElementById('gateAdminInput').value;
+    if (!password) return;
+    showGateError('');
+    const ok = await apiAdminLogin(password);
+    if (!ok) { showGateError('Неверный пароль кабинета'); return; }
+    await enterCabinet(password);
+});
+document.getElementById('gateAdminInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('gateAdminBtn').click();
+});
+
+document.getElementById('btnLogout').addEventListener('click', () => {
+    sessionStorage.removeItem('adminPassword');
+    sessionStorage.removeItem('accessMode');
+    sessionStorage.removeItem('accessCode');
+    sessionStorage.removeItem('accessTemplate');
+    location.reload();
+});
+
+// ── Панель инструментов кабинета: пароль + коды доступа ──────────────────
+const cabinetPanel = document.getElementById('cabinetPanel');
+document.getElementById('btnCabinetTools').addEventListener('click', async () => {
+    cabinetPanel.classList.toggle('open');
+    if (cabinetPanel.classList.contains('open')) await refreshCabinetPanel();
+});
+document.getElementById('cabinetCloseBtn').addEventListener('click', () => cabinetPanel.classList.remove('open'));
+
+async function refreshCabinetPanel() {
+    const select = document.getElementById('cabCodeTemplate');
+    select.innerHTML = dbList.map(e => `<option value="${e.name}">${e.name.replace('.json', '')}</option>`).join('');
+
+    try {
+        const codes = await apiListCodes();
+        const list = document.getElementById('cabCodesList');
+        if (codes.length === 0) {
+            list.innerHTML = '<div class="chat-empty">Кодов пока нет</div>';
+            return;
+        }
+        list.innerHTML = codes.map(c => {
+            const expired = c.expiresAt && c.expiresAt < Date.now();
+            const expiresStr = c.expiresAt ? new Date(c.expiresAt).toLocaleDateString('ru-RU') : '—';
+            return `
+                <div class="cabinet-code-row">
+                    <div class="code-info">
+                        <div class="code-value">${escapeHtml(c.code)}</div>
+                        <div class="code-meta">${escapeHtml(c.template.replace('.json',''))}${c.label ? ' · ' + escapeHtml(c.label) : ''} · до ${expiresStr}${expired ? ' <span class="code-expired">(истёк)</span>' : ''}</div>
+                    </div>
+                    <button data-code="${c.code}">Отозвать</button>
+                </div>
+            `;
+        }).join('');
+        list.querySelectorAll('button[data-code]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                try {
+                    await apiRevokeCode(btn.dataset.code);
+                    await refreshCabinetPanel();
+                    showToast('Код отозван', 'success');
+                } catch (err) {
+                    showToast('Не удалось отозвать: ' + err.message, 'error');
+                }
+            });
+        });
+    } catch (err) {
+        showToast('Не удалось загрузить коды: ' + err.message, 'error');
+    }
+}
+
+document.getElementById('cabChangePassBtn').addEventListener('click', async () => {
+    const current = document.getElementById('cabCurrentPass').value;
+    const next = document.getElementById('cabNewPass').value;
+    if (!current || !next) { showToast('Заполните оба поля', 'error'); return; }
+    try {
+        await apiChangePassword(current, next);
+        sessionStorage.setItem('adminPassword', next);
+        document.getElementById('cabCurrentPass').value = '';
+        document.getElementById('cabNewPass').value = '';
+        showToast('Пароль изменён', 'success');
+    } catch (err) {
+        showToast('Не удалось сменить пароль: ' + err.message, 'error');
+    }
+});
+
+document.getElementById('cabCreateCodeBtn').addEventListener('click', async () => {
+    const template = document.getElementById('cabCodeTemplate').value;
+    const label = document.getElementById('cabCodeLabel').value.trim();
+    const days = document.getElementById('cabCodeDays').value;
+    if (!template) { showToast('Нет доступных баз для кода', 'error'); return; }
+    try {
+        const entry = await apiCreateCode(template, label, days);
+        document.getElementById('cabCodeLabel').value = '';
+        await refreshCabinetPanel();
+        await showModal({
+            title: 'Код создан',
+            desc: `Код доступа: ${entry.code}\nДействителен до: ${new Date(entry.expiresAt).toLocaleString('ru-RU')}`,
+            type: 'alert'
+        });
+    } catch (err) {
+        showToast('Не удалось создать код: ' + err.message, 'error');
+    }
+});
+
+// ── Инициализация: пробуем восстановить сессию, иначе показываем шлюз ───
+(async function initSession() {
+    const mode = sessionStorage.getItem('accessMode');
+    try {
+        if (mode === 'cabinet') {
+            const password = getAdminPassword();
+            if (password && await apiAdminLogin(password)) {
+                await enterCabinet(password);
+                return;
+            }
+        } else if (mode === 'public') {
+            const code = sessionStorage.getItem('accessCode');
+            if (code) {
+                const { template, data } = await apiValidateAccessCode(code);
+                enterPublic(code, template, data);
+                return;
+            }
+        }
+    } catch {
+        // сессия недействительна (пароль сменили / код истёк) — покажем шлюз
+    }
+    sessionStorage.removeItem('adminPassword');
+    sessionStorage.removeItem('accessMode');
+    sessionStorage.removeItem('accessCode');
+    sessionStorage.removeItem('accessTemplate');
+    applyLocked(true);
+})();
 </script>
 </body>
 </html>

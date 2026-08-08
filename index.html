@@ -417,6 +417,35 @@
             font-size: 18px; cursor: pointer;
         }
         .lightbox-close:hover { background: rgba(255,255,255,0.3); }
+        .lightbox-copy {
+            position: fixed; top: 16px; right: 70px; height: 40px;
+            border-radius: 20px; border: none; background: rgba(255,255,255,0.15); color: #fff;
+            font-size: 13px; font-weight: 600; cursor: pointer; padding: 0 16px;
+        }
+        .lightbox-copy:hover { background: rgba(255,255,255,0.3); }
+        .lightbox-nav {
+            position: fixed; top: 50%; transform: translateY(-50%);
+            width: 48px; height: 48px; border-radius: 50%; border: none;
+            background: rgba(255,255,255,0.15); color: #fff; font-size: 26px; cursor: pointer;
+            display: none; align-items: center; justify-content: center; line-height: 1;
+        }
+        .lightbox-nav:hover { background: rgba(255,255,255,0.3); }
+        .lightbox-overlay.has-gallery .lightbox-nav { display: flex; }
+        .lightbox-prev { left: 16px; }
+        .lightbox-next { right: 16px; }
+        .lightbox-counter {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.5); color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 12px;
+            display: none;
+        }
+        .lightbox-overlay.has-gallery .lightbox-counter { display: block; }
+
+        .thumb-copy-btn {
+            position: absolute; bottom: -4px; right: -4px; width: 20px; height: 20px;
+            border-radius: 50%; border: none; background: var(--brand-yellow); color: var(--brand-yellow-fg);
+            font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .thumb-wrap { position: relative; display: inline-block; }
 
         /* ── Скриншоты вопроса ─────────────────────────────────────────── */
         .question-screenshots { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -706,10 +735,14 @@
     </div>
 </div>
 
-<!-- Лайтбокс для скриншотов -->
+<!-- Лайтбокс для скриншотов (с галереей и копированием в буфер) -->
 <div id="lightbox" class="lightbox-overlay">
     <button id="lightboxClose" class="lightbox-close" title="Закрыть">✕</button>
+    <button id="lightboxCopy" class="lightbox-copy" title="Скопировать — потом Ctrl+V в чат">📋 Копировать</button>
+    <button id="lightboxPrev" class="lightbox-nav lightbox-prev" title="Предыдущее">‹</button>
     <img id="lightboxImg" class="lightbox-img" src="" alt="Скриншот">
+    <button id="lightboxNext" class="lightbox-nav lightbox-next" title="Следующее">›</button>
+    <div id="lightboxCounter" class="lightbox-counter"></div>
 </div>
 
 <!-- Редактор вопроса: используется и для добавления, и для правки -->
@@ -1257,12 +1290,21 @@ function renderCards() {
                 </div>
                 <div class="answer-title">${escapeHtml(item.title)}</div>
                 <div class="answer-text">${escapeHtml(item.text)}</div>
-                ${screenshots.length ? `<div class="question-screenshots">${screenshots.map(s => `<img class="question-screenshot-thumb" src="${s.url}" alt="Скриншот">`).join('')}</div>` : ''}
+                ${screenshots.length ? `<div class="question-screenshots">${screenshots.map(s => `
+                    <span class="thumb-wrap">
+                        <img class="question-screenshot-thumb" src="${s.url}" alt="Скриншот">
+                        <button type="button" class="thumb-copy-btn" data-url="${s.url}" title="Скопировать — потом Ctrl+V в чат">📋</button>
+                    </span>
+                `).join('')}</div>` : ''}
             `;
             card.querySelector('.btn-delete').addEventListener('click', () => deleteCard(item.id));
             card.querySelector('.btn-edit-question').addEventListener('click', () => editQuestion(item.id));
-            card.querySelectorAll('.question-screenshot-thumb').forEach(img => {
-                img.addEventListener('click', () => openLightbox(img.src));
+            const allUrls = screenshots.map(s => s.url);
+            card.querySelectorAll('.question-screenshot-thumb').forEach((img, idx) => {
+                img.addEventListener('click', () => openLightbox(allUrls, idx));
+            });
+            card.querySelectorAll('.thumb-copy-btn').forEach(btn => {
+                btn.addEventListener('click', e => { e.stopPropagation(); copyImageToClipboard(btn.dataset.url); });
             });
             pane.appendChild(card);
         });
@@ -1777,20 +1819,61 @@ document.addEventListener('click', e => {
     }
 });
 
-// ── Лайтбокс для скриншотов ──────────────────────────────────────────────
+// ── Лайтбокс для скриншотов (с галереей и копированием в буфер) ─────────
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightboxImg');
-function openLightbox(src) {
-    lightboxImg.src = src;
+const lightboxCounter = document.getElementById('lightboxCounter');
+let lightboxUrls = [];
+let lightboxIndex = 0;
+
+function renderLightboxImage() {
+    lightboxImg.src = lightboxUrls[lightboxIndex];
+    lightboxCounter.textContent = `${lightboxIndex + 1} / ${lightboxUrls.length}`;
+    lightbox.classList.toggle('has-gallery', lightboxUrls.length > 1);
+}
+
+// urls: строка (одно фото) или массив (галерея); startIndex — с какого открыть
+function openLightbox(urls, startIndex) {
+    lightboxUrls = Array.isArray(urls) ? urls : [urls];
+    lightboxIndex = startIndex || 0;
+    renderLightboxImage();
     lightbox.classList.add('open');
 }
 function closeLightbox() {
     lightbox.classList.remove('open');
     lightboxImg.src = '';
 }
+function lightboxShowPrev() {
+    lightboxIndex = (lightboxIndex - 1 + lightboxUrls.length) % lightboxUrls.length;
+    renderLightboxImage();
+}
+function lightboxShowNext() {
+    lightboxIndex = (lightboxIndex + 1) % lightboxUrls.length;
+    renderLightboxImage();
+}
+
+async function copyImageToClipboard(url) {
+    try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+        showToast('Скопировано — вставьте в чат сочетанием Ctrl+V', 'success');
+    } catch (err) {
+        showToast('Не удалось скопировать: ' + err.message, 'error');
+    }
+}
+
 document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+document.getElementById('lightboxPrev').addEventListener('click', lightboxShowPrev);
+document.getElementById('lightboxNext').addEventListener('click', lightboxShowNext);
+document.getElementById('lightboxCopy').addEventListener('click', () => copyImageToClipboard(lightboxUrls[lightboxIndex]));
 lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox(); });
+document.addEventListener('keydown', e => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft' && lightboxUrls.length > 1) lightboxShowPrev();
+    else if (e.key === 'ArrowRight' && lightboxUrls.length > 1) lightboxShowNext();
+});
 
 // ── Редактор вопроса (добавление и правка, со скриншотами) ──────────────
 const qeOverlay = document.getElementById('qeOverlay');
@@ -1808,11 +1891,16 @@ function renderQeScreenshots() {
     qeScreenshotsEl.innerHTML = qeScreenshots.map((s, idx) => `
         <span class="qe-thumb-wrap">
             <img class="question-screenshot-thumb" src="${s.url}" data-idx="${idx}" alt="Скриншот">
+            <button type="button" class="thumb-copy-btn" data-url="${s.url}" title="Скопировать — потом Ctrl+V в чат">📋</button>
             <button type="button" class="qe-thumb-remove" data-idx="${idx}" title="Удалить">✕</button>
         </span>
     `).join('');
-    qeScreenshotsEl.querySelectorAll('.question-screenshot-thumb').forEach(img => {
-        img.addEventListener('click', () => openLightbox(img.src));
+    const allUrls = qeScreenshots.map(s => s.url);
+    qeScreenshotsEl.querySelectorAll('.question-screenshot-thumb').forEach((img, idx) => {
+        img.addEventListener('click', () => openLightbox(allUrls, idx));
+    });
+    qeScreenshotsEl.querySelectorAll('.thumb-copy-btn').forEach(btn => {
+        btn.addEventListener('click', e => { e.stopPropagation(); copyImageToClipboard(btn.dataset.url); });
     });
     qeScreenshotsEl.querySelectorAll('.qe-thumb-remove').forEach(btn => {
         btn.addEventListener('click', () => {

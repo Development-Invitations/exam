@@ -1837,7 +1837,9 @@ document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && chatIsOpen) closeChat();
 });
 document.addEventListener('click', e => {
-    if (chatIsOpen && !chatPanel.contains(e.target) && !chatFab.contains(e.target)) {
+    // Лайтбокс — отдельный оверлей вне .chat-panel: клики по фото/стрелкам
+    // галереи/закрытию лайтбокса не должны считаться "кликом вне чата".
+    if (chatIsOpen && !chatPanel.contains(e.target) && !chatFab.contains(e.target) && !lightbox.contains(e.target)) {
         closeChat();
     }
 });

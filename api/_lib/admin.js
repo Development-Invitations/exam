@@ -65,13 +65,16 @@ async function revokeAccessCode(code) {
 }
 
 // Возвращает имя шаблона, если код существует и не истёк, иначе null.
+// Возвращает { template, expiresAt } если код существует и не истёк, иначе null.
+// expiresAt отдаётся клиенту, чтобы он мог точно по времени сам себя
+// заблокировать в нужный момент, а не только по периодическому опросу.
 async function validateAccessCode(code) {
     if (!code) return null;
     const codes = await listAccessCodes();
     const entry = codes.find(e => e.code === String(code).toUpperCase());
     if (!entry) return null;
     if (entry.expiresAt && entry.expiresAt < Date.now()) return null;
-    return entry.template;
+    return { template: entry.template, expiresAt: entry.expiresAt };
 }
 
 module.exports = {

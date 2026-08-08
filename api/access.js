@@ -13,8 +13,9 @@ module.exports = async (req, res) => {
         const { code } = req.body || {};
         if (!code) return res.status(400).json({ error: 'Код обязателен' });
 
-        const template = await validateAccessCode(code);
-        if (!template) return res.status(403).json({ error: 'Код недействителен или истёк' });
+        const result = await validateAccessCode(code);
+        if (!result) return res.status(403).json({ error: 'Код недействителен или истёк' });
+        const { template, expiresAt } = result;
 
         const file = await getFile(`${BAZA_DIR}/${template}`);
         if (!file) return res.status(404).json({ error: 'Шаблон не найден' });
@@ -24,7 +25,7 @@ module.exports = async (req, res) => {
             return res.status(500).json({ error: 'Файл шаблона повреждён' });
         }
 
-        return res.status(200).json({ template, data: Array.isArray(data) ? data : [] });
+        return res.status(200).json({ template, expiresAt, data: Array.isArray(data) ? data : [] });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: err.message });

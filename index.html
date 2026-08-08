@@ -2030,23 +2030,29 @@ async function enterCabinet(password) {
 }
 
 let accessExpiryTimer = null;
+let accessExpiryDeadlineTimer = null;
 let accessExpiryCode = null;
+
+function lockDueToExpiry() {
+    clearInterval(accessExpiryTimer);
+    clearTimeout(accessExpiryDeadlineTimer);
+    sessionStorage.removeItem('accessMode');
+    sessionStorage.removeItem('accessCode');
+    sessionStorage.removeItem('accessTemplate');
+    showToast('Срок действия кода доступа истёк', 'error');
+    applyLocked(true);
+}
 
 async function checkAccessExpiry() {
     if (!accessExpiryCode || document.body.classList.contains('locked')) return;
     try {
         await apiValidateAccessCode(accessExpiryCode);
     } catch {
-        clearInterval(accessExpiryTimer);
-        sessionStorage.removeItem('accessMode');
-        sessionStorage.removeItem('accessCode');
-        sessionStorage.removeItem('accessTemplate');
-        showToast('Срок действия кода доступа истёк', 'error');
-        applyLocked(true);
+        lockDueToExpiry();
     }
 }
 
-function enterPublic(code, template, data) {
+function enterPublic(code, template, data, expiresAt) {
     sessionStorage.setItem('accessMode', 'public');
     sessionStorage.setItem('accessCode', code);
     sessionStorage.setItem('accessTemplate', template);
@@ -2059,14 +2065,27 @@ function enterPublic(code, template, data) {
     renderCards();
     applyLocked(false);
 
-    // Код может закончиться, пока вкладка открыта — перепроверяем его
-    // регулярно, чтобы сайт заблокировался сам, без обновления страницы.
-    // Одного setInterval недостаточно: браузеры замедляют/приостанавливают
-    // таймеры для свёрнутых/неактивных вкладок, поэтому дополнительно
-    // проверяем сразу при возврате на вкладку/фокусе окна.
+    // Периодический опрос — подстраховка (например, код отозвали вручную
+    // раньше срока), но браузеры замедляют/приостанавливают setInterval для
+    // свёрнутых вкладок. Поэтому ГЛАВНЫЙ механизм — точный setTimeout ровно
+    // до expiresAt: пока вкладка активна, блокировка сработает секунда в
+    // секунду, а не только при следующем опросе или возврате на вкладку.
     accessExpiryCode = code;
     clearInterval(accessExpiryTimer);
+    clearTimeout(accessExpiryDeadlineTimer);
     accessExpiryTimer = setInterval(checkAccessExpiry, 30000);
+    if (expiresAt) {
+        const msLeft = expiresAt - Date.now();
+        // setTimeout не гарантирует точность на огромных интервалах (Vercel/
+        // браузер могут "уснуть") — если до истечения больше часа, просто
+        // подождём следующего опроса/возврата на вкладку и переназначим
+        // точный таймер позже, ближе к делу.
+        if (msLeft <= 0) {
+            lockDueToExpiry();
+        } else if (msLeft < 60 * 60 * 1000) {
+            accessExpiryDeadlineTimer = setTimeout(checkAccessExpiry, msLeft + 500);
+        }
+    }
 }
 
 document.addEventListener('visibilitychange', () => {
@@ -2083,8 +2102,8 @@ document.getElementById('gateCodeBtn').addEventListener('click', async () => {
     if (!code) return;
     showGateError('');
     try {
-        const { template, data } = await apiValidateAccessCode(code);
-        enterPublic(code.toUpperCase(), template, data);
+        const { template, data, expiresAt } = await apiValidateAccessCode(code);
+        enterPublic(code.toUpperCase(), template, data, expiresAt);
     } catch (err) {
         showGateError(err.message);
     }
@@ -2257,8 +2276,8 @@ document.getElementById('cabCreateCodeBtn').addEventListener('click', async () =
         } else if (mode === 'public') {
             const code = sessionStorage.getItem('accessCode');
             if (code) {
-                const { template, data } = await apiValidateAccessCode(code);
-                enterPublic(code, template, data);
+                const { template, data, expiresAt } = await apiValidateAccessCode(code);
+                enterPublic(code, template, data, expiresAt);
                 return;
             }
         }

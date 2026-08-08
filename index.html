@@ -2030,6 +2030,21 @@ async function enterCabinet(password) {
 }
 
 let accessExpiryTimer = null;
+let accessExpiryCode = null;
+
+async function checkAccessExpiry() {
+    if (!accessExpiryCode || document.body.classList.contains('locked')) return;
+    try {
+        await apiValidateAccessCode(accessExpiryCode);
+    } catch {
+        clearInterval(accessExpiryTimer);
+        sessionStorage.removeItem('accessMode');
+        sessionStorage.removeItem('accessCode');
+        sessionStorage.removeItem('accessTemplate');
+        showToast('Срок действия кода доступа истёк', 'error');
+        applyLocked(true);
+    }
+}
 
 function enterPublic(code, template, data) {
     sessionStorage.setItem('accessMode', 'public');
@@ -2046,20 +2061,18 @@ function enterPublic(code, template, data) {
 
     // Код может закончиться, пока вкладка открыта — перепроверяем его
     // регулярно, чтобы сайт заблокировался сам, без обновления страницы.
+    // Одного setInterval недостаточно: браузеры замедляют/приостанавливают
+    // таймеры для свёрнутых/неактивных вкладок, поэтому дополнительно
+    // проверяем сразу при возврате на вкладку/фокусе окна.
+    accessExpiryCode = code;
     clearInterval(accessExpiryTimer);
-    accessExpiryTimer = setInterval(async () => {
-        try {
-            await apiValidateAccessCode(code);
-        } catch {
-            clearInterval(accessExpiryTimer);
-            sessionStorage.removeItem('accessMode');
-            sessionStorage.removeItem('accessCode');
-            sessionStorage.removeItem('accessTemplate');
-            showToast('Срок действия кода доступа истёк', 'error');
-            applyLocked(true);
-        }
-    }, 60000);
+    accessExpiryTimer = setInterval(checkAccessExpiry, 30000);
 }
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') checkAccessExpiry();
+});
+window.addEventListener('focus', checkAccessExpiry);
 
 function showGateError(msg) {
     document.getElementById('gateError').textContent = msg || '';

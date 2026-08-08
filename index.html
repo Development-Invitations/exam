@@ -1617,13 +1617,15 @@ function renderChatMessages(messages) {
     chatMessages.innerHTML = messages.map(m => {
         const showAuthor = m.from === 'admin' && m.authorName && prevFrom !== (m.authorName || m.from);
         prevFrom = m.from === 'admin' ? (m.authorName || m.from) : m.from;
+        // Важно: внутри .chat-bubble нет переносов строк/отступов — там стоит
+        // white-space: pre-wrap, и любые "красивые" отступы шаблона иначе
+        // отображались бы как настоящие пробелы/пустые строки в пузыре.
+        const imgHtml = m.imageUrl ? `<img class="chat-bubble-img" src="${m.imageUrl}" alt="Скриншот" data-src="${m.imageUrl}">` : '';
+        const textHtml = m.text ? escapeHtml(m.text) : '';
         return `
         <div class="chat-row ${m.from === 'admin' ? 'admin' : 'user'}">
             ${showAuthor ? `<div class="chat-author-name">${escapeHtml(m.authorName)}</div>` : ''}
-            <div class="chat-bubble">
-                ${m.imageUrl ? `<img class="chat-bubble-img" src="${m.imageUrl}" alt="Скриншот" data-src="${m.imageUrl}">` : ''}
-                ${m.text ? escapeHtml(m.text) : ''}
-            </div>
+            <div class="chat-bubble">${imgHtml}${textHtml}</div>
             <div class="chat-bubble-time">${formatChatTime(m.ts)}</div>
         </div>`;
     }).join('');

@@ -29,5 +29,18 @@
     "from": "user",
     "text": "привет",
     "ts": 1786174274368
+  },
+  {
+    "id": "1786174458563-1a825j",
+    "from": "user",
+    "text": "привет",
+    "ts": 1786174458563
+  },
+  {
+    "id": "1786174480548-rf4b1x",
+    "from": "user",
+    "text": "",
+    "ts": 1786174480548,
+    "imageUrl": "https://raw.githubusercontent.com/Development-Invitations/exam/main/chat-screenshots/1786174476690-qpk61d.png"
   }
 ]

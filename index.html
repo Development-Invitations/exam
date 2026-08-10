@@ -2253,6 +2253,10 @@ document.getElementById('cabChangePassBtn').addEventListener('click', async () =
 });
 
 document.getElementById('cabCreateCodeBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('cabCreateCodeBtn');
+    if (btn.disabled) return; // защита от повторного клика, пока идёт запрос —
+                               // иначе два почти одновременных создания кода
+                               // могут гоняться друг с другом за один и тот же файл
     const template = document.getElementById('cabCodeTemplate').value;
     const label = document.getElementById('cabCodeLabel').value.trim();
     const untilValue = document.getElementById('cabCodeUntil').value;
@@ -2260,6 +2264,7 @@ document.getElementById('cabCreateCodeBtn').addEventListener('click', async () =
     if (!untilValue) { showToast('Укажите дату окончания действия кода', 'error'); return; }
     const expiresAt = new Date(untilValue).getTime();
     if (!expiresAt || expiresAt <= Date.now()) { showToast('Дата окончания должна быть в будущем', 'error'); return; }
+    btn.disabled = true;
     try {
         const entry = await apiCreateCode(template, label, expiresAt);
         document.getElementById('cabCodeLabel').value = '';
@@ -2272,6 +2277,8 @@ document.getElementById('cabCreateCodeBtn').addEventListener('click', async () =
         });
     } catch (err) {
         showToast('Не удалось создать код: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
     }
 });
 

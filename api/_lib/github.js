@@ -155,13 +155,28 @@ async function updateJson(path, fallback, mutate, message, attempt = 1) {
     const newData = mutate(data);
     try {
         await putFile(path, JSON.stringify(newData, null, 2) + '\n', message, sha || undefined);
-        return newData;
     } catch (err) {
-        if (isShaConflict(err) && attempt < 3) {
+        if (isShaConflict(err) && attempt < 5) {
             return updateJson(path, fallback, mutate, message, attempt + 1);
         }
         throw err;
     }
+
+    // Подстраховка от «тихой» гонки: при нескольких почти одновременных
+    // записях (например, создание нескольких кодов доступа подряд) GitHub
+    // Contents API не всегда даёт строгую консистентность «чтение сразу
+    // после записи» — sha может не конфликтовать, а физически записанный
+    // файл при этом не будет содержать то, что мы только что отправили
+    // (напр. другая запись успела вклиниться на другой реплике). Раньше
+    // это могло молча "терять" ранее созданные коды доступа. Перечитываем
+    // и, если результат не совпадает с ожидаемым, повторяем цикл поверх
+    // актуальных данных вместо того, чтобы считать запись успешной.
+    const verify = await getJson(path, fallback);
+    if (JSON.stringify(verify.data) !== JSON.stringify(newData)) {
+        if (attempt < 5) return updateJson(path, fallback, mutate, message, attempt + 1);
+        throw new Error(`Не удалось согласованно записать "${path}" после нескольких попыток — попробуйте ещё раз`);
+    }
+    return newData;
 }
 
 module.exports = {

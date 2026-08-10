@@ -13,13 +13,25 @@ function assertGithubConfig() {
     }
 }
 
+// Абсолютный адрес самого сайта — нужен там, где относительная ссылка не
+// подходит (Telegram sendPhoto требует полный URL с хостом, а не /api/...).
+// APP_URL можно задать явно (свой домен), иначе берём автоматический адрес
+// текущего деплоя Vercel.
+function getPublicBaseUrl() {
+    if (process.env.APP_URL) return process.env.APP_URL.replace(/\/$/, '');
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+    return '';
+}
+
 // Ссылка на картинку через СВОЙ сервер (не напрямую на GitHub) — работает
 // независимо от того, публичный репозиторий или приватный, т.к. сервер сам
 // авторизуется токеном. Раньше ссылки шли напрямую на raw.githubusercontent.com,
 // которая отдаёт файл только если репозиторий публичный — стоило кому-то
 // случайно включить приватность, все скриншоты переставали открываться.
+// Ссылка абсолютная (с хостом) — Telegram sendPhoto не принимает относительные URL.
 function getImageUrl(path) {
-    return `/api/image?path=${encodeURIComponent(path)}`;
+    return `${getPublicBaseUrl()}/api/image?path=${encodeURIComponent(path)}`;
 }
 
 // Старые скриншоты в уже сохранённых данных могут содержать прежние прямые

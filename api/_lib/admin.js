@@ -56,12 +56,12 @@ async function createAccessCode({ template, label, expiresAt, days }) {
         createdAt: Date.now(),
         expiresAt: expiry,
     };
-    await updateJson(CODES_PATH, [], list => [...list, entry], `Кабинет: новый код доступа для "${template}"`);
+    await updateJson(CODES_PATH, [], list => [...list, entry], `Кабинет: новый код доступа для "${template}"`, 1, { verify: true });
     return entry;
 }
 
 async function revokeAccessCode(code) {
-    await updateJson(CODES_PATH, [], list => list.filter(e => e.code !== code), `Кабинет: отзыв кода доступа ${code}`);
+    await updateJson(CODES_PATH, [], list => list.filter(e => e.code !== code), `Кабинет: отзыв кода доступа ${code}`, 1, { verify: true });
 }
 
 // Возвращает имя шаблона, если код существует и не истёк, иначе null.

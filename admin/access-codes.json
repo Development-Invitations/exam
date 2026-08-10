@@ -12,5 +12,12 @@
     "label": "Тест 2",
     "createdAt": 1786366026048,
     "expiresAt": 1786376940000
+  },
+  {
+    "code": "DNWRHUK5",
+    "template": "1с-екзамен_database.json",
+    "label": "Тест 2",
+    "createdAt": 1786366026048,
+    "expiresAt": 1786376940000
   }
 ]

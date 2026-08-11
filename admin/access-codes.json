@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "code": "MSY9LF68",
+    "template": "1с-екзамен_database.json",
+    "label": "тест 1",
+    "createdAt": 1786420716630,
+    "expiresAt": 1787025480000
+  }
+]

@@ -1,7 +1,7 @@
 // Telegram вызывает этот URL при каждом новом сообщении в чате с ботом
 // (регистрируется один раз через setWebhook, см. инструкцию в README/чате).
 const { assertGithubConfig } = require('./_lib/github');
-const { appendMessage, resolveSessionForReply, isAllowedTelegramUser, telegramDisplayName, getTelegramFileUrl } = require('./_lib/telegram');
+const { appendMessage, resolveSessionForReply, claimUpdate, isAllowedTelegramUser, telegramDisplayName, getTelegramFileUrl } = require('./_lib/telegram');
 
 const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
 
@@ -33,6 +33,13 @@ module.exports = async (req, res) => {
         const message = update.message;
         if (!message || !message.from || (!message.text && !message.photo)) {
             return res.status(200).end(); // нечего обрабатывать, но Telegram ждёт 200
+        }
+
+        // Telegram мог прислать этот же update повторно (не дождался быстрого
+        // ответа в прошлый раз) — не обрабатываем дважды, иначе ответ
+        // администратора задваивается в чате на сайте.
+        if (!(await claimUpdate(update.update_id))) {
+            return res.status(200).end();
         }
 
         if (!isAllowedTelegramUser(message.from.id)) {

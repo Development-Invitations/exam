@@ -1001,12 +1001,22 @@ async function apiDeleteDb(name) {
 
 // ── API: кабинет (пароль, коды доступа, скриншоты) ──────────────────────
 async function apiAdminLogin(password) {
-    const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-    });
-    return res.ok;
+    let res;
+    try {
+        res = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password }),
+        });
+    } catch (err) {
+        err.invalid = false; // сбой сети — не "неверный пароль"
+        throw err;
+    }
+    if (res.ok) return true;
+    if (res.status === 401) return false; // действительно неверный пароль
+    const err = new Error(`Ошибка сервера (${res.status})`);
+    err.invalid = false; // временный сбой сервера — не разлогиниваем из-за этого
+    throw err;
 }
 
 async function apiChangePassword(currentPassword, newPassword) {
@@ -1081,14 +1091,25 @@ async function apiUploadChatScreenshot(imageDataUrl) {
 }
 
 async function apiValidateAccessCode(code) {
-    const res = await fetch('/api/access', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-    });
+    let res;
+    try {
+        res = await fetch('/api/access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code }),
+        });
+    } catch (err) {
+        err.invalid = false; // сбой сети — код тут ни при чём
+        throw err;
+    }
     if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+        const body = await res.json().catch(() => ({}));
+        const err = new Error(body.error || `Ошибка сервера (${res.status})`);
+        // 403 — сервер осознанно сказал "код недействителен/истёк". Любой
+        // другой статус (500, таймаут и т.п.) — временный сбой, из-за
+        // которого нельзя выкидывать пользователя с валидным кодом на шлюз.
+        err.invalid = res.status === 403;
+        throw err;
     }
     return res.json();
 }
@@ -2059,8 +2080,11 @@ async function checkAccessExpiry() {
     if (!accessExpiryCode || document.body.classList.contains('locked')) return;
     try {
         await apiValidateAccessCode(accessExpiryCode);
-    } catch {
-        lockDueToExpiry();
+    } catch (err) {
+        // Блокируем только если сервер явно сказал "код недействителен/истёк"
+        // (403). Сетевой/серверный сбой — не повод выкидывать пользователя
+        // с валидным кодом, просто попробуем ещё раз на следующем опросе.
+        if (err && err.invalid) lockDueToExpiry();
     }
 }
 
@@ -2300,8 +2324,17 @@ document.getElementById('cabCreateCodeBtn').addEventListener('click', async () =
                 return;
             }
         }
-    } catch {
-        // сессия недействительна (пароль сменили / код истёк) — покажем шлюз
+    } catch (err) {
+        if (mode && err && err.invalid === false) {
+            // Временный сбой сети/сервера при проверке сессии — НЕ считаем
+            // код/пароль недействительным и не разлогиниваем. Оставляем
+            // sessionStorage как есть и просто пробуем ещё раз чуть позже
+            // (пользователь и так скоро что-нибудь обновит/переключит).
+            showToast('Не удалось проверить доступ — проверьте соединение и обновите страницу', 'error');
+            setTimeout(() => location.reload(), 4000);
+            return;
+        }
+        // err.invalid === true (код/пароль реально недействителен) — покажем шлюз.
     }
     sessionStorage.removeItem('adminPassword');
     sessionStorage.removeItem('accessMode');

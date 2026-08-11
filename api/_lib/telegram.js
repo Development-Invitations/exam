@@ -27,8 +27,10 @@ function getAdminChatIds() {
 const CHAT_DIR = 'chat-sessions';
 const MSG_MAP_PATH = `${CHAT_DIR}/_msgmap.json`;
 const LAST_SESSION_PATH = `${CHAT_DIR}/_last-session.json`;
+const PROCESSED_UPDATES_PATH = `${CHAT_DIR}/_processed-updates.json`;
 const MAX_MESSAGES = 100;
 const MSG_MAP_MAX_ENTRIES = 100;
+const PROCESSED_UPDATES_MAX_ENTRIES = 200;
 
 function assertTelegramConfig() {
     if (!TELEGRAM_BOT_TOKEN || getAdminChatIds().length === 0) {
@@ -127,6 +129,28 @@ async function resolveSessionForReply(update) {
     return last.sessionId || null;
 }
 
+// Telegram гарантирует лишь доставку "как минимум один раз": если наш
+// вебхук не ответил достаточно быстро, тот же самый update присылается
+// повторно. Раньше это приводило к задвоению ответа администратора в чате
+// на сайте. Запоминаем обработанные update_id и пропускаем повторные —
+// возвращает true, если update новый (и его нужно обработать), false —
+// если уже обрабатывали.
+async function claimUpdate(updateId) {
+    if (updateId === undefined || updateId === null) return true;
+    const { data } = await getJson(PROCESSED_UPDATES_PATH, []);
+    const seen = Array.isArray(data) ? data : [];
+    if (seen.includes(updateId)) return false;
+    await updateJson(
+        PROCESSED_UPDATES_PATH, [],
+        arr => {
+            const trimmed = (Array.isArray(arr) ? arr : []).slice(-(PROCESSED_UPDATES_MAX_ENTRIES - 1));
+            return trimmed.includes(updateId) ? trimmed : [...trimmed, updateId];
+        },
+        `Чат: отметка обработанного Telegram-update ${updateId}`
+    );
+    return true;
+}
+
 function isAllowedTelegramUser(userId) {
     return TELEGRAM_ALLOWED_IDS.includes(String(userId));
 }
@@ -146,6 +170,7 @@ module.exports = {
     clearLog,
     rememberMessageSessions,
     resolveSessionForReply,
+    claimUpdate,
     isAllowedTelegramUser,
     telegramDisplayName,
     getTelegramFileUrl,

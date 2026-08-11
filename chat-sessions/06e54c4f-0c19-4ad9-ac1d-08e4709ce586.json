@@ -57,5 +57,12 @@
     "from": "user",
     "text": "привет",
     "ts": 1786422302337
+  },
+  {
+    "id": "1786422327252-o5yusb",
+    "from": "admin",
+    "text": "salom",
+    "ts": 1786422327252,
+    "authorName": "Firdavsbek 773"
   }
 ]

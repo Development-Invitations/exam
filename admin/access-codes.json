@@ -5,5 +5,12 @@
     "label": "тест 1",
     "createdAt": 1786420716630,
     "expiresAt": 1787025480000
+  },
+  {
+    "code": "94CMWDKS",
+    "template": "1с-екзамен_database.json",
+    "label": "тест 2",
+    "createdAt": 1786420733379,
+    "expiresAt": 1787025480000
   }
 ]

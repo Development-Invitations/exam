@@ -3440,7 +3440,11 @@
     "id": "1786097605331",
     "title": "На рисунке представлена:",
     "text": "Диаграмма",
-    "screenshots": []
+    "screenshots": [
+      {
+        "url": "https://exam-ruddy-six.vercel.app/api/image?path=screenshots%2F1786514621476-tjkm9a.jpg"
+      }
+    ]
   },
   {
     "id": "1786097692967",

@@ -111,5 +111,13 @@
     "text": "Что хочешь?",
     "ts": 1786543049982,
     "authorName": "Азамов"
+  },
+  {
+    "id": "1786543068256-cn6o7m",
+    "from": "admin",
+    "text": "",
+    "ts": 1786543068256,
+    "authorName": "Азамов",
+    "imageUrl": "https://api.telegram.org/file/bot8849241075:AAEIrJJFvNqOpL7EKwlwalxDu0BlpvIqINY/photos/file_2.jpg"
   }
 ]

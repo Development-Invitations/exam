@@ -423,7 +423,12 @@
   {
     "id": "1785842673355",
     "title": "Выберите правильный ответ:",
-    "text": "Верно 1 и 2 утверждение"
+    "text": "Верно 1 и 2 утверждение",
+    "screenshots": [
+      {
+        "url": "https://exam-ruddy-six.vercel.app/api/image?path=screenshots%2F1786535450705-2qqqgt.png"
+      }
+    ]
   },
   {
     "id": "1785842682143",

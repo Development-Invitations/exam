@@ -3740,7 +3740,12 @@
   {
     "id": "1786106330133",
     "title": "На рисунке представлена: Ганта",
-    "text": "Диаграмма Ганта"
+    "text": "Диаграмма Ганта",
+    "screenshots": [
+      {
+        "url": "https://exam-ruddy-six.vercel.app/api/image?path=screenshots%2F1786513721246-p7ynbo.jpg"
+      }
+    ]
   },
   {
     "id": "1786106359232",

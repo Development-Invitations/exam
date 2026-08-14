@@ -132,5 +132,12 @@
     "text": "Ты зря не пиши на всякий случай",
     "ts": 1786680409627,
     "authorName": "Азамов"
+  },
+  {
+    "id": "1786680627408-z5vlpd",
+    "from": "user",
+    "text": "отправьте мне тоже скрин, предыдущий поломан",
+    "ts": 1786680627408,
+    "imageUrl": "https://exam-ruddy-six.vercel.app/api/image?path=chat-screenshots%2F1786680591911-031q95.png"
   }
 ]

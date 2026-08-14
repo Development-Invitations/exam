@@ -3299,7 +3299,12 @@
   {
     "id": "1786093544136",
     "title": "Оповещения в системе взаимодействия формируются: Второй вариант",
-    "text": "Варианты 1 и 2"
+    "text": "Варианты 1 и 2",
+    "screenshots": [
+      {
+        "url": "https://exam-ruddy-six.vercel.app/api/image?path=screenshots%2F1786683233255-zvssv3.png"
+      }
+    ]
   },
   {
     "id": "1786093609129",

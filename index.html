@@ -245,8 +245,18 @@
         }
         .current-db-title {
             font-size: 13px; color: var(--text-muted);
-            margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px;
+            text-transform: uppercase; letter-spacing: 0.5px;
         }
+        .db-title-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            margin-bottom: 15px; flex-wrap: wrap;
+        }
+        .btn-toggle-all-cards {
+            flex-shrink: 0; background: transparent; border: 1px solid var(--border);
+            color: var(--text-secondary); font-size: 12px; padding: 5px 10px;
+            border-radius: 5px; cursor: pointer; white-space: nowrap;
+        }
+        .btn-toggle-all-cards:hover { background: var(--accent-bg); color: var(--accent); }
         .category-badge {
             display: inline-block; margin-left: 6px; padding: 2px 8px;
             border-radius: 4px; font-size: 11px; font-weight: 700;
@@ -275,7 +285,17 @@
             background: var(--accent-bg); padding: 3px 8px;
             border-radius: 4px; border: 1px solid var(--border);
         }
-        .answer-title { font-size: 18px; font-weight: bold; color: var(--text-primary); margin-bottom: 10px; word-break: break-word; }
+        .answer-title {
+            font-size: 18px; font-weight: bold; color: var(--text-primary); margin-bottom: 10px;
+            word-break: break-word; cursor: pointer; display: flex; align-items: flex-start; gap: 8px;
+            user-select: none;
+        }
+        .answer-title .answer-toggle-arrow {
+            flex-shrink: 0; font-size: 13px; color: var(--text-muted); margin-top: 3px;
+            transition: transform 0.15s ease;
+        }
+        .answer-card.collapsed .answer-title .answer-toggle-arrow { transform: rotate(-90deg); }
+        .answer-card.collapsed .answer-body { display: none; }
         .answer-text { color: var(--text-secondary); line-height: 1.5; font-size: 15px; word-break: break-word; white-space: pre-wrap; }
         .btn-delete {
             position: absolute; top: 20px; right: 20px;
@@ -889,7 +909,10 @@
 </div>
 
 <div class="right-pane" id="rightPane">
-    <div id="dbNameLabel" class="current-db-title">Текущая база: — (0 вопросов)</div>
+    <div class="db-title-row">
+        <div id="dbNameLabel" class="current-db-title">Текущая база: — (0 вопросов)</div>
+        <button id="btnToggleAllCards" class="btn-toggle-all-cards" title="Развернуть/свернуть все вопросы">Развернуть все</button>
+    </div>
     <div id="emptyState" class="empty-placeholder">⏳ Загрузка баз...</div>
 </div>
 
@@ -1331,6 +1354,7 @@ function renderCards() {
     const pane = document.getElementById('rightPane');
     Array.from(pane.getElementsByClassName('answer-card')).forEach(c => c.remove());
     updateDbLabel();
+    document.getElementById('btnToggleAllCards').textContent = 'Развернуть все';
 
     let emptyState = document.getElementById('emptyState');
     if (currentDbData.length === 0) {
@@ -1347,7 +1371,7 @@ function renderCards() {
         currentDbData.forEach((item, i) => {
             const screenshots = Array.isArray(item.screenshots) ? item.screenshots : [];
             const card = document.createElement('div');
-            card.className = 'answer-card';
+            card.className = 'answer-card collapsed';
             card.setAttribute('data-id', item.id);
             card.innerHTML = `
                 <button class="btn-edit-question" data-id="${item.id}">✏ Изменить</button>
@@ -1355,17 +1379,20 @@ function renderCards() {
                 <div class="answer-header-row">
                     <span class="answer-number">№ ${i + 1} из ${currentDbData.length}</span>
                 </div>
-                <div class="answer-title">${escapeHtml(item.title)}</div>
-                <div class="answer-text">${renderAnswerText(item.text)}</div>
-                ${screenshots.length ? `<div class="question-screenshots">${screenshots.map(s => `
-                    <span class="thumb-wrap">
-                        <img class="question-screenshot-thumb" src="${s.url}" alt="Скриншот">
-                        <button type="button" class="thumb-copy-btn" data-url="${s.url}" title="Скопировать — потом Ctrl+V в чат">📋</button>
-                    </span>
-                `).join('')}</div>` : ''}
+                <div class="answer-title"><span class="answer-toggle-arrow">▾</span><span>${escapeHtml(item.title)}</span></div>
+                <div class="answer-body">
+                    <div class="answer-text">${renderAnswerText(item.text)}</div>
+                    ${screenshots.length ? `<div class="question-screenshots">${screenshots.map(s => `
+                        <span class="thumb-wrap">
+                            <img class="question-screenshot-thumb" src="${s.url}" alt="Скриншот">
+                            <button type="button" class="thumb-copy-btn" data-url="${s.url}" title="Скопировать — потом Ctrl+V в чат">📋</button>
+                        </span>
+                    `).join('')}</div>` : ''}
+                </div>
             `;
             card.querySelector('.btn-delete').addEventListener('click', () => deleteCard(item.id));
             card.querySelector('.btn-edit-question').addEventListener('click', () => editQuestion(item.id));
+            card.querySelector('.answer-title').addEventListener('click', () => card.classList.toggle('collapsed'));
             const allUrls = screenshots.map(s => s.url);
             card.querySelectorAll('.question-screenshot-thumb').forEach((img, idx) => {
                 img.addEventListener('click', () => openLightbox(allUrls, idx));
@@ -1378,6 +1405,13 @@ function renderCards() {
     }
     buildSearchList();
 }
+
+document.getElementById('btnToggleAllCards').addEventListener('click', () => {
+    const cards = Array.from(document.getElementById('rightPane').getElementsByClassName('answer-card'));
+    const anyCollapsed = cards.some(c => c.classList.contains('collapsed'));
+    cards.forEach(c => c.classList.toggle('collapsed', !anyCollapsed));
+    document.getElementById('btnToggleAllCards').textContent = anyCollapsed ? 'Свернуть все' : 'Развернуть все';
+});
 
 function buildSearchList() {
     const list = document.getElementById('questionsList');
@@ -1397,6 +1431,7 @@ function buildSearchList() {
             item.classList.add('active');
             cards.forEach(c => c.classList.remove('highlight'));
             card.classList.add('highlight');
+            card.classList.remove('collapsed');
             card.scrollIntoView({ behavior: 'auto', block: 'center' });
         });
         list.appendChild(item);

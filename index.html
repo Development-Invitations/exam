@@ -310,6 +310,29 @@
         }
         .modal-input:focus { border-color: var(--border-focus); }
         .modal-textarea { resize: vertical; height: 100px; font-family: inherit; }
+        .qe-richtext { overflow-y: auto; cursor: text; }
+        .qe-richtext:empty::before { content: attr(data-placeholder); color: var(--text-muted); }
+        .qe-toolbar {
+            display: flex; align-items: center; gap: 4px; margin-bottom: 6px;
+            background: var(--bg-input); border: 1px solid var(--border-input);
+            border-radius: 6px; padding: 5px 6px;
+        }
+        .qe-tb-btn {
+            width: 28px; height: 28px; border: none; border-radius: 4px; cursor: pointer;
+            background: transparent; color: var(--text-primary); font-size: 13px;
+        }
+        .qe-tb-btn:hover { background: var(--btn-default-bg); }
+        .qe-toolbar-sep { width: 1px; height: 18px; background: var(--border-input); margin: 0 4px; }
+        .qe-tb-color {
+            position: relative; display: flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: 13px;
+            color: var(--text-primary);
+        }
+        .qe-tb-color:hover { background: var(--btn-default-bg); }
+        .qe-tb-color input[type="color"] {
+            position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0;
+            cursor: pointer; border: none; padding: 0;
+        }
         .modal-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block; }
         .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
         .modal-btn { padding: 9px 18px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
@@ -767,7 +790,15 @@
         <label class="modal-label">Заголовок / вопрос</label>
         <input type="text" id="qeTitleInput" class="modal-input" placeholder="Введите вопрос...">
         <label class="modal-label">Текст ответа</label>
-        <textarea id="qeTextInput" class="modal-input modal-textarea" placeholder="Введите ответ..."></textarea>
+        <div class="qe-toolbar" id="qeToolbar">
+            <button type="button" class="qe-tb-btn" data-cmd="bold" title="Жирный"><b>Ж</b></button>
+            <button type="button" class="qe-tb-btn" data-cmd="underline" title="Подчёркнутый"><u>Ч</u></button>
+            <button type="button" class="qe-tb-btn" data-cmd="removeFormat" title="Очистить форматирование">✕</button>
+            <span class="qe-toolbar-sep"></span>
+            <label class="qe-tb-color" title="Цвет текста">A<input type="color" id="qeColorText" value="#c0392b"></label>
+            <label class="qe-tb-color" title="Цвет выделения">🖍<input type="color" id="qeColorHighlight" value="#fff3a0"></label>
+        </div>
+        <div id="qeTextInput" class="modal-input modal-textarea qe-richtext" contenteditable="true" data-placeholder="Введите ответ..."></div>
         <label class="modal-label">Скриншоты</label>
         <div id="qeScreenshots" class="question-screenshots" style="margin-bottom: 10px;"></div>
         <input type="file" id="qeFileInput" accept="image/*" style="display:none" multiple>
@@ -1325,7 +1356,7 @@ function renderCards() {
                     <span class="answer-number">№ ${i + 1} из ${currentDbData.length}</span>
                 </div>
                 <div class="answer-title">${escapeHtml(item.title)}</div>
-                <div class="answer-text">${escapeHtml(item.text)}</div>
+                <div class="answer-text">${renderAnswerText(item.text)}</div>
                 ${screenshots.length ? `<div class="question-screenshots">${screenshots.map(s => `
                     <span class="thumb-wrap">
                         <img class="question-screenshot-thumb" src="${s.url}" alt="Скриншот">
@@ -1999,7 +2030,7 @@ function openQuestionEditor({ mode, originalItem }) {
     qeTitleLabel.textContent = mode === 'edit' ? 'Изменить вопрос' : 'Новый вопрос';
     qeOriginal = originalItem || { title: '', text: '', screenshots: [] };
     qeTitleInput.value = qeOriginal.title || '';
-    qeTextInput.value = qeOriginal.text || '';
+    qeTextInput.innerHTML = textToEditableHtml(qeOriginal.text || '');
     qeScreenshots = Array.isArray(qeOriginal.screenshots) ? [...qeOriginal.screenshots] : [];
     renderQeScreenshots();
     qeOverlay.classList.add('open');
@@ -2035,13 +2066,79 @@ qeFileInput.addEventListener('change', async e => {
 });
 document.getElementById('qeRevertBtn').addEventListener('click', () => {
     qeTitleInput.value = qeOriginal.title || '';
-    qeTextInput.value = qeOriginal.text || '';
+    qeTextInput.innerHTML = textToEditableHtml(qeOriginal.text || '');
     qeScreenshots = Array.isArray(qeOriginal.screenshots) ? [...qeOriginal.screenshots] : [];
     renderQeScreenshots();
 });
 document.getElementById('qeCancelBtn').addEventListener('click', () => closeQuestionEditor(null));
 document.getElementById('qeSaveBtn').addEventListener('click', () => {
-    closeQuestionEditor({ title: qeTitleInput.value, text: qeTextInput.value, screenshots: qeScreenshots });
+    closeQuestionEditor({ title: qeTitleInput.value, text: sanitizeRichHtml(qeTextInput.innerHTML), screenshots: qeScreenshots });
+});
+
+// ── Форматирование текста ответа (жирный/подчёркнутый/цвет/выделение) ───
+// Старые ответы хранились как обычный текст с переносами строк — если в
+// сохранённом тексте нет HTML-тегов, считаем его "старым" и оборачиваем
+// переносы в <br>, иначе (уже отформатированный ответ) вставляем как есть.
+function looksLikeHtml(str) {
+    return /<\/?[a-z][\s\S]*>/i.test(str || '');
+}
+function textToEditableHtml(str) {
+    if (!str) return '';
+    if (looksLikeHtml(str)) return str;
+    return escapeHtml(str).replace(/\n/g, '<br>');
+}
+
+// Разрешаем только теги форматирования и только style с цветом/фоном —
+// не доверяем содержимому contenteditable по умолчанию (может попасть что
+// угодно при вставке из других источников), а это поле видят и обычные
+// пользователи с кодом доступа, не только кабинет.
+const QE_ALLOWED_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'SPAN', 'BR', 'DIV', 'P']);
+function sanitizeRichHtml(html) {
+    const doc = new DOMParser().parseFromString(html || '', 'text/html');
+    function clean(node) {
+        Array.from(node.childNodes).forEach(child => {
+            if (child.nodeType === Node.ELEMENT_NODE) {
+                if (!QE_ALLOWED_TAGS.has(child.tagName)) {
+                    while (child.firstChild) node.insertBefore(child.firstChild, child);
+                    node.removeChild(child);
+                    return;
+                }
+                Array.from(child.attributes).forEach(attr => {
+                    if (attr.name.toLowerCase() !== 'style') { child.removeAttribute(attr.name); return; }
+                    const safeDecls = attr.value.split(';')
+                        .map(d => d.trim())
+                        .filter(d => /^(color|background-color)\s*:\s*(#[0-9a-fA-F]{3,8}|rgb\([0-9,\s]+\)|[a-zA-Z]+)$/.test(d));
+                    if (safeDecls.length) child.setAttribute('style', safeDecls.join('; '));
+                    else child.removeAttribute('style');
+                });
+                clean(child);
+            } else if (child.nodeType !== Node.TEXT_NODE) {
+                node.removeChild(child);
+            }
+        });
+    }
+    clean(doc.body);
+    return doc.body.innerHTML;
+}
+function renderAnswerText(text) {
+    return looksLikeHtml(text) ? sanitizeRichHtml(text) : escapeHtml(text || '');
+}
+
+document.execCommand && document.execCommand('styleWithCSS', false, true);
+qeTextInput.addEventListener('mousedown', () => qeTextInput.focus());
+document.getElementById('qeToolbar').querySelectorAll('.qe-tb-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        qeTextInput.focus();
+        document.execCommand(btn.dataset.cmd, false, null);
+    });
+});
+document.getElementById('qeColorText').addEventListener('input', e => {
+    qeTextInput.focus();
+    document.execCommand('foreColor', false, e.target.value);
+});
+document.getElementById('qeColorHighlight').addEventListener('input', e => {
+    qeTextInput.focus();
+    document.execCommand('hiliteColor', false, e.target.value);
 });
 
 // ── Шлюз доступа: код клиента ИЛИ пароль кабинета ────────────────────────

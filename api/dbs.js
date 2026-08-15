@@ -18,8 +18,14 @@ function normalizeQuestionScreenshots(data) {
     });
 }
 
+// Символы : * ? " < > | запрещены в именах файлов Windows — если раздел с
+// таким именем попадёт в репозиторий, локальный git у владельца (Windows)
+// не сможет вытащить/смержить этот файл на диск ("invalid path"). GitHub
+// (Linux) такие имена принимает молча, поэтому баг проявляется только
+// при следующем pull/merge, а не сразу при создании раздела.
 function normalizeName(name) {
     let filename = String(name || '').split('/').pop().split('\\').pop();
+    filename = filename.replace(/[:*?"<>|]/g, '-');
     if (!filename.endsWith('.json')) filename += '.json';
     return filename;
 }

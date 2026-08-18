@@ -304,5 +304,11 @@
     "title": "Какую периодичность разделения хранения журнала регистрации необходимо устанавливать для наиболее эффективной работы механизма?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Чтобы размер файла не превышал 100 mb</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787048334176",
+    "title": "В каком режиме можно использовать автообновление журнала регистрации?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Конфигуратор</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

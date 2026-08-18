@@ -214,5 +214,11 @@
     "title": "Какой вид клиентской лицензии требуется для работы клиентских приложений с файловой информационной базой на терминальном сервере?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Многопользовательская программная лицензия</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787047549492",
+    "title": "Что такое комбинированные клиентские лицензии?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Вид многопользовательской клиентской лицензии, в котором возможно использование двух способов использования клиентских лицензий, как набор однопользовательских, или одна многопользовательская</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

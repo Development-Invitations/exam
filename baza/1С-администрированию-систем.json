@@ -106,5 +106,11 @@
     "title": "Сколько соединений с информационной базой поддерживается при работе с файловой базой?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1024</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787046673799",
+    "title": "Что необходимо выбрать в составе компонент при установке платформы для возможности использования конфигуратора?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1С:Предприятие</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

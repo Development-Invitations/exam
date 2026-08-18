@@ -406,5 +406,11 @@
     "title": "Какова последовательность действий создания новой информационной базы при файловом варианте работы системы?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В окне запуска \"1С:Предприятие\" выбрать \"Добавить\" - \"Создание новой информационной базы\" - выбрать из шаблонов либо пустую - указать имя базы - указать каталог информационной базы</span><div><br></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787050209344",
+    "title": "Какова последовательность действия при добавлении существующей информационной базы в клиент-серверном варианте работы?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В меню запуска 1С:Предприятие выбрать \"Добавить\" - \"Добавление в список существующей информационной базы\" - указать имя базы - указать \"На сервере 1С:Предприятие\" - указать имя базы на сервере и имя сервера</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

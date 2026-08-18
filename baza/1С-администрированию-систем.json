@@ -166,5 +166,11 @@
     "title": "Если в ИБ используются лицензии ПРОФ, часть которых приобретены до 11.02.19, а другая часть — после 11.02.19, то, как будет работать программа у пользователей?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В данном случае будет задействовано не более 12 ядер и запускаться до 500 сеансов с ИБ. Функциональность КОРП будет доступна, если число одновременных сеансов с ИБ будет не более 10.</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787046993007",
+    "title": "Где осуществляется настройка времени перехода сеанса в спящий режим?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В конфигураторе через параметры Информационной базы</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

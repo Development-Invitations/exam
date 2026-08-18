@@ -388,5 +388,11 @@
     "title": "Какой вид аутентификации обязателен для учетной записи администратора прикладного решения?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Аутентификация 1С:Предприятия</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787050140954",
+    "title": "Как реализовать в прикладном решении контроль модифицированности внешних обработок, используемых пользователем?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Включить в настройках учетной записи флажок \"Защита от опасных действий\"</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

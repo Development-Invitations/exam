@@ -136,5 +136,11 @@
     "title": "Какой вид лицензии необходим для возможности использования в платформе механизмов, находящихся в стадии бета-версии",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Лицензия для тестирования выделенной функциональности</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787046926143",
+    "title": "Какое максимальное количество одновременных сеансов на одну информационную базу возможно при использовании лицензии на сервер 1С:Предприятие 8 ПРОФ?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">500</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

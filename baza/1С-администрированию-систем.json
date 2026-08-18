@@ -460,11 +460,5 @@
     "title": "Что позволяет настройка диалога запуска?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Верны все ответы</span><div><br></div></div></div></div></div></div></div></div>",
     "screenshots": []
-  },
-  {
-    "id": "1787051021797",
-    "title": "Какой тип данных можно задать для кода счета?",
-    "text": "Конфигурация",
-    "screenshots": []
   }
 ]

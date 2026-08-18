@@ -82,5 +82,11 @@
     "title": "Где работает внешнее соединение?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Только на Windows</span><div><br></div></div></div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787046626302",
+    "title": "Какие варианты поставки платформы существуют?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Обычная версия платформы \"1С:Предприятие\", учебная версия платформы \"1С:Предприятие\" и \"1С:Предприятие - Работа с файлами\"</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

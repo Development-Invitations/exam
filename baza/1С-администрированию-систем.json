@@ -58,5 +58,11 @@
     "title": "Можно ли использовать клиентские приложения разной разрядности при работе с одной базой?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Да</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787046439727",
+    "title": "Можно ли использовать клиентские приложения разной версии при работе с одной базой?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Нет</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

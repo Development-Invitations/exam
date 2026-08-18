@@ -1,0 +1,464 @@
+[
+  {
+    "id": "1787046270034",
+    "title": "Для работы с прикладным решением может использоваться поставка платформы:",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Верны варианты 1, 2</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(64, 28, 25)\"></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046364144",
+    "title": "В каком порядке происходит установка платформы и конфигурации?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Порядок установки не имеет значения</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046377802",
+    "title": "Чем является Конфигуратор?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Это режим запуска толстого клиента</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046385499",
+    "title": "Чем определяются требования к оперативной памяти для работы клиентских приложений?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Требования к оперативной памяти определяются функциональностью используемой конфигурации</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046392418",
+    "title": "Какое имя исполняемого файла у толстого клиента?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1cv8</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046399641",
+    "title": "Какое имя исполняемого файла запуска системы 1С:Предприятие 8 для всех версий платформы?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1cestart</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046406232",
+    "title": "Какое имя исполняемого файла у веб-клиента?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">нет исполняемого файла (его роль играет веб-браузер)</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046412961",
+    "title": "Какая разрядность клиентских приложений существует в системе 1С:Предприятие 8?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">32-х разрядная и 64-разрядная для Windows и Linux, Только 64-х разрядная для MacOS</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046420127",
+    "title": "На каких операционных системах для персональных компьютеров могут работать клиентские приложения 1С:Предприятие 8?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Windows, Linux и MacOS</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046430640",
+    "title": "Можно ли использовать клиентские приложения разной разрядности при работе с одной базой?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Да</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046439727",
+    "title": "Можно ли использовать клиентские приложения разной версии при работе с одной базой?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Нет</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046458585",
+    "title": "С какими СУБД может работать система 1С:Предприятие 8 через механизм внешних источников данных?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">С любыми СУБД, работающие через odbc интерфейс</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046466385",
+    "title": "Шаблоны конфигураций...",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">служат прототипами создаваемых информационных баз и устанавливаются в каталог шаблонов, указываемый пользователем</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046473257",
+    "title": "Где работает внешнее соединение?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Только на Windows</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046626302",
+    "title": "Какие варианты поставки платформы существуют?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Обычная версия платформы \"1С:Предприятие\", учебная версия платформы \"1С:Предприятие\" и \"1С:Предприятие - Работа с файлами\"</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046644999",
+    "title": "Какое имя исполняемого файла у тонкого клиента?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1cv8c</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046651758",
+    "title": "Какое имя исполняемого файла запуска системы 1С:Предприятие 8 для конкретной версии платформы?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1cv8s</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046666151",
+    "title": "Сколько соединений с информационной базой поддерживается при работе с файловой базой?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1024</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046673799",
+    "title": "Что необходимо выбрать в составе компонент при установке платформы для возможности использования конфигуратора?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1С:Предприятие</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046895384",
+    "title": "Какие варианты защиты от несанкционированного использования системы \"1С:Предприятие\" существуют?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Верные варианты 1, 2</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046904455",
+    "title": "Какие виды лицензий существуют?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Варианты 2, 3</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046911623",
+    "title": "В каких поставках платформы используются клиентские лицензии?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Обычная версия платформы \"1С:Предприятие\"</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046918912",
+    "title": "Какой вид лицензии необходим для возможности использования в платформе механизмов, находящихся в стадии бета-версии",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Лицензия для тестирования выделенной функциональности</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046926143",
+    "title": "Какое максимальное количество одновременных сеансов на одну информационную базу возможно при использовании лицензии на сервер 1С:Предприятие 8 ПРОФ?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">500</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046940711",
+    "title": "Потребуется ли повторная активация программной лицензии при изменении параметров сетевого адаптера?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Да</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046948815",
+    "title": "Какой вид клиентской лицензии требуется для работы клиентского приложения с файловой информационной базой на рабочей станции (отдельно стоящий персональный компьютер)?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Однопользовательская программная лицензия</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046957223",
+    "title": "На одном кластере есть две базы. В одной 600 пользователей, в другой — 100. Может ли на этом кластере использоваться 600 КОРП-лицензий для первой базы и 100 ПРОФ — для второй? На сервере используется лицензия на сервер КОРП.",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Использование клиентских лицензий \"1С:Предприятия 8\" уровня ПРОФ с лицензией на сервер \"1С:Предприятия 8\" уровня КОРП противоречит лицензионному соглашению. Все используемые в кластере лицензии \"1С:Предприятия 8\" должны быть уровня КОРП.</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046986543",
+    "title": "Если в ИБ используются лицензии ПРОФ, часть которых приобретены до 11.02.19, а другая часть — после 11.02.19, то, как будет работать программа у пользователей?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В данном случае будет задействовано не более 12 ядер и запускаться до 500 сеансов с ИБ. Функциональность КОРП будет доступна, если число одновременных сеансов с ИБ будет не более 10.</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787046993007",
+    "title": "Где осуществляется настройка времени перехода сеанса в спящий режим?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В конфигураторе через параметры Информационной базы</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047000679",
+    "title": "В каком файле осуществляются настройки параметров взаимодействия системы \"1С:Предприятие\" с HASP License Manager?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">nethasp.ini</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047015511",
+    "title": "Какие возможности доступны при использовании клиентской лицензии КОРП?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Все возможности системы</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(64, 28, 25)\"></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047072622",
+    "title": "К чему привязывается программная лицензия при использовании на виртуальной машине?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Возможны оба варианта</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047123670",
+    "title": "Что произойдет, если попытаться использовать функционал КОРП, при наличии лицензии ПРОФ?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Сеанс получит ошибку, если в кластере серверов используются возможности, доступные под лицензией КОРП, а лицензий КОРП недостаточно, но только в том случае, если текущий сеанс 11 по счету на базу</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047455221",
+    "title": "Что представляет собой лицензия \"1С:Предприятие 8.3. Сервер МИНИ\"?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Это лицензия на использование сервера \"1С:Предприятия 8.3\" уровня ПРОФ, который обеспечивает запуск не более пяти сеансов пользователей в режиме \"1С:Предприятие\" и еще одного сеанса в режиме \"Конфигуратор\" (всего шесть подключений, каждое из которых требует наличия клиентской лицензии). При этом в кластере серверов может быть не более одного рабочего сервера. Поддерживается работа 32-разрядного и 64-разрядного сервера \"1С:Предприятия 8\"</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047531093",
+    "title": "Какой вид клиентской лицензии требуется для работы мобильного клиента?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Однопользовательская программная лицензия</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047542109",
+    "title": "Какой вид клиентской лицензии требуется для работы клиентских приложений с файловой информационной базой на терминальном сервере?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Многопользовательская программная лицензия</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047549492",
+    "title": "Что такое комбинированные клиентские лицензии?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Вид многопользовательской клиентской лицензии, в котором возможно использование двух способов использования клиентских лицензий, как набор однопользовательских, или одна многопользовательская</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047556845",
+    "title": "Сколько клиентских лицензий требуется, для подключения 2-х сеансов клиентских приложений, 3-х сеансов фоновых заданий, 1-го COM-соединения, 5 сеансов веб-сервиса и 3-х http-сервиса?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">3</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047565021",
+    "title": "Какие лицензии освобождаются при переходе сеанса в спящий режим?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Любые клиентские лицензии, выданные сервером 1С:Предприятие 8</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047572653",
+    "title": "При каком условии автономный сервер может работать без серверной лицензии?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">До 3-х клиентских сеансов, при работе с файловой базой</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787047586204",
+    "title": "Каким образом функциональность КОРП может быть предоставлена организациям, которые используют технологию 1cFresh для создания коммерческих сервисов для третьих лиц?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Необходимо обменять клиентские и серверные лицензии \"1С:Предприятия 8\" уровня ПРОФ, включенные в лицензионный договор, на аналогичные лицензии \"1С:Предприятия 8\" уровня КОРП без дополнительной платы либо приобрести лицензии \"1С:Предприятие 8 КОРП\" по цене аналогичных лицензий уровня ПРОФ.</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048147440",
+    "title": "Где находится информация о пользователях, которые сейчас работают в системе?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В списке активных пользователей</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048158034",
+    "title": "Какую информацию содержит Журнал регистрации?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Информацию о событиях, действиях пользователей в детализации, настроенной в конфигураторе. Может изменяться программно</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048188152",
+    "title": "Отбор выводимой информации Журнала регистрации…",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">верны ответы 2, 3 и 4</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048199242",
+    "title": "Сколько файлов настройки технологического журнала необходимо сделать для сбора в отдельных папках логов по ошибкам работы компонент платформы, расследования ошибок запросов и операторов к СУБД, а также сбора информации о системе лицензирования",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048206562",
+    "title": "В чем измеряется значение атрибута \"history\" настройки технологического журнала?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">в часах</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048214122",
+    "title": "Какой минимальный интервал автообновления журнала регистрации?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">10 секунд</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048222442",
+    "title": "Почему в настройках отбора поле метаданные не содержит значений для выбора?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Отображается отбор только по тем метаданным, которые были задействованы в событиях</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048229522",
+    "title": "К какому уровню журнала регистрации относятся события начала и завершения сеанса?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Информация</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048244826",
+    "title": "Как уменьшить число записей журнала регистрации при использовании формата хранения SQLLite?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Верны ответы 1, 2 и 3</span><div><br></div></div></div></div></div></div></div></div></div><div><div><div><div><div></div></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048284258",
+    "title": "Какую периодичность разделения хранения журнала регистрации необходимо устанавливать для наиболее эффективной работы механизма?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Чтобы размер файла не превышал 100 mb</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048334176",
+    "title": "В каком режиме можно использовать автообновление журнала регистрации?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Конфигуратор</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048401673",
+    "title": "К какому уровню журнала регистрации относятся ошибки аутентификации?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Ошибка</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048447586",
+    "title": "Как узнать какой ip-адрес компьютера, на котором работает клиентское приложение, средствами платформы 1С:Предприятие 8?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">В свойствах сеанса на сервере 1С:Предприятие 8</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048806463",
+    "title": "Каким образом производится настройка детализации Журнала регистрации и его просмотр?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В режиме конфигуратора, просмотр самого журнала доступен в обоих режимах</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048854063",
+    "title": "Что можно сделать с журналом регистрации независимо от способа хранения данных?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">выгрузить, определив параметры и условия выгрузки</span></div></div></div></div></div><div><div><div><div><div></div></div></div></div></div></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787048863975",
+    "title": "Как перейти из журнала регистрации к списку активных пользователей?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Верны ответы 1, 2 и 3</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787049360085",
+    "title": "Хранение журнала регистрации можно разделять по периодам:",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">верны ответы 1, 2, 3</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787049379493",
+    "title": "Какова периодичность опроса файла настройки технологического журнала?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1 минута</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787049400853",
+    "title": "Как отслеживать подробную историю изменения данных? (Какое значение было, какое стало)",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">С помощью специального механизма \"История данных\"</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787049413814",
+    "title": "Как добавить собственную запись в журнал регистрации?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Использовать метод глобального контекста ЗаписьЖурналаРегистрации</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787049594876",
+    "title": "Какое имя файла настройки технологического журнала?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">logcfg.xml</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787049697748",
+    "title": "Как можно зафиксировать историю действий пользователей в интерфейсе, если пользователь с данными не работал?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В параметрах запуска платформы нужно указать параметр LogUI</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050128274",
+    "title": "Каким образом определяется, что учетная запись пользователя создается для целей администрирования прикладного решения?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Необходимо назначить для учетной записи роль из Конфигурации, для которой установлены права \"Администрирование\" и \"Администрирование данных\"</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050134826",
+    "title": "Какой вид аутентификации обязателен для учетной записи администратора прикладного решения?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Аутентификация 1С:Предприятия</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050140954",
+    "title": "Как реализовать в прикладном решении контроль модифицированности внешних обработок, используемых пользователем?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Включить в настройках учетной записи флажок \"Защита от опасных действий\"</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050146697",
+    "title": "При использовании единой базы у сотрудников склада и бухгалтерии в диалоге аутентификации должны показываться разные списки пользователей. Как это реализовать?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Необходимо использовать механизм разделения данных</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050203064",
+    "title": "Какова последовательность действий создания новой информационной базы при файловом варианте работы системы?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В окне запуска \"1С:Предприятие\" выбрать \"Добавить\" - \"Создание новой информационной базы\" - выбрать из шаблонов либо пустую - указать имя базы - указать каталог информационной базы</span><div><br></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050209344",
+    "title": "Какова последовательность действия при добавлении существующей информационной базы в клиент-серверном варианте работы?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В меню запуска 1С:Предприятие выбрать \"Добавить\" - \"Добавление в список существующей информационной базы\" - указать имя базы - указать \"На сервере 1С:Предприятие\" - указать имя базы на сервере и имя сервера</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050215544",
+    "title": "Как использовать утилиту восстановления файловой базы данных?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Самостоятельно без запуска конфигуратора</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050221345",
+    "title": "В случае если пользователю назначено несколько ролей, то права пользователя определяются исходя из стратегии:",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Если разрешено в какой-либо из ролей, то действие разрешается</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050227322",
+    "title": "Аутентификация средствами операционной системы может проводиться",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">через выставление соответствия указанному пользователю операционной системы</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050233858",
+    "title": "По каким полям определяется уникальность учетной записи пользователя в прикладном решении?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Имя пользователя, Полное имя пользователя и Пользователь, если включена аутентификация операционной системы</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050239833",
+    "title": "Что делать, если пользователь забыл пароль?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Просмотр пароля не доступен, Администратор меняет пароль пользователю и отправляет новый.</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050255329",
+    "title": "Что нужно сделать, чтобы можно было создать учетную запись администратора учетных записей без возможности изменять конфигурацию и выгружать информационную базу в режиме Конфигуратор?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Создать общий реквизит, включить для него разделение данных и разделение списка пользователей, а затем в настройке разделение данных соответствующей учетной записи включить использование разделения по данному реквизиту</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050313826",
+    "title": "В каком случае учетная запись в списке отображается со знаком вопрос?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Отключены все варианты аутентификации</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(64, 28, 25)\"></div></div></div></div></div>",
+    "screenshots": []
+  },
+  {
+    "id": "1787050371769",
+    "title": "Что позволяет настройка диалога запуска?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Верны все ответы</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
+  }
+]

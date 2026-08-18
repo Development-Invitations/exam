@@ -34,5 +34,11 @@
     "title": "Какое имя исполняемого файла запуска системы 1С:Предприятие 8 для всех версий платформы?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1cestart</span><div><br></div></div></div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787046406232",
+    "title": "Какое имя исполняемого файла у веб-клиента?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">нет исполняемого файла (его роль играет веб-браузер)</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

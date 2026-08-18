@@ -220,5 +220,11 @@
     "title": "Что такое комбинированные клиентские лицензии?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Вид многопользовательской клиентской лицензии, в котором возможно использование двух способов использования клиентских лицензий, как набор однопользовательских, или одна многопользовательская</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787047556845",
+    "title": "Сколько клиентских лицензий требуется, для подключения 2-х сеансов клиентских приложений, 3-х сеансов фоновых заданий, 1-го COM-соединения, 5 сеансов веб-сервиса и 3-х http-сервиса?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">3</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

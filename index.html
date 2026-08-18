@@ -2161,6 +2161,15 @@ function renderAnswerText(text) {
 
 document.execCommand && document.execCommand('styleWithCSS', false, true);
 qeTextInput.addEventListener('mousedown', () => qeTextInput.focus());
+// Вставка по Ctrl+V — только чистый текст, без фона/шрифта/цвета из источника
+// (Word, сайты и т.п. кладут в буфер обмена HTML с кучей своих inline-стилей —
+// без этого при вставке "приезжал" фон исходного текста). Форматирование —
+// только через панель инструментов вручную, уже после вставки.
+qeTextInput.addEventListener('paste', e => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text);
+});
 document.getElementById('qeToolbar').querySelectorAll('.qe-tb-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         qeTextInput.focus();

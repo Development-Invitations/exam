@@ -334,5 +334,11 @@
     "title": "Что можно сделать с журналом регистрации независимо от способа хранения данных?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">правильный ответ 1 и 2</span><div><br></div></div></div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787048863975",
+    "title": "Как перейти из журнала регистрации к списку активных пользователей?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Верны ответы 1, 2 и 3</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

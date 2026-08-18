@@ -184,5 +184,11 @@
     "title": "Какие возможности доступны при использовании клиентской лицензии КОРП?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Все возможности системы</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(64, 28, 25)\"></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787047072622",
+    "title": "К чему привязывается программная лицензия при использовании на виртуальной машине?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">Возможны оба варианта</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

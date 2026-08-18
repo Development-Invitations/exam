@@ -328,5 +328,11 @@
     "title": "Каким образом производится настройка детализации Журнала регистрации и его просмотр?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">В режиме конфигуратора, просмотр самого журнала доступен в обоих режимах</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787048854063",
+    "title": "Что можно сделать с журналом регистрации независимо от способа хранения данных?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div><span style=\"color: rgb(184, 184, 191)\">правильный ответ 1 и 2</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

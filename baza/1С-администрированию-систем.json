@@ -256,5 +256,11 @@
     "title": "Какую информацию содержит Журнал регистрации?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Информацию о событиях, действиях пользователей в детализации, настроенной в конфигураторе. Может изменяться программно</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787048188152",
+    "title": "Отбор выводимой информации Журнала регистрации…",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">верны ответы 2, 3 и 4</span><div><br></div></div></div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

@@ -516,6 +516,25 @@
         }
         .btn-edit-question:hover { background: var(--border-focus); color: #fff; }
 
+        /* ── Прикреплённые файлы вопроса (любой тип, со скачиванием) ──────── */
+        .qe-files-list, .question-files { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+        .qe-file-chip, .question-file-chip {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px;
+            padding: 6px 10px; font-size: 13px; color: var(--text-primary);
+        }
+        .qe-file-chip .qe-file-icon, .question-file-chip .qe-file-icon { flex-shrink: 0; }
+        .qe-file-chip .qe-file-name, .question-file-chip .qe-file-name {
+            flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration: none; color: inherit;
+        }
+        .qe-file-chip .qe-file-name:hover, .question-file-chip .qe-file-name:hover { color: var(--accent); text-decoration: underline; }
+        .qe-file-chip .qe-file-size, .question-file-chip .qe-file-size { flex-shrink: 0; color: var(--text-muted); font-size: 11px; }
+        .qe-file-remove {
+            flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; border: none;
+            background: #ef4444; color: #fff; font-size: 11px; line-height: 1; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+
         /* ── Плавающий Telegram-чат (в стиле мессенджера) ─────────────────── */
         @keyframes chatFabPulse {
             0%, 100% { box-shadow: 0 6px 18px rgba(0,0,0,0.3), 0 0 0 0 rgba(255,209,0,0.5); }
@@ -823,6 +842,10 @@
         <div id="qeScreenshots" class="question-screenshots" style="margin-bottom: 10px;"></div>
         <input type="file" id="qeFileInput" accept="image/*" style="display:none" multiple>
         <button id="qeAddScreenshotBtn" type="button" class="btn-file-action" style="width:100%; margin-bottom: 8px;">📷 Добавить скриншот</button>
+        <label class="modal-label">Файлы</label>
+        <div id="qeFiles" class="qe-files-list" style="margin-bottom: 10px;"></div>
+        <input type="file" id="qeAttachInput" style="display:none" multiple>
+        <button id="qeAddFileBtn" type="button" class="btn-file-action" style="width:100%; margin-bottom: 8px;">📎 Прикрепить файл</button>
         <div class="modal-buttons">
             <button id="qeRevertBtn" type="button" class="modal-btn cancel">↺ Восстановить исходное</button>
             <button id="qeCancelBtn" type="button" class="modal-btn cancel">Отмена</button>
@@ -1130,6 +1153,21 @@ async function apiUploadScreenshot(imageDataUrl) {
     return res.json();
 }
 
+// Прикреплённый файл любого типа (не только изображение) — хранится и
+// раздаётся отдельно от скриншотов, всегда как вложение для скачивания.
+async function apiUploadFile(fileDataUrl, filename) {
+    const res = await fetch('/api/admin/file', {
+        method: 'POST',
+        headers: adminHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ fileDataUrl, filename }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Ошибка сервера (${res.status})`);
+    }
+    return res.json();
+}
+
 // Загрузка скриншота из виджета чата — без пароля кабинета, чат публичный.
 async function apiUploadChatScreenshot(imageDataUrl) {
     const res = await fetch('/api/chat/upload', {
@@ -1370,6 +1408,7 @@ function renderCards() {
         if (emptyState) emptyState.remove();
         currentDbData.forEach((item, i) => {
             const screenshots = Array.isArray(item.screenshots) ? item.screenshots : [];
+            const files = Array.isArray(item.files) ? item.files : [];
             const card = document.createElement('div');
             card.className = 'answer-card collapsed';
             card.setAttribute('data-id', item.id);
@@ -1386,6 +1425,13 @@ function renderCards() {
                         <span class="thumb-wrap">
                             <img class="question-screenshot-thumb" src="${s.url}" alt="Скриншот">
                             <button type="button" class="thumb-copy-btn" data-url="${s.url}" title="Скопировать — потом Ctrl+V в чат">📋</button>
+                        </span>
+                    `).join('')}</div>` : ''}
+                    ${files.length ? `<div class="question-files">${files.map(f => `
+                        <span class="question-file-chip">
+                            <span class="qe-file-icon">📎</span>
+                            <a class="qe-file-name" href="${f.url}" target="_blank" rel="noopener" title="${escapeHtml(f.name || '')}">${escapeHtml(f.name || 'файл')}</a>
+                            <span class="qe-file-size">${formatFileSize(f.size)}</span>
                         </span>
                     `).join('')}</div>` : ''}
                 </div>
@@ -2033,10 +2079,37 @@ const qeTitleInput = document.getElementById('qeTitleInput');
 const qeTextInput = document.getElementById('qeTextInput');
 const qeScreenshotsEl = document.getElementById('qeScreenshots');
 const qeFileInput = document.getElementById('qeFileInput');
+const qeFilesEl = document.getElementById('qeFiles');
+const qeAttachInput = document.getElementById('qeAttachInput');
 
 let qeScreenshots = [];
+let qeFiles = [];
 let qeOriginal = null;
 let qeResolve = null;
+
+function formatFileSize(bytes) {
+    if (!bytes && bytes !== 0) return '';
+    if (bytes < 1024) return bytes + ' Б';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' КБ';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' МБ';
+}
+
+function renderQeFiles() {
+    qeFilesEl.innerHTML = qeFiles.map((f, idx) => `
+        <span class="qe-file-chip">
+            <span class="qe-file-icon">📎</span>
+            <a class="qe-file-name" href="${f.url}" target="_blank" rel="noopener" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</a>
+            <span class="qe-file-size">${formatFileSize(f.size)}</span>
+            <button type="button" class="qe-file-remove" data-idx="${idx}" title="Удалить">✕</button>
+        </span>
+    `).join('');
+    qeFilesEl.querySelectorAll('.qe-file-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+            qeFiles.splice(Number(btn.dataset.idx), 1);
+            renderQeFiles();
+        });
+    });
+}
 
 function renderQeScreenshots() {
     qeScreenshotsEl.innerHTML = qeScreenshots.map((s, idx) => `
@@ -2063,11 +2136,13 @@ function renderQeScreenshots() {
 
 function openQuestionEditor({ mode, originalItem }) {
     qeTitleLabel.textContent = mode === 'edit' ? 'Изменить вопрос' : 'Новый вопрос';
-    qeOriginal = originalItem || { title: '', text: '', screenshots: [] };
+    qeOriginal = originalItem || { title: '', text: '', screenshots: [], files: [] };
     qeTitleInput.value = qeOriginal.title || '';
     qeTextInput.innerHTML = textToEditableHtml(qeOriginal.text || '');
     qeScreenshots = Array.isArray(qeOriginal.screenshots) ? [...qeOriginal.screenshots] : [];
+    qeFiles = Array.isArray(qeOriginal.files) ? [...qeOriginal.files] : [];
     renderQeScreenshots();
+    renderQeFiles();
     qeOverlay.classList.add('open');
     setTimeout(() => qeTitleInput.focus(), 50);
 
@@ -2099,15 +2174,42 @@ qeFileInput.addEventListener('change', async e => {
     }
     qeFileInput.value = '';
 });
+document.getElementById('qeAddFileBtn').addEventListener('click', () => qeAttachInput.click());
+qeAttachInput.addEventListener('change', async e => {
+    const files = Array.from(e.target.files || []);
+    for (const file of files) {
+        try {
+            const dataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+            const { url, name, size } = await apiUploadFile(dataUrl, file.name);
+            qeFiles.push({ url, name, size });
+            renderQeFiles();
+        } catch (err) {
+            showToast(`Не удалось загрузить "${file.name}": ` + err.message, 'error');
+        }
+    }
+    qeAttachInput.value = '';
+});
 document.getElementById('qeRevertBtn').addEventListener('click', () => {
     qeTitleInput.value = qeOriginal.title || '';
     qeTextInput.innerHTML = textToEditableHtml(qeOriginal.text || '');
     qeScreenshots = Array.isArray(qeOriginal.screenshots) ? [...qeOriginal.screenshots] : [];
+    qeFiles = Array.isArray(qeOriginal.files) ? [...qeOriginal.files] : [];
     renderQeScreenshots();
+    renderQeFiles();
 });
 document.getElementById('qeCancelBtn').addEventListener('click', () => closeQuestionEditor(null));
 document.getElementById('qeSaveBtn').addEventListener('click', () => {
-    closeQuestionEditor({ title: qeTitleInput.value, text: sanitizeRichHtml(qeTextInput.innerHTML), screenshots: qeScreenshots });
+    closeQuestionEditor({
+        title: qeTitleInput.value,
+        text: sanitizeRichHtml(qeTextInput.innerHTML),
+        screenshots: qeScreenshots,
+        files: qeFiles,
+    });
 });
 
 // ── Форматирование текста ответа (жирный/подчёркнутый/цвет/выделение) ───

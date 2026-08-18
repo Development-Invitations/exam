@@ -64,5 +64,11 @@
     "title": "Можно ли использовать клиентские приложения разной версии при работе с одной базой?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Нет</span><div><br></div></div></div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787046458585",
+    "title": "С какими СУБД может работать система 1С:Предприятие 8 через механизм внешних источников данных?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">С любыми СУБД, работающие через odbc интерфейс</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

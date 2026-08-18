@@ -44,7 +44,7 @@
   {
     "id": "1787046412961",
     "title": "Какая разрядность клиентских приложений существует в системе 1С:Предприятие 8?",
-    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">32-х разрядная и 64-разрядная для Windows и Linux, Только 64-х разрядная для MacOS</span><div><br></div></div></div></div></div></div></div></div>",
+    "text": "<span style=\"color: rgb(0, 0, 0)\">32-х разрядная и 64-разрядная для Windows и Linux, Только 64-х разрядная для MacOS</span>",
     "screenshots": []
   },
   {

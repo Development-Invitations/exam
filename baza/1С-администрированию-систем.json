@@ -262,5 +262,11 @@
     "title": "Отбор выводимой информации Журнала регистрации…",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">верны ответы 2, 3 и 4</span><div><br></div></div></div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787048199242",
+    "title": "Сколько файлов настройки технологического журнала необходимо сделать для сбора в отдельных папках логов по ошибкам работы компонент платформы, расследования ошибок запросов и операторов к СУБД, а также сбора информации о системе лицензирования",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

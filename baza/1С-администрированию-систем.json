@@ -112,5 +112,11 @@
     "title": "Что необходимо выбрать в составе компонент при установке платформы для возможности использования конфигуратора?",
     "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">1С:Предприятие</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
     "screenshots": []
+  },
+  {
+    "id": "1787046895384",
+    "title": "Какие варианты защиты от несанкционированного использования системы \"1С:Предприятие\" существуют?",
+    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Верные варианты 1, 2</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "screenshots": []
   }
 ]

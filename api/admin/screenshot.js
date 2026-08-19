@@ -6,8 +6,13 @@ const { verifyAdminPassword } = require('../_lib/admin');
 
 const SCREENSHOTS_DIR = 'screenshots';
 const FILES_DIR = 'files';
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 МБ — с запасом хватает для скриншота
-const MAX_FILE_BYTES = 20 * 1024 * 1024; // 20 МБ — предел GitHub Contents API на файл через base64
+// Vercel Serverless Functions режут тело запроса на уровне платформы —
+// жёсткий лимит 4.5 МБ, не настраивается даже на платных планах. Base64
+// раздувает исходный файл примерно в 1.33 раза, плюс небольшой отступ на
+// служебные поля JSON — отсюда границы ниже (иначе сервер отвечает 413
+// ещё до того, как код функции вообще запустится).
+const MAX_IMAGE_BYTES = 3 * 1024 * 1024; // 3 МБ исходного файла ≈ 4 МБ в base64
+const MAX_FILE_BYTES = 3 * 1024 * 1024;
 
 function extFromMime(mime) {
     if (mime === 'image/png') return 'png';

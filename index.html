@@ -2160,6 +2160,10 @@ document.getElementById('qeAddScreenshotBtn').addEventListener('click', () => qe
 qeFileInput.addEventListener('change', async e => {
     const files = Array.from(e.target.files || []);
     for (const file of files) {
+        if (file.size > MAX_ATTACH_BYTES) {
+            showToast(`"${file.name}" слишком большой (макс. ${(MAX_ATTACH_BYTES / 1024 / 1024).toFixed(0)} МБ) — ограничение самого Vercel на размер запроса`, 'error');
+            continue;
+        }
         try {
             const dataUrl = await new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -2177,9 +2181,17 @@ qeFileInput.addEventListener('change', async e => {
     qeFileInput.value = '';
 });
 document.getElementById('qeAddFileBtn').addEventListener('click', () => qeAttachInput.click());
+// Vercel режет тело запроса на уровне платформы — 4.5 МБ жёстко, даже на
+// платных планах. Проверяем размер сразу на клиенте, чтобы не тратить
+// время на загрузку и не получать невнятный "Ошибка сервера (413)".
+const MAX_ATTACH_BYTES = 3 * 1024 * 1024;
 qeAttachInput.addEventListener('change', async e => {
     const files = Array.from(e.target.files || []);
     for (const file of files) {
+        if (file.size > MAX_ATTACH_BYTES) {
+            showToast(`"${file.name}" слишком большой (макс. ${(MAX_ATTACH_BYTES / 1024 / 1024).toFixed(0)} МБ) — ограничение самого Vercel на размер запроса`, 'error');
+            continue;
+        }
         try {
             const dataUrl = await new Promise((resolve, reject) => {
                 const reader = new FileReader();

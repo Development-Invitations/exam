@@ -1484,7 +1484,7 @@
   {
     "id": "1787147605300",
     "title": "В каком файле осуществляются настройки HASP License Manager?",
-    "text": "nethasp.ini",
+    "text": "nhsrv.ini",
     "screenshots": []
   }
 ]

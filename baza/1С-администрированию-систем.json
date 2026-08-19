@@ -176,7 +176,7 @@
   {
     "id": "1787047000679",
     "title": "В каком файле осуществляются настройки параметров взаимодействия системы \"1С:Предприятие\" с HASP License Manager?",
-    "text": "<span style=\"color: rgb(0, 0, 0)\">nethasp.ini</span>",
+    "text": "<span style=\"color: rgb(0, 0, 0)\">nhsrv.ini</span>",
     "screenshots": []
   },
   {

@@ -1,8 +1,13 @@
+// Загрузка скриншота ИЛИ произвольного файла-вложения из кабинета —
+// объединены в одну функцию (а не в отдельные screenshot.js/file.js),
+// т.к. на Vercel Hobby-плане жёсткий лимит 12 serverless-функций в /api/.
 const { assertGithubConfig, putBinaryFile, getImageUrl } = require('../_lib/github');
 const { verifyAdminPassword } = require('../_lib/admin');
 
 const SCREENSHOTS_DIR = 'screenshots';
-const MAX_BYTES = 5 * 1024 * 1024; // 5 МБ — с запасом хватает для скриншота
+const FILES_DIR = 'files';
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 МБ — с запасом хватает для скриншота
+const MAX_FILE_BYTES = 20 * 1024 * 1024; // 20 МБ — предел GitHub Contents API на файл через base64
 
 function extFromMime(mime) {
     if (mime === 'image/png') return 'png';
@@ -10,6 +15,17 @@ function extFromMime(mime) {
     if (mime === 'image/webp') return 'webp';
     if (mime === 'image/gif') return 'gif';
     return null;
+}
+
+// Имя на диске (в репозитории) должно быть безопасно для Windows/URL —
+// оригинальное имя пользователя может содержать что угодно (те же
+// проблемы, что были с ":" в названии раздела). Показывать пользователю
+// при скачивании будем настоящее имя — оно передаётся отдельно через
+// параметр "name" в ссылке, само хранение это не затрагивает.
+function sanitizeStorageName(name) {
+    const base = String(name || 'file').split('/').pop().split('\\').pop();
+    const safe = base.replace(/[^a-zA-Z0-9._-]/g, '_');
+    return (safe || 'file').slice(-80);
 }
 
 module.exports = async (req, res) => {
@@ -21,23 +37,45 @@ module.exports = async (req, res) => {
             return res.status(401).json({ error: 'Неверный пароль кабинета' });
         }
 
-        const { imageDataUrl } = req.body || {};
-        const match = /^data:(image\/(?:png|jpeg|webp|gif));base64,(.+)$/.exec(imageDataUrl || '');
-        if (!match) return res.status(400).json({ error: 'Ожидается изображение (PNG/JPEG/WEBP/GIF) в виде data URL' });
+        const { imageDataUrl, fileDataUrl, filename } = req.body || {};
 
-        const [, mime, base64] = match;
-        const ext = extFromMime(mime);
-        const buffer = Buffer.from(base64, 'base64');
-        if (buffer.length > MAX_BYTES) {
-            return res.status(400).json({ error: `Файл слишком большой (макс. ${MAX_BYTES / 1024 / 1024} МБ)` });
+        if (imageDataUrl) {
+            const match = /^data:(image\/(?:png|jpeg|webp|gif));base64,(.+)$/.exec(imageDataUrl);
+            if (!match) return res.status(400).json({ error: 'Ожидается изображение (PNG/JPEG/WEBP/GIF) в виде data URL' });
+
+            const [, mime, base64] = match;
+            const ext = extFromMime(mime);
+            const buffer = Buffer.from(base64, 'base64');
+            if (buffer.length > MAX_IMAGE_BYTES) {
+                return res.status(400).json({ error: `Файл слишком большой (макс. ${MAX_IMAGE_BYTES / 1024 / 1024} МБ)` });
+            }
+
+            const fname = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const path = `${SCREENSHOTS_DIR}/${fname}`;
+            await putBinaryFile(path, base64, `Кабинет: загрузка скриншота ${fname}`);
+            return res.status(200).json({ success: true, url: getImageUrl(path), path });
         }
 
-        const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-        const path = `${SCREENSHOTS_DIR}/${filename}`;
+        if (fileDataUrl) {
+            const match = /^data:([^;]*);base64,(.+)$/.exec(fileDataUrl);
+            if (!match) return res.status(400).json({ error: 'Некорректный файл' });
 
-        await putBinaryFile(path, base64, `Кабинет: загрузка скриншота ${filename}`);
+            const [, , base64] = match;
+            const buffer = Buffer.from(base64, 'base64');
+            if (buffer.length > MAX_FILE_BYTES) {
+                return res.status(400).json({ error: `Файл слишком большой (макс. ${MAX_FILE_BYTES / 1024 / 1024} МБ)` });
+            }
 
-        return res.status(200).json({ success: true, url: getImageUrl(path), path });
+            const storedName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${sanitizeStorageName(filename)}`;
+            const path = `${FILES_DIR}/${storedName}`;
+            await putBinaryFile(path, base64, `Кабинет: загрузка файла ${storedName}`);
+
+            const displayName = String(filename || storedName).slice(0, 200);
+            const url = `${getImageUrl(path)}&name=${encodeURIComponent(displayName)}`;
+            return res.status(200).json({ success: true, url, name: displayName, size: buffer.length });
+        }
+
+        return res.status(400).json({ error: 'Не передан файл' });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: err.message });

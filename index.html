@@ -1153,10 +1153,12 @@ async function apiUploadScreenshot(imageDataUrl) {
     return res.json();
 }
 
-// Прикреплённый файл любого типа (не только изображение) — хранится и
-// раздаётся отдельно от скриншотов, всегда как вложение для скачивания.
+// Прикреплённый файл любого типа (не только изображение) — хранится
+// отдельно от скриншотов (папка files/), но идёт через тот же эндпоинт
+// /api/admin/screenshot и раздаётся через тот же /api/image — на Vercel
+// Hobby-плане лимит 12 функций в /api/, отдельные файлы под это не заводим.
 async function apiUploadFile(fileDataUrl, filename) {
-    const res = await fetch('/api/admin/file', {
+    const res = await fetch('/api/admin/screenshot', {
         method: 'POST',
         headers: adminHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ fileDataUrl, filename }),

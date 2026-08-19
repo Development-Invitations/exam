@@ -440,7 +440,7 @@
   {
     "id": "1787050239833",
     "title": "Что делать, если пользователь забыл пароль?",
-    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Просмотр пароля не доступен, Администратор меняет пароль пользователю и отправляет новый.</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "text": "<span style=\"color: rgb(0, 0, 0)\">Просмотр пароля не доступен, Администратор меняет пароль пользователю и отправляет новый.</span>",
     "screenshots": []
   },
   {

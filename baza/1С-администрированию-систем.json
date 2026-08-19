@@ -74,7 +74,7 @@
   {
     "id": "1787046466385",
     "title": "Шаблоны конфигураций...",
-    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">служат прототипами создаваемых информационных баз и устанавливаются в каталог шаблонов, указываемый пользователем</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "text": "<span style=\"color: rgb(0, 0, 0)\">служат прототипами создаваемых информационных баз и устанавливаются в каталог шаблонов, указываемый пользователем</span><div><span style=\"color: rgb(184, 184, 191)\"><br></span></div>",
     "screenshots": []
   },
   {

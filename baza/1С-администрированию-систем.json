@@ -398,7 +398,7 @@
   {
     "id": "1787050146697",
     "title": "При использовании единой базы у сотрудников склада и бухгалтерии в диалоге аутентификации должны показываться разные списки пользователей. Как это реализовать?",
-    "text": "<div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div style=\"background-color: rgb(25, 64, 35)\"><span style=\"color: rgb(184, 184, 191)\">Необходимо использовать механизм разделения данных</span></div></div></div></div></div><div style=\"background-color: rgb(26, 26, 26)\"><div><div><div><div></div></div></div></div></div>",
+    "text": "<span style=\"color: rgb(0, 0, 0)\">Необходимо использовать механизм разделения данных</span>",
     "screenshots": []
   },
   {

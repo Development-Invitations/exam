@@ -1,7 +1,7 @@
 // Загрузка скриншота ИЛИ произвольного файла-вложения из кабинета —
 // объединены в одну функцию (а не в отдельные screenshot.js/file.js),
 // т.к. на Vercel Hobby-плане жёсткий лимит 12 serverless-функций в /api/.
-const { assertGithubConfig, putBinaryFile, getImageUrl } = require('../_lib/github');
+const { assertGithubConfig, putBinaryFile, getFile, deleteFile, getImageUrl } = require('../_lib/github');
 const { verifyAdminPassword } = require('../_lib/admin');
 
 const SCREENSHOTS_DIR = 'screenshots';
@@ -33,7 +33,33 @@ function sanitizeStorageName(name) {
     return (safe || 'file').slice(-80);
 }
 
+// Удаление скриншота/файла-вложения из репозитория — раньше при удалении
+// из списка в редакторе ссылка пропадала из вопроса, а сам файл в
+// screenshots/ или files/ оставался висеть в репозитории навсегда.
+const DELETE_ALLOWED_PATH = /^(screenshots|files)\/[a-zA-Z0-9_.-]+$/;
+
 module.exports = async (req, res) => {
+    if (req.method === 'DELETE') {
+        try {
+            assertGithubConfig();
+            const password = req.headers['x-admin-password'];
+            if (!(await verifyAdminPassword(password))) {
+                return res.status(401).json({ error: 'Неверный пароль кабинета' });
+            }
+            const { path } = req.query;
+            if (!path || typeof path !== 'string' || !DELETE_ALLOWED_PATH.test(path)) {
+                return res.status(400).json({ error: 'Некорректный путь к файлу' });
+            }
+            const existing = await getFile(path).catch(() => null);
+            if (!existing) return res.status(200).json({ success: true }); // уже удалён — не ошибка
+            await deleteFile(path, `Кабинет: удаление файла ${path}`, existing.sha);
+            return res.status(200).json({ success: true });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: err.message });
+        }
+    }
+
     if (req.method !== 'POST') return res.status(405).json({ error: 'Метод не поддерживается' });
     try {
         assertGithubConfig();

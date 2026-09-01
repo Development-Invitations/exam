@@ -1170,6 +1170,37 @@ async function apiUploadFile(fileDataUrl, filename) {
     return res.json();
 }
 
+// Достаём внутренний путь в репозитории (screenshots/... или files/...)
+// из ссылки вида /api/image?path=...&name=... — чтобы удалить физический
+// файл, а не только его ссылку из вопроса.
+function extractStoragePath(url) {
+    try {
+        return new URL(url, location.origin).searchParams.get('path');
+    } catch {
+        return null;
+    }
+}
+
+// Удаляет сам файл из репозитория (не только ссылку из вопроса) — иначе
+// он остаётся висеть в screenshots/ или files/ навсегда. Сбой удаления не
+// должен мешать убрать вложение из списка — просто предупреждаем тостом.
+async function apiDeleteAttachment(url) {
+    const path = extractStoragePath(url);
+    if (!path) return;
+    try {
+        const res = await fetch(`/api/admin/screenshot?path=${encodeURIComponent(path)}`, {
+            method: 'DELETE',
+            headers: adminHeaders(),
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `Ошибка сервера (${res.status})`);
+        }
+    } catch (err) {
+        showToast('Файл удалён из вопроса, но не удалось стереть его из репозитория: ' + err.message, 'error');
+    }
+}
+
 // Загрузка скриншота из виджета чата — без пароля кабинета, чат публичный.
 async function apiUploadChatScreenshot(imageDataUrl) {
     const res = await fetch('/api/chat/upload', {
@@ -2088,6 +2119,11 @@ let qeScreenshots = [];
 let qeFiles = [];
 let qeOriginal = null;
 let qeResolve = null;
+// Ссылки, помеченные на удаление из репозитория — стираем физически
+// только при реальном сохранении. Если сохранить убранный скриншот/файл
+// сразу по клику "✕", то "Отмена" и "Восстановить исходное" будут
+// показывать вернувшуюся ссылку на уже стёртый файл.
+let qeDeletedUrls = [];
 
 function formatFileSize(bytes) {
     if (!bytes && bytes !== 0) return '';
@@ -2107,7 +2143,8 @@ function renderQeFiles() {
     `).join('');
     qeFilesEl.querySelectorAll('.qe-file-remove').forEach(btn => {
         btn.addEventListener('click', () => {
-            qeFiles.splice(Number(btn.dataset.idx), 1);
+            const [removed] = qeFiles.splice(Number(btn.dataset.idx), 1);
+            if (removed) qeDeletedUrls.push(removed.url);
             renderQeFiles();
         });
     });
@@ -2130,7 +2167,8 @@ function renderQeScreenshots() {
     });
     qeScreenshotsEl.querySelectorAll('.qe-thumb-remove').forEach(btn => {
         btn.addEventListener('click', () => {
-            qeScreenshots.splice(Number(btn.dataset.idx), 1);
+            const [removed] = qeScreenshots.splice(Number(btn.dataset.idx), 1);
+            if (removed) qeDeletedUrls.push(removed.url);
             renderQeScreenshots();
         });
     });
@@ -2143,6 +2181,7 @@ function openQuestionEditor({ mode, originalItem }) {
     qeTextInput.innerHTML = textToEditableHtml(qeOriginal.text || '');
     qeScreenshots = Array.isArray(qeOriginal.screenshots) ? [...qeOriginal.screenshots] : [];
     qeFiles = Array.isArray(qeOriginal.files) ? [...qeOriginal.files] : [];
+    qeDeletedUrls = [];
     renderQeScreenshots();
     renderQeFiles();
     qeOverlay.classList.add('open');
@@ -2208,16 +2247,41 @@ qeAttachInput.addEventListener('change', async e => {
     }
     qeAttachInput.value = '';
 });
+// Вложения, загруженные в этой сессии редактирования, но так и не
+// сохранённые (пользователь нажал "Отмена" или "Восстановить исходное") —
+// тоже нужно стереть из репозитория, иначе они останутся висеть без
+// единой ссылки на себя.
+function collectOrphanedNewUploads() {
+    const originalUrls = new Set([
+        ...(Array.isArray(qeOriginal.screenshots) ? qeOriginal.screenshots.map(s => s.url) : []),
+        ...(Array.isArray(qeOriginal.files) ? qeOriginal.files.map(f => f.url) : []),
+    ]);
+    return [...qeScreenshots, ...qeFiles]
+        .map(x => x.url)
+        .filter(url => !originalUrls.has(url));
+}
+async function flushDeletedAttachments(urls) {
+    await Promise.all(urls.map(url => apiDeleteAttachment(url)));
+}
+
 document.getElementById('qeRevertBtn').addEventListener('click', () => {
+    const orphaned = collectOrphanedNewUploads(); // новые загрузки этой сессии — при откате пропадут без следа
+    qeDeletedUrls = []; // ранее убранные ИСХОДНЫЕ вложения при откате возвращаются — их удалять не нужно
     qeTitleInput.value = qeOriginal.title || '';
     qeTextInput.innerHTML = textToEditableHtml(qeOriginal.text || '');
     qeScreenshots = Array.isArray(qeOriginal.screenshots) ? [...qeOriginal.screenshots] : [];
     qeFiles = Array.isArray(qeOriginal.files) ? [...qeOriginal.files] : [];
     renderQeScreenshots();
     renderQeFiles();
+    if (orphaned.length) flushDeletedAttachments(orphaned);
 });
-document.getElementById('qeCancelBtn').addEventListener('click', () => closeQuestionEditor(null));
-document.getElementById('qeSaveBtn').addEventListener('click', () => {
+document.getElementById('qeCancelBtn').addEventListener('click', () => {
+    const orphaned = collectOrphanedNewUploads();
+    if (orphaned.length) flushDeletedAttachments(orphaned);
+    closeQuestionEditor(null);
+});
+document.getElementById('qeSaveBtn').addEventListener('click', async () => {
+    if (qeDeletedUrls.length) await flushDeletedAttachments(qeDeletedUrls);
     closeQuestionEditor({
         title: qeTitleInput.value,
         text: sanitizeRichHtml(qeTextInput.innerHTML),

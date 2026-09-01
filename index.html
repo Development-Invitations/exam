@@ -1597,7 +1597,7 @@ document.getElementById('btnAdd').addEventListener('click', async () => {
         isNewDb = true;
     }
 
-    const newItem = { id: Date.now().toString(), title, text, screenshots: result.screenshots || [] };
+    const newItem = { id: Date.now().toString(), title, text, screenshots: result.screenshots || [], files: result.files || [] };
     const dataToSave = [...currentDbData, newItem];
 
     try {
@@ -1649,7 +1649,7 @@ async function editQuestion(id) {
 
     const previousData = currentDbData;
     const newData = currentDbData.map(i => i.id === id
-        ? { ...i, title, text, screenshots: result.screenshots || [] }
+        ? { ...i, title, text, screenshots: result.screenshots || [], files: result.files || [] }
         : i);
     try {
         await apiSaveDb(currentDbName, newData);

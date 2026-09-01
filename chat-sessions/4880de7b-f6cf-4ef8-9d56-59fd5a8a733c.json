@@ -24,5 +24,39 @@
     "from": "user",
     "text": "Помогите",
     "ts": 1786186628941
+  },
+  {
+    "id": "1787676963670-lxevd3",
+    "from": "user",
+    "text": "Привет всем это тест",
+    "ts": 1787676963670
+  },
+  {
+    "id": "1787676976792-uwz5fc",
+    "from": "admin",
+    "text": "Хорошо",
+    "ts": 1787676976792,
+    "authorName": "Азамов"
+  },
+  {
+    "id": "1787736691304-88kkco",
+    "from": "admin",
+    "text": "Assalomu alaykum\nBugun bora olmayman shekilli, uzr",
+    "ts": 1787736691304,
+    "authorName": "Firdavsbek 773"
+  },
+  {
+    "id": "1787769519185-tki0qx",
+    "from": "admin",
+    "text": "Assalomu alaykum\nMoshinani orqa labavoyiga Instagram, telegram ssilkalarni yozib qo'ysak qanday bo'larkin",
+    "ts": 1787769519185,
+    "authorName": "Firdavsbek 773"
+  },
+  {
+    "id": "1787770963491-b52e41",
+    "from": "admin",
+    "text": "Va alaykum assalom yaxshi fikir buni oldin o’ylab qo’ygandim bir zakaz ham qildim keyin esdan chiqib qolganiydi",
+    "ts": 1787770963491,
+    "authorName": "AUDITOR 1C"
   }
 ]

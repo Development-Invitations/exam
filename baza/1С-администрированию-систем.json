@@ -914,8 +914,9 @@
   {
     "id": "1787137448864",
     "title": "Какое имя у файла приложения сервера хранилища?",
-    "text": "crserver<div><br></div>",
-    "screenshots": []
+    "text": "crserver",
+    "screenshots": [],
+    "files": []
   },
   {
     "id": "1787137461624",

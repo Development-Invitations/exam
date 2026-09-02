@@ -1077,8 +1077,9 @@
   {
     "id": "1787138488748",
     "title": "Какое имя у файла расширения веб-сервера IIS?",
-    "text": "wsisapi.dll<div><br></div>",
-    "screenshots": []
+    "text": "wsisapi.dll",
+    "screenshots": [],
+    "files": []
   },
   {
     "id": "1787138495644",

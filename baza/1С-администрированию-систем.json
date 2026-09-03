@@ -1386,8 +1386,9 @@
   {
     "id": "1787139940772",
     "title": "Что делает команда? ring cs --instance <cs_instance> service create --java-home \"%JAVA_HOME%\" --stopped",
-    "text": "Регистрирует службу сервера взаимодействия<div><br></div>",
-    "screenshots": []
+    "text": "Регистрирует службу сервера взаимодействия",
+    "screenshots": [],
+    "files": []
   },
   {
     "id": "1787139947531",

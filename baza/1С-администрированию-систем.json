@@ -1339,8 +1339,9 @@
   {
     "id": "1787139892948",
     "title": "Из каких компонент состоит сервер взаимодействия?",
-    "text": "hazelcast, elasticsearch, cs<div><br></div>",
-    "screenshots": []
+    "text": "hazelcast, elasticsearch, cs",
+    "screenshots": [],
+    "files": []
   },
   {
     "id": "1787139898460",

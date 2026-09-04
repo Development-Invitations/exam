@@ -102,8 +102,9 @@
   {
     "id": "1787046651758",
     "title": "Какое имя исполняемого файла запуска системы 1С:Предприятие 8 для конкретной версии платформы?",
-    "text": "<span style=\"color: rgb(0, 0, 0)\">1cv8s</span><div><span style=\"color: rgb(184, 184, 191)\"><br></span></div>",
-    "screenshots": []
+    "text": "<span style=\"color: rgb(0, 0, 0)\">1cv8s</span>",
+    "screenshots": [],
+    "files": []
   },
   {
     "id": "1787046666151",

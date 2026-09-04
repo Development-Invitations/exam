@@ -2208,5 +2208,12 @@
     "text": "Без платформы JAVA",
     "screenshots": [],
     "files": []
+  },
+  {
+    "id": "1788499534136",
+    "title": "Что делает команда? ring cs instance create --dir %ProgramData%\\1C\\1CE\\instances\\<cs_instance>",
+    "text": "Создает конфигурационные файлы сервера взаимодействия",
+    "screenshots": [],
+    "files": []
   }
 ]

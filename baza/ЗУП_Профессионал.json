@@ -1789,5 +1789,16 @@
       }
     ],
     "files": []
+  },
+  {
+    "id": "1790744942732",
+    "title": "В справочнике \"Виды отпусков\" элемент \"Дополнительный отпуск\":",
+    "text": "При необходимости добавляется в справочник вручную<div><br></div>",
+    "screenshots": [
+      {
+        "url": "https://exam-ruddy-six.vercel.app/api/image?path=screenshots%2F1790744939180-omx7fs.png"
+      }
+    ],
+    "files": []
   }
 ]

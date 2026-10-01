@@ -3625,5 +3625,16 @@
     "text": "В справочнике \"Банковские счета контрагентов\"<div><br></div>",
     "screenshots": [],
     "files": []
+  },
+  {
+    "id": "1790853918933",
+    "title": "Как в списке справочника \"Сотрудники\" выделить все элементы?",
+    "text": "Верны ответы 1 и 2<div><br></div>",
+    "screenshots": [
+      {
+        "url": "https://exam-ruddy-six.vercel.app/api/image?path=screenshots%2F1790853916014-dq6xe6.png"
+      }
+    ],
+    "files": []
   }
 ]

@@ -8,7 +8,7 @@ const { getJson, updateJson } = require('./github');
 
 const SETTINGS_PATH = 'admin/settings.json';
 const CODES_PATH = 'admin/access-codes.json';
-const DEFAULT_PASSWORD = '0404';
+const DEFAULT_PASSWORD = '2024';
 
 async function getAdminPassword() {
     const { data } = await getJson(SETTINGS_PATH, { password: DEFAULT_PASSWORD });
